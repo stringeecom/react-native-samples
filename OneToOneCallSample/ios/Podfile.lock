@@ -1,0 +1,46 @@
+PODS:
+  - React (0.52.3):
+    - React/Core (= 0.52.3)
+  - React/Core (0.52.3):
+    - yoga (= 0.52.3.React)
+  - React/DevSupport (0.52.3):
+    - React/Core
+    - React/RCTWebSocket
+  - React/fishhook (0.52.3)
+  - React/RCTBlob (0.52.3):
+    - React/Core
+  - React/RCTNetwork (0.52.3):
+    - React/Core
+  - React/RCTWebSocket (0.52.3):
+    - React/Core
+    - React/fishhook
+    - React/RCTBlob
+  - RNStringee (1.0.0):
+    - React
+    - Stringee
+  - Stringee (1.2.5)
+  - yoga (0.52.3.React)
+
+DEPENDENCIES:
+  - React/DevSupport (from `../node_modules/react-native`)
+  - React/RCTNetwork (from `../node_modules/react-native`)
+  - RNStringee (from `../node_modules/stringee-react-native/ios`)
+  - yoga (from `../node_modules/react-native/ReactCommon/yoga/yoga.podspec`)
+
+EXTERNAL SOURCES:
+  React:
+    :path: ../node_modules/react-native
+  RNStringee:
+    :path: ../node_modules/stringee-react-native/ios
+  yoga:
+    :path: ../node_modules/react-native/ReactCommon/yoga/yoga.podspec
+
+SPEC CHECKSUMS:
+  React: 43e97926f429d846050880666de1809e22dd5cc5
+  RNStringee: f37e7ee14a85a46a2ae8783bfe20ea06af639464
+  Stringee: cd41b9f3bff08ba698c37cfa32c3fb0c8e947a71
+  yoga: 55da126afc384965b96bff46652464373b330add
+
+PODFILE CHECKSUM: 4590e2452e6b9841246546046ce186147d2ecbb7
+
+COCOAPODS: 1.4.0
