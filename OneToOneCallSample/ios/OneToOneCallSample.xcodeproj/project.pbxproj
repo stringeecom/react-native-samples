@@ -5,7 +5,6 @@
 	};
 	objectVersion = 46;
 	objects = {
-
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -24,6 +23,7 @@
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 		ADBDB9381DFEBF1600ED6528 /* libRCTBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ADBDB9271DFEBF0700ED6528 /* libRCTBlob.a */; };
 		F76485AA378F62B15C7B4566 /* libPods-OneToOneCallSample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7B0160F1C871679C7298094E /* libPods-OneToOneCallSample.a */; };
+		FDD568284E8E4A2DAD280F9C /* libRNStringee.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1CB0206056D24E2FA338CFAC /* libRNStringee.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -313,6 +313,8 @@
 		84890FB8D28954CB56D8DF23 /* Pods-OneToOneCallSample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OneToOneCallSample.debug.xcconfig"; path = "Pods/Target Support Files/Pods-OneToOneCallSample/Pods-OneToOneCallSample.debug.xcconfig"; sourceTree = "<group>"; };
 		ADBDB91F1DFEBF0600ED6528 /* RCTBlob.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTBlob.xcodeproj; path = "../node_modules/react-native/Libraries/Blob/RCTBlob.xcodeproj"; sourceTree = "<group>"; };
 		C3E7716615D900A73191FF6C /* Pods-OneToOneCallSample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OneToOneCallSample.release.xcconfig"; path = "Pods/Target Support Files/Pods-OneToOneCallSample/Pods-OneToOneCallSample.release.xcconfig"; sourceTree = "<group>"; };
+		8CACA2390397487A873784EA /* RNStringee.xcodeproj */ = {isa = PBXFileReference; name = "RNStringee.xcodeproj"; path = "../node_modules/stringee-react-native/ios/RNStringee.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		1CB0206056D24E2FA338CFAC /* libRNStringee.a */ = {isa = PBXFileReference; name = "libRNStringee.a"; path = "libRNStringee.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -334,6 +336,7 @@
 				00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */,
 				139FDEF61B0652A700C62182 /* libRCTWebSocket.a in Frameworks */,
 				F76485AA378F62B15C7B4566 /* libPods-OneToOneCallSample.a in Frameworks */,
+				FDD568284E8E4A2DAD280F9C /* libRNStringee.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -490,6 +493,7 @@
 				832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */,
 				00C302DF1ABCB9EE00DB3ED1 /* RCTVibration.xcodeproj */,
 				139FDEE61B06529A00C62182 /* RCTWebSocket.xcodeproj */,
+				8CACA2390397487A873784EA /* RNStringee.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -564,7 +568,7 @@
 		83CBB9F71A601CBA00E9B192 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0610;
+				LastUpgradeCheck = 610;
 				ORGANIZATIONNAME = Facebook;
 				TargetAttributes = {
 					13B07F861A680F5B00A75B9A = {
@@ -1027,6 +1031,14 @@
 				PROVISIONING_PROFILE = "cf8caa6b-c105-491f-b555-b0e1e0ed701a";
 				PROVISIONING_PROFILE_SPECIFIER = Callkit_develop_provision;
 				VERSIONING_SYSTEM = "apple-generic";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/OneToOneCallSample\"",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)\..\node_modules\stringee-react-native\ios",
+				);
 			};
 			name = Debug;
 		};
@@ -1052,6 +1064,14 @@
 				PROVISIONING_PROFILE = "c1daf5de-095e-433d-b860-02860f5990fc";
 				PROVISIONING_PROFILE_SPECIFIER = Callkit_product_provision;
 				VERSIONING_SYSTEM = "apple-generic";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRCROOT)/OneToOneCallSample\"",
+				);
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)\..\node_modules\stringee-react-native\ios",
+				);
 			};
 			name = Release;
 		};
