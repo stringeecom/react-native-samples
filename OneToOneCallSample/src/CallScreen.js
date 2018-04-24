@@ -12,9 +12,7 @@ import {
 
 import {
   StringeeCall,
-  StringeeVideoView,
-  StringeeLocalVideoView,
-  StringeeRemoteVideoView
+  StringeeVideoView
 } from "stringee-react-native";
 
 var height = Dimensions.get("window").height;
@@ -28,9 +26,6 @@ const speakerImg_selected = require("../resource/speaker_selected.png");
 
 const videoDisableImg = require("../resource/video_disable.png");
 const videoEnableImg = require("../resource/video_enable.png");
-
-var isVideoCall;
-var callId;
 
 export default class CallScreen extends Component {
   constructor(props) {
@@ -50,6 +45,9 @@ export default class CallScreen extends Component {
   state = {
     userId: "UserId",
     callState: "Outgoing call",
+
+    isVideoCall:false,
+    callId:'',
 
     isMute: false,
     isSpeaker: false,
@@ -75,7 +73,7 @@ export default class CallScreen extends Component {
     const isOutgoingCall = params ? params.isOutgoingCall : false;
     const from = params ? params.from : "";
     const to = params ? params.to : "";
-    this.isVideoCall = params ? params.isVideoCall : false;
+    const isVideoCall = params ? params.isVideoCall : false;
 
     console.log("isVideoCall " + isVideoCall);
 
@@ -83,7 +81,7 @@ export default class CallScreen extends Component {
       const myObj = {
         from: from,
         to: to,
-        isVideoCall: this.isVideoCall,
+        isVideoCall: isVideoCall,
         videoResolution: "NORMAL"
       };
 
@@ -95,12 +93,13 @@ export default class CallScreen extends Component {
         isShowAcceptBt: false,
         isShowOptionView: true,
         isOutgoingCall: isOutgoingCall,
-        userId: to
+        userId: to,
+        isVideoCall: isVideoCall
       });
       this.refs.stringeeCall.makeCall(
         parameters,
         (status, code, message, callId) => {
-          this.callId = callId;
+          this.setState({callId:callId});
           console.log(
             "status-" +
               status +
@@ -113,7 +112,7 @@ export default class CallScreen extends Component {
         }
       );
     } else {
-      this.callId = params ? params.callId : "";
+      const callId = params ? params.callId : "";
       this.setState({
         isShowDeclineBt: true,
         isShowEndBt: false,
@@ -121,11 +120,13 @@ export default class CallScreen extends Component {
         isShowOptionView: false,
         isOutgoingCall: isOutgoingCall,
         userId: from,
-        callState: "Incoming call"
+        callState: "Incoming call",
+        isVideoCall: isVideoCall,
+        callId: callId
       });
 
       this.refs.stringeeCall.initAnswer(
-        this.callId,
+        callId,
         (status, code, message) => {
           console.log(message);
         }
@@ -226,7 +227,7 @@ export default class CallScreen extends Component {
   // Action
   _onDeclinePress = () => {
     console.log("_onDeclinePress");
-    this.refs.stringeeCall.reject(this.callId, (status, code, message) => {
+    this.refs.stringeeCall.reject(this.state.callId, (status, code, message) => {
       console.log(message);
       this.endCallAndDismissView();
     });
@@ -234,7 +235,7 @@ export default class CallScreen extends Component {
 
   _onEndCallPress = () => {
     console.log("_onEndCallPress" + this.callId);
-    this.refs.stringeeCall.hangup(this.callId, (status, code, message) => {
+    this.refs.stringeeCall.hangup(this.state.callId, (status, code, message) => {
       console.log(message);
       this.endCallAndDismissView();
     });
@@ -242,7 +243,7 @@ export default class CallScreen extends Component {
 
   _onAcceptCallPress = () => {
     console.log("_onAcceptCallPress");
-    this.refs.stringeeCall.answer(this.callId, (status, code, message) => {
+    this.refs.stringeeCall.answer(this.state.callId, (status, code, message) => {
       console.log(message);
       if (status) {
         this.setState({
@@ -259,7 +260,7 @@ export default class CallScreen extends Component {
 
   _onMutePress = () => {
     this.refs.stringeeCall.mute(
-      this.callId,
+      this.state.callId,
       !this.state.isMute,
       (status, code, message) => {
         console.log("_onMutePress" + message);
@@ -272,7 +273,7 @@ export default class CallScreen extends Component {
 
   _onSpeakerPress = () => {
     this.refs.stringeeCall.setSpeakerphoneOn(
-      this.callId,
+      this.state.callId,
       !this.state.isSpeaker,
       (status, code, message) => {
         if (status) {
@@ -284,15 +285,15 @@ export default class CallScreen extends Component {
 
   _onSwitchCameraPress = () => {
     this.refs.stringeeCall.switchCamera(
-      this.callId,
+      this.state.callId,
       (status, code, message) => {}
     );
   };
 
   _onVideoPress = () => {
-    if (this.isVideoCall) {
+    if (this.state.isVideoCall) {
       this.refs.stringeeCall.enableVideo(
-        this.callId,
+        this.state.callId,
         !this.state.isEnableVideo,
         (status, code, message) => {
           if (status) {
@@ -325,47 +326,28 @@ export default class CallScreen extends Component {
   render() {
     return (
       <View style={styles.container}>
-        {this.isVideoCall &&
-          this.callId !== "" &&
-          this.state.hasReceivedRemoteStream && (
-            <StringeeRemoteVideoView
-              style={styles.remoteView}
-              callId={this.callId}
-              streamId=""
-            />
-          )}
 
-        {this.state.hasReceivedLocalStream &&
-          this.callId !== "" &&
-          this.isVideoCall && (
-            <StringeeLocalVideoView
-              style={styles.localView}
-              callId={this.callId}
-              streamId=""
-            />
-          )}
-
-        {this.isVideoCall &&
-          this.callId !== "" &&
+        {this.state.isVideoCall &&
+          this.state.callId !== "" &&
           this.state.hasReceivedRemoteStream && (
             <StringeeVideoView
               style={styles.remoteView}
-              callId={this.callId}
+              callId={this.state.callId}
               local={false}
             />
           )}
 
         {this.state.hasReceivedLocalStream &&
-          this.callId !== "" &&
-          this.isVideoCall && (
+          this.state.callId !== "" &&
+          this.state.isVideoCall && (
             <StringeeVideoView
               style={styles.localView}
-              callId={this.callId}
+              callId={this.state.callId}
               local={true}
             />
           )}
 
-        {this.isVideoCall && (
+        {this.state.isVideoCall && (
           <TouchableOpacity
             onPress={this._onSwitchCameraPress}
             style={styles.camera}
@@ -386,7 +368,7 @@ export default class CallScreen extends Component {
               {this.renderMuteImage()}
             </TouchableOpacity>
 
-            {this.isVideoCall && (
+            {this.state.isVideoCall && (
               <TouchableOpacity onPress={this._onVideoPress}>
                 {this.renderVideoImage()}
               </TouchableOpacity>

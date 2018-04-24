@@ -1,0 +1,1 @@
+../../../../../node_modules/stringee-react-native/ios/RNStringeeVideoViewManager.h
