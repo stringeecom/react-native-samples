@@ -200,11 +200,31 @@ export default class CallScreen extends Component {
         break;
       case 3:
         // busy
-        this.endCallAndDismissView();
+        if (Platform.OS === "android") {
+          this.refs.stringeeCall.hangup(
+            this.state.callId,
+            (status, code, message) => {
+              console.log(message);
+              this.endCallAndDismissView();
+            }
+          );
+        } else {
+          this.endCallAndDismissView();
+        }
         break;
       case 4:
         // end
-        this.endCallAndDismissView();
+        if (Platform.OS === "android") {
+          this.refs.stringeeCall.hangup(
+            this.state.callId,
+            (status, code, message) => {
+              console.log(message);
+              this.endCallAndDismissView();
+            }
+          );
+        } else {
+          this.endCallAndDismissView();
+        }
         break;
       default:
         break;
