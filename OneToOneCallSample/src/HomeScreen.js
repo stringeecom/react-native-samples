@@ -12,7 +12,8 @@ import {
 
 import { StringeeClient } from "stringee-react-native";
 
-const user1 = "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyLTE1MjM4NTQ2MTkiLCJpc3MiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyIiwiZXhwIjoxNTI2NDQ2NjE5LCJ1c2VySWQiOiJ1c2VyMSJ9.VU8Bm538J2F8r1bGXdm1DAPTu_y5NCp_TNYCrnKjsyw";
+const user1 =
+  "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0NsejhzQ2tKeDNzdU13SmdCdDJ6bUc2T01JbVRYb2Y1LTE1MjMwODgzNTciLCJpc3MiOiJTS0NsejhzQ2tKeDNzdU13SmdCdDJ6bUc2T01JbVRYb2Y1IiwiZXhwIjoxNTI1NjgwMzU3LCJ1c2VySWQiOiJzdHJpbmdlZTIifQ.lSU1qYPOv_aIJ9e86jNUagFmSGJBwaKLuXYVYaIW4AQ";
 
 const iOS = Platform.OS === "ios" ? true : false;
 
