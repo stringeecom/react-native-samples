@@ -16,12 +16,8 @@ import VoipPushNotification from "react-native-voip-push-notification";
 
 import RNCallKit from "react-native-callkit";
 
-const user3 =
-  "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyLTE1MjUyMzQ3NzAiLCJpc3MiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyIiwiZXhwIjoxNTI3ODI2NzcwLCJ1c2VySWQiOiJ1c2VyMyJ9.mfe-Aw6-5ch5O8ideUUBL3_-TM2KFsS9WOqyrWktFVY";
-const user4 =
-  "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyLTE1MjUyMzQ3ODkiLCJpc3MiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyIiwiZXhwIjoxNTI3ODI2Nzg5LCJ1c2VySWQiOiJ1c2VyNCJ9.I0W2iccU3IdEucubtWSpXzXpsDdbl65D3jbOF8JpRzU";
-const user5 =
-  "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyLTE1MjUzMzA2NjkiLCJpc3MiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyIiwiZXhwIjoxNTI3OTIyNjY5LCJ1c2VySWQiOiJ1c2VyNSJ9.KGv18nYXDYBt0_sUfWIye9t2QCVIYyOjvz6ohdpgysI";
+const yourUser = "YOUR_USER_ACCESS_TOKEN";
+
 const iOS = Platform.OS === "ios" ? true : false;
 
 export default class HomeScreen extends Component {
@@ -58,7 +54,7 @@ export default class HomeScreen extends Component {
   }
 
   async componentDidMount() {
-    await this.refs.client.connect(user3);
+    await this.refs.client.connect(yourUser);
 
     VoipPushNotification.requestPermissions();
 
