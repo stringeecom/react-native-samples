@@ -1,0 +1,1 @@
+../../../../Stringee/Stringee/Classes/Stringee.framework/Versions/A/Headers/StringeeRoom.h
