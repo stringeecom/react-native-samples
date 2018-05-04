@@ -7,13 +7,12 @@ import {
   Image,
   Dimensions,
   Platform,
-  Alert
+  Alert,
+  PermissionsAndroid
 } from "react-native";
+import { each } from "underscore";
 
-import {
-  StringeeCall,
-  StringeeVideoView
-} from "stringee-react-native";
+import { StringeeCall, StringeeVideoView } from "stringee-react-native";
 
 var height = Dimensions.get("window").height;
 var width = Dimensions.get("window").width;
@@ -26,6 +25,32 @@ const speakerImg_selected = require("../resource/speaker_selected.png");
 
 const videoDisableImg = require("../resource/video_disable.png");
 const videoEnableImg = require("../resource/video_enable.png");
+
+checkAndroidPermissions = () =>
+  new Promise((resolve, reject) => {
+    PermissionsAndroid.requestMultiple([
+      PermissionsAndroid.PERMISSIONS.CAMERA,
+      PermissionsAndroid.PERMISSIONS.RECORD_AUDIO
+    ])
+      .then(result => {
+        const permissionsError = {};
+        permissionsError.permissionsDenied = [];
+        each(result, (permissionValue, permissionType) => {
+          if (permissionValue === "denied") {
+            permissionsError.permissionsDenied.push(permissionType);
+            permissionsError.type = "Permissions error";
+          }
+        });
+        if (permissionsError.permissionsDenied.length > 0) {
+          reject(permissionsError);
+        } else {
+          resolve();
+        }
+      })
+      .catch(error => {
+        reject(error);
+      });
+  });
 
 export default class CallScreen extends Component {
   constructor(props) {
@@ -46,8 +71,8 @@ export default class CallScreen extends Component {
     userId: "UserId",
     callState: "Outgoing call",
 
-    isVideoCall:false,
-    callId:'',
+    isVideoCall: false,
+    callId: "",
 
     isMute: false,
     isSpeaker: false,
@@ -69,6 +94,20 @@ export default class CallScreen extends Component {
   componentWillMount() {}
 
   componentDidMount() {
+    if (Platform.OS === "android") {
+      checkAndroidPermissions()
+        .then(() => {
+          this.makeOrAnswerCall();
+        })
+        .catch(error => {
+          alert("You must grant permissions to make a call " + error);
+        });
+    } else {
+      this.makeOrAnswerCall();
+    }
+  }
+
+  makeOrAnswerCall() {
     const { params } = this.props.navigation.state;
     const isOutgoingCall = params ? params.isOutgoingCall : false;
     const from = params ? params.from : "";
@@ -99,7 +138,7 @@ export default class CallScreen extends Component {
       this.refs.stringeeCall.makeCall(
         parameters,
         (status, code, message, callId) => {
-          this.setState({callId:callId});
+          this.setState({ callId: callId });
           console.log(
             "status-" +
               status +
@@ -125,12 +164,9 @@ export default class CallScreen extends Component {
         callId: callId
       });
 
-      this.refs.stringeeCall.initAnswer(
-        callId,
-        (status, code, message) => {
-          console.log(message);
-        }
-      );
+      this.refs.stringeeCall.initAnswer(callId, (status, code, message) => {
+        console.log(message);
+      });
     }
   }
 
@@ -164,11 +200,31 @@ export default class CallScreen extends Component {
         break;
       case 3:
         // busy
-        this.endCallAndDismissView();
+        if (Platform.OS === "android") {
+          this.refs.stringeeCall.hangup(
+            this.state.callId,
+            (status, code, message) => {
+              console.log(message);
+              this.endCallAndDismissView();
+            }
+          );
+        } else {
+          this.endCallAndDismissView();
+        }
         break;
       case 4:
         // end
-        this.endCallAndDismissView();
+        if (Platform.OS === "android") {
+          this.refs.stringeeCall.hangup(
+            this.state.callId,
+            (status, code, message) => {
+              console.log(message);
+              this.endCallAndDismissView();
+            }
+          );
+        } else {
+          this.endCallAndDismissView();
+        }
         break;
       default:
         break;
@@ -227,35 +283,44 @@ export default class CallScreen extends Component {
   // Action
   _onDeclinePress = () => {
     console.log("_onDeclinePress");
-    this.refs.stringeeCall.reject(this.state.callId, (status, code, message) => {
-      console.log(message);
-      this.endCallAndDismissView();
-    });
+    this.refs.stringeeCall.reject(
+      this.state.callId,
+      (status, code, message) => {
+        console.log(message);
+        this.endCallAndDismissView();
+      }
+    );
   };
 
   _onEndCallPress = () => {
     console.log("_onEndCallPress" + this.callId);
-    this.refs.stringeeCall.hangup(this.state.callId, (status, code, message) => {
-      console.log(message);
-      this.endCallAndDismissView();
-    });
+    this.refs.stringeeCall.hangup(
+      this.state.callId,
+      (status, code, message) => {
+        console.log(message);
+        this.endCallAndDismissView();
+      }
+    );
   };
 
   _onAcceptCallPress = () => {
     console.log("_onAcceptCallPress");
-    this.refs.stringeeCall.answer(this.state.callId, (status, code, message) => {
-      console.log(message);
-      if (status) {
-        this.setState({
-          isShowOptionView: true,
-          isShowDeclineBt: false,
-          isShowEndBt: true,
-          isShowAcceptBt: false
-        });
-      } else {
-        this.endCallAndDismissView();
+    this.refs.stringeeCall.answer(
+      this.state.callId,
+      (status, code, message) => {
+        console.log(message);
+        if (status) {
+          this.setState({
+            isShowOptionView: true,
+            isShowDeclineBt: false,
+            isShowEndBt: true,
+            isShowAcceptBt: false
+          });
+        } else {
+          this.endCallAndDismissView();
+        }
       }
-    });
+    );
   };
 
   _onMutePress = () => {
@@ -326,7 +391,6 @@ export default class CallScreen extends Component {
   render() {
     return (
       <View style={styles.container}>
-
         {this.state.isVideoCall &&
           this.state.callId !== "" &&
           this.state.hasReceivedRemoteStream && (
