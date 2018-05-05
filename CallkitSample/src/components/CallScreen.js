@@ -48,9 +48,6 @@ export default class CallScreen extends PureComponent {
       onHandleOnAnotherDevice: this._didHandleOnAnotherDevice
     };
 
-    this.onRNCallKitDidReceiveStartCallAction = this.onRNCallKitDidReceiveStartCallAction.bind(
-      this
-    );
     this.onRNCallKitPerformAnswerCallAction = this.onRNCallKitPerformAnswerCallAction.bind(
       this
     );
@@ -62,10 +59,6 @@ export default class CallScreen extends PureComponent {
     );
 
     // Add RNCallKit Events
-    RNCallKit.addEventListener(
-      "didReceiveStartCallAction",
-      this.onRNCallKitDidReceiveStartCallAction
-    );
     RNCallKit.addEventListener(
       "answerCall",
       this.onRNCallKitPerformAnswerCallAction
@@ -405,11 +398,11 @@ export default class CallScreen extends PureComponent {
 
   /* CALLKIT ====================================> BEGIN */
 
-  onRNCallKitDidReceiveStartCallAction(data) {
-    // Sự kiện gọi đi..có thể bắt đầu từ việc ấn call recents hoặc siri..
-    _uuid = uuid.v4();
-    RNCallKit.startCall(_uuid, data.handle);
-  }
+  // onRNCallKitDidReceiveStartCallAction(data) {
+  //   // Sự kiện gọi đi..có thể bắt đầu từ việc ấn call recents hoặc siri..
+  //   _uuid = uuid.v4();
+  //   RNCallKit.startCall(_uuid, data.handle);
+  // }
 
   onRNCallKitPerformAnswerCallAction({ callUUID }) {
     console.log("onRNCallKitPerformAnswerCallAction " + callUUID);

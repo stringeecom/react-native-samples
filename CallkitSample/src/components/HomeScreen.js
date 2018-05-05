@@ -16,7 +16,8 @@ import VoipPushNotification from "react-native-voip-push-notification";
 
 import RNCallKit from "react-native-callkit";
 
-const yourUser = "YOUR_USER_ACCESS_TOKEN";
+const yourUser =
+  "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyLTE1MjU0MzIzMjgiLCJpc3MiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyIiwiZXhwIjoxNTI4MDI0MzI4LCJ1c2VySWQiOiJ1c2VyMyJ9.057sJoMyVczLI9M2X3MYsKaK-LsfE1pHKXj_u3K6yDY";
 
 const iOS = Platform.OS === "ios" ? true : false;
 
@@ -25,11 +26,7 @@ export default class HomeScreen extends Component {
     super(props);
     console.log("$$$$$$$$ HOME CONSTRUCTOR");
 
-    this.state = {
-      myUserId: "",
-      callToUserId: "",
-      hasConnected: false
-    };
+    this.state = { myUserId: "", callToUserId: "", hasConnected: false };
 
     this.clientEventHandlers = {
       onConnect: this._clientDidConnect,
@@ -51,6 +48,15 @@ export default class HomeScreen extends Component {
     } catch (err) {
       console.log("error:", err.message);
     }
+
+    this.onRNCallKitDidReceiveStartCallAction = this.onRNCallKitDidReceiveStartCallAction.bind(
+      this
+    );
+
+    RNCallKit.addEventListener(
+      "didReceiveStartCallAction",
+      this.onRNCallKitDidReceiveStartCallAction
+    );
   }
 
   async componentDidMount() {
@@ -89,12 +95,18 @@ export default class HomeScreen extends Component {
   // Connection
   _clientDidConnect = ({ userId }) => {
     console.log("_clientDidConnect - " + userId);
-    this.setState({ myUserId: userId, hasConnected: true });
+    this.setState({
+      myUserId: userId,
+      hasConnected: true
+    });
   };
 
   _clientDidDisConnect = () => {
     console.log("_clientDidDisConnect");
-    this.setState({ myUserId: "", hasConnected: false });
+    this.setState({
+      myUserId: "",
+      hasConnected: false
+    });
   };
 
   _clientDidFailWithError = () => {
@@ -140,6 +152,20 @@ export default class HomeScreen extends Component {
       isVideoCall: isVideoCall
     });
   };
+
+  // Callkit
+  onRNCallKitDidReceiveStartCallAction({ handle, video }) {
+    console.log("$$$$$$$$ START CALL " + handle + " " + video);
+    // Sự kiện gọi đi..có thể bắt đầu từ việc ấn call recents hoặc siri..
+    if (this.state.hasConnected) {
+      this.props.navigation.navigate("Call", {
+        from: this.state.myUserId,
+        to: handle,
+        isOutgoingCall: true,
+        isVideoCall: video
+      });
+    }
+  }
 
   // Action
   _onVoiceCallButtonPress = () => {
