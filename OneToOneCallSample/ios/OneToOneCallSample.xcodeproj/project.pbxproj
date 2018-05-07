@@ -1105,8 +1105,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.stringee.CallkitDemo;
 				PRODUCT_NAME = OneToOneCallSample;
-				PROVISIONING_PROFILE = "c1daf5de-095e-433d-b860-02860f5990fc";
-				PROVISIONING_PROFILE_SPECIFIER = Callkit_product_provision;
+				PROVISIONING_PROFILE = "d89e87ec-4755-4ace-9c71-c1fbaeaec1ac";
+				PROVISIONING_PROFILE_SPECIFIER = Callkit_adhoc;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Release;
