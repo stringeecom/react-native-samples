@@ -1,5 +1,4 @@
 rootProject.name = 'OneToOneCallSample'
 include ':stringee-react-native'
 project(':stringee-react-native').projectDir = new File(rootProject.projectDir, '../node_modules/stringee-react-native/android')
-
 include ':app'
