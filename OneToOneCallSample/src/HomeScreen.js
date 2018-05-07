@@ -7,10 +7,12 @@ import {
   TextInput,
   Button,
   TouchableOpacity,
-  Keyboard
+  Keyboard,
+  AsyncStorage
 } from "react-native";
-
 import { StringeeClient } from "stringee-react-native";
+import FCM from "react-native-fcm";
+import { FCMEvent } from "react-native-fcm";
 
 // const user1 =
 //   "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0NsejhzQ2tKeDNzdU13SmdCdDJ6bUc2T01JbVRYb2Y1LTE1MjU1MTA5NDQiLCJpc3MiOiJTS0NsejhzQ2tKeDNzdU13SmdCdDJ6bUc2T01JbVRYb2Y1IiwiZXhwIjoxNTI4MTAyOTQ0LCJ1c2VySWQiOiJzdHJpbmdlZTEifQ.oBdWzL8euG1UXOfD1SvnI8EQFJI8oiIO63SKEcdDYrY";
@@ -47,12 +49,37 @@ export default class HomeScreen extends Component {
   _clientDidConnect = ({ userId }) => {
     console.log("_clientDidConnect - " + userId);
     this.setState({ myUserId: userId, hasConnected: true });
-    this.refs.client.registerPush(
-      "",
-      true,
-      true,
-      (result, code, desc, token) => {}
-    );
+
+    if (!iOS) {
+      AsyncStorage.getItem("isPushTokenRegistered").then(value => {
+        if (value !== "true") {
+          FCM.getFCMToken().then(token => {
+            this.refs.client.registerPush(
+              token,
+              true,
+              true,
+              (result, code, desc) => {
+                if (result) {
+                  AsyncStorage.multiSet([
+                    ["isPushTokenRegistered", "true"],
+                    ["token", token]
+                  ]);
+                }
+              }
+            );
+          });
+        }
+      });
+
+      FCM.on(FCMEvent.RefreshToken, token => {
+        this.refs.client.registerPush(
+          token,
+          true,
+          true,
+          (result, code, desc) => {}
+        );
+      });
+    }
   };
 
   _clientDidDisConnect = () => {

@@ -3,6 +3,7 @@ package com.onetoonecallsample;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import com.evollu.react.fcm.FIRMessagingPackage;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactRootView;
 import com.facebook.react.common.LifecycleState;
@@ -25,6 +26,7 @@ public class MyReactActivity extends AppCompatActivity implements DefaultHardwar
                 .setJSMainModulePath("index")
                 .addPackage(new MainReactPackage())
                 .addPackage(new RNStringeeReactPackage())
+                .addPackage(new FIRMessagingPackage())
                 .setUseDeveloperSupport(BuildConfig.DEBUG)
                 .setInitialLifecycleState(LifecycleState.RESUMED)
                 .build();

@@ -3,7 +3,7 @@ package com.onetoonecallsample;
 import android.content.Intent;
 import android.util.Log;
 
-import com.google.firebase.messaging.FirebaseMessagingService;
+import com.evollu.react.fcm.MessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.stringee.StringeeClient;
 import com.stringeereactnative.StringeeManager;
@@ -11,11 +11,12 @@ import com.stringeereactnative.StringeeManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class MyFirebaseMessagingService extends FirebaseMessagingService {
+public class MyFirebaseMessagingService extends MessagingService {
     private final String TAG = "Stringee";
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
+        super.onMessageReceived(remoteMessage);
         if (remoteMessage.getData().size() > 0) {
             Log.d(TAG, "Message data payload: " + remoteMessage.getData());
             String pushFromStringee = remoteMessage.getData().get("stringeePushNotification");
