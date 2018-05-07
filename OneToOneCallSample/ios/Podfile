@@ -8,6 +8,8 @@ target 'OneToOneCallSample' do
 
   pod 'RNStringee', path: "#{node_modules_path}/stringee-react-native/ios"
   
+  pod 'react-native-fcm', :path => '../node_modules/react-native-fcm'
+
 end
 
 

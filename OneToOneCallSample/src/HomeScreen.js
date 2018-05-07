@@ -7,14 +7,17 @@ import {
   TextInput,
   Button,
   TouchableOpacity,
-  Keyboard
+  Keyboard,
+  AsyncStorage
 } from "react-native";
-
 import { StringeeClient } from "stringee-react-native";
+import FCM from "react-native-fcm";
+import { FCMEvent } from "react-native-fcm";
 
+// const user1 =
+//   "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0NsejhzQ2tKeDNzdU13SmdCdDJ6bUc2T01JbVRYb2Y1LTE1MjU1MTA5NDQiLCJpc3MiOiJTS0NsejhzQ2tKeDNzdU13SmdCdDJ6bUc2T01JbVRYb2Y1IiwiZXhwIjoxNTI4MTAyOTQ0LCJ1c2VySWQiOiJzdHJpbmdlZTEifQ.oBdWzL8euG1UXOfD1SvnI8EQFJI8oiIO63SKEcdDYrY";
 const user1 =
-  "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0NsejhzQ2tKeDNzdU13SmdCdDJ6bUc2T01JbVRYb2Y1LTE1MjMwODgzNTciLCJpc3MiOiJTS0NsejhzQ2tKeDNzdU13SmdCdDJ6bUc2T01JbVRYb2Y1IiwiZXhwIjoxNTI1NjgwMzU3LCJ1c2VySWQiOiJzdHJpbmdlZTIifQ.lSU1qYPOv_aIJ9e86jNUagFmSGJBwaKLuXYVYaIW4AQ";
-
+  "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0NsejhzQ2tKeDNzdU13SmdCdDJ6bUc2T01JbVRYb2Y1LTE1MjU1MTQ5MDIiLCJpc3MiOiJTS0NsejhzQ2tKeDNzdU13SmdCdDJ6bUc2T01JbVRYb2Y1IiwiZXhwIjoxNTI4MTA2OTAyLCJ1c2VySWQiOiJzdHJpbmdlZTIifQ.tpcBIjTk7cYbt9RyUkOSkuPfuRaLD1EWjGrmDzQsDPs";
 const iOS = Platform.OS === "ios" ? true : false;
 
 export default class HomeScreen extends Component {
@@ -46,6 +49,37 @@ export default class HomeScreen extends Component {
   _clientDidConnect = ({ userId }) => {
     console.log("_clientDidConnect - " + userId);
     this.setState({ myUserId: userId, hasConnected: true });
+
+    if (!iOS) {
+      AsyncStorage.getItem("isPushTokenRegistered").then(value => {
+        if (value !== "true") {
+          FCM.getFCMToken().then(token => {
+            this.refs.client.registerPush(
+              token,
+              true,
+              true,
+              (result, code, desc) => {
+                if (result) {
+                  AsyncStorage.multiSet([
+                    ["isPushTokenRegistered", "true"],
+                    ["token", token]
+                  ]);
+                }
+              }
+            );
+          });
+        }
+      });
+
+      FCM.on(FCMEvent.RefreshToken, token => {
+        this.refs.client.registerPush(
+          token,
+          true,
+          true,
+          (result, code, desc) => {}
+        );
+      });
+    }
   };
 
   _clientDidDisConnect = () => {

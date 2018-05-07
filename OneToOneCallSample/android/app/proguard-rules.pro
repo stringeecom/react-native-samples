@@ -68,3 +68,7 @@
 -dontwarn java.nio.file.*
 -dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
 -dontwarn okio.**
+
+-dontwarn org.webrtc.Logging
+-keep class org.webrtc.** { *; }
+-keep class com.stringee.** { *; }
