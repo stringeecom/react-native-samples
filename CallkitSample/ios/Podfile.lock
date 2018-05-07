@@ -18,7 +18,7 @@ PODS:
   - RNStringee (1.0.0):
     - React
     - Stringee
-  - Stringee (1.2.5)
+  - Stringee (1.2.6)
   - yoga (0.55.3.React)
 
 DEPENDENCIES:
@@ -38,7 +38,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   React: aa2040dbb6f317b95314968021bd2888816e03d5
   RNStringee: 0778d947b0224423a0510fcf73fcf0b33c43ab73
-  Stringee: cd41b9f3bff08ba698c37cfa32c3fb0c8e947a71
+  Stringee: 722c2baf1f0fc11a018fca2118a39c60b028f798
   yoga: a23273df0088bf7f2bb7e5d7b00044ea57a2a54a
 
 PODFILE CHECKSUM: d8654a58690cf20e18f563df62e3878b6a3b911f

@@ -93,8 +93,8 @@ export default class HomeScreen extends Component {
   }
 
   // Connection
-  _clientDidConnect = ({ userId }) => {
-    console.log("_clientDidConnect - " + userId);
+  _clientDidConnect = ({ userId, projectId }) => {
+    console.log("_clientDidConnect - " + userId + "***" + projectId);
     this.setState({
       myUserId: userId,
       hasConnected: true
