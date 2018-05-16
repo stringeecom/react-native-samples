@@ -1057,7 +1057,9 @@
 				ENABLE_BITCODE = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(SRCROOT)..\node_modulesstringee-react-nativeios",
+					"$(SRCROOT)..",
+					"ode_modulesstringee-react-nativeios",
+					"\"$(SRCROOT)/../node_modules/stringee-react-native/ios\"",
 				);
 				INFOPLIST_FILE = OneToOneCallSample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1090,7 +1092,9 @@
 				ENABLE_BITCODE = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(SRCROOT)..\node_modulesstringee-react-nativeios",
+					"$(SRCROOT)..",
+					"ode_modulesstringee-react-nativeios",
+					"\"$(SRCROOT)/../node_modules/stringee-react-native/ios\"",
 				);
 				INFOPLIST_FILE = OneToOneCallSample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

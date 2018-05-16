@@ -43,7 +43,7 @@
 @property (weak, nonatomic) id<StringeeIncomingCallDelegate> incomingCallDelegate;
 @property (assign, nonatomic, readonly) BOOL hasConnected;
 @property (strong, nonatomic, readonly) NSString *userId;
-
+@property (strong, nonatomic, readonly) NSString *projectId;
 
 - (instancetype)initWithConnectionDelegate:(id<StringeeConnectionDelegate>)delegate;
 
