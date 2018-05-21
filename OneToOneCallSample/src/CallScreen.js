@@ -275,7 +275,7 @@ export default class CallScreen extends Component {
     console.log(
       "_didHandleOnAnotherDevice " + callId + "***" + code + "***" + description
     );
-    if (code == 2 || signalingState == 3 || signalingState == 4) {
+    if (code == 2 || code == 3 || code == 4) {
       // Answered || Busy || End
       this.endCallAndDismissView();
     }
