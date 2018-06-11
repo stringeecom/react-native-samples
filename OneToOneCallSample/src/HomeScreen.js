@@ -15,9 +15,9 @@ import FCM from "react-native-fcm";
 import { FCMEvent } from "react-native-fcm";
 
 const user1 =
-  "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyLTE1MjY0Mzk4MzYiLCJpc3MiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyIiwiZXhwIjoxNTI5MDMxODM2LCJ1c2VySWQiOiJ1c2VyMSJ9.b3SyresP13tRRqpDKsrICTL_pgy1cZhWhLzWOmcHOqE";
+  "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyLTE1Mjg3MTM5MjciLCJpc3MiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyIiwiZXhwIjoxNTMxMzA1OTI3LCJ1c2VySWQiOiJ1c2VyMSJ9.HLMHToMN70_GBm2eLWkutfOV-1cfLzwzI6Iwg940vVI";
 const user2 =
-  "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyLTE1MjY0Mzk4NjciLCJpc3MiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyIiwiZXhwIjoxNTI5MDMxODY3LCJ1c2VySWQiOiJ1c2VyMiJ9.ToDDjZd61zLb2Cez-a5e8xu6JKcLQv4Aky1fyYl0rNo";
+  "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyLTE1Mjg3MTM5NDIiLCJpc3MiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyIiwiZXhwIjoxNTMxMzA1OTQyLCJ1c2VySWQiOiJ1c2VyMiJ9.OkqohK0D4DMg2oPtufUxPyaR3B5HHCUEj_R0X-_fCn0";
 
 const iOS = Platform.OS === "ios" ? true : false;
 
@@ -25,11 +25,7 @@ export default class HomeScreen extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      myUserId: "",
-      callToUserId: "",
-      hasConnected: false
-    };
+    this.state = { myUserId: "", callToUserId: "", hasConnected: false };
 
     this.clientEventHandlers = {
       onConnect: this._clientDidConnect,
@@ -49,7 +45,10 @@ export default class HomeScreen extends Component {
   // Connection
   _clientDidConnect = ({ userId }) => {
     console.log("_clientDidConnect - " + userId);
-    this.setState({ myUserId: userId, hasConnected: true });
+    this.setState({
+      myUserId: userId,
+      hasConnected: true
+    });
 
     if (!iOS) {
       AsyncStorage.getItem("isPushTokenRegistered").then(value => {
@@ -85,7 +84,10 @@ export default class HomeScreen extends Component {
 
   _clientDidDisConnect = () => {
     console.log("_clientDidDisConnect");
-    this.setState({ myUserId: "", hasConnected: false });
+    this.setState({
+      myUserId: "",
+      hasConnected: false
+    });
   };
 
   _clientDidFailWithError = () => {
@@ -94,6 +96,8 @@ export default class HomeScreen extends Component {
 
   _clientRequestAccessToken = () => {
     console.log("_clientRequestAccessToken");
+    // Token để kết nối tới Stringee server đã hết bạn. Bạn cần lấy token mới và gọi connect lại ở đây
+    // this.refs.client.connect("NEW_TOKEN");
   };
 
   // Call events
@@ -104,7 +108,8 @@ export default class HomeScreen extends Component {
     fromAlias,
     toAlias,
     callType,
-    isVideoCall
+    isVideoCall,
+    customDataFromYourServer
   }) => {
     console.log(
       "IncomingCallId-" +
@@ -120,7 +125,9 @@ export default class HomeScreen extends Component {
         " isVideoCall-" +
         isVideoCall +
         "callType-" +
-        callType
+        callType +
+        "customDataFromYourServer-" +
+        customDataFromYourServer
     );
 
     this.props.navigation.navigate("Call", {

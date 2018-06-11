@@ -138,7 +138,7 @@ export default class CallScreen extends Component {
       });
       this.refs.stringeeCall.makeCall(
         parameters,
-        (status, code, message, callId) => {
+        (status, code, message, callId, customDataFromYourServer) => {
           this.setState({ callId: callId });
           console.log(
             "status-" +
@@ -147,7 +147,10 @@ export default class CallScreen extends Component {
               code +
               " message-" +
               message +
-              callId
+              " callId-" +
+              callId +
+              " customDataFromYourServer-" +
+              customDataFromYourServer
           );
         }
       );
