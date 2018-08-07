@@ -92,7 +92,7 @@ export default class CallScreen extends Component {
     mediaConnected: false
   };
 
-  componentWillMount() {}
+  componentWillMount() { }
 
   componentDidMount() {
     if (Platform.OS === "android") {
@@ -138,17 +138,18 @@ export default class CallScreen extends Component {
       });
       this.refs.stringeeCall.makeCall(
         parameters,
-        (status, code, message, callId) => {
+        (status, code, message, callId, customDataFromYourServer) => {
           this.setState({ callId: callId });
           console.log(
             "status-" +
-              status +
-              " code-" +
-              code +
-              " message-" +
-              message +
-              callId
+            status +
+            " code-" +
+            code +
+            " message-" +
+            message +
+            callId
           );
+          alert(customDataFromYourServer);
         }
       );
     } else {
@@ -181,15 +182,15 @@ export default class CallScreen extends Component {
   }) => {
     console.log(
       "callId-" +
-        callId +
-        "code-" +
-        code +
-        " reason-" +
-        reason +
-        " sipCode-" +
-        sipCode +
-        " sipReason-" +
-        sipReason
+      callId +
+      "code-" +
+      code +
+      " reason-" +
+      reason +
+      " sipCode-" +
+      sipCode +
+      " sipReason-" +
+      sipReason
     );
     this.setState({ callState: reason });
     switch (code) {
@@ -299,7 +300,7 @@ export default class CallScreen extends Component {
       this.state.callId,
       (status, code, message) => {
         console.log(message);
-        this.endCallAndDismissView();
+        this.endCallAndDismissView();        
       }
     );
   };
@@ -352,7 +353,7 @@ export default class CallScreen extends Component {
   _onSwitchCameraPress = () => {
     this.refs.stringeeCall.switchCamera(
       this.state.callId,
-      (status, code, message) => {}
+      (status, code, message) => { }
     );
   };
 
@@ -396,9 +397,9 @@ export default class CallScreen extends Component {
           this.state.callId !== "" &&
           this.state.hasReceivedRemoteStream && (
             <StringeeVideoView
-              style={styles.remoteView}
-              callId={this.state.callId}
+              style={styles.remoteView}              
               local={false}
+              callId={this.state.callId}
             />
           )}
 

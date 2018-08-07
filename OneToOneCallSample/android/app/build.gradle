@@ -145,7 +145,6 @@ android {
 dependencies {
     implementation 'com.facebook.react:react-native:+'
     // From node_modules
-    implementation 'com.stringee.sdk.android:stringee-android-sdk:1.2.6'
     implementation 'com.google.firebase:firebase-messaging:15.0.0'
     implementation project(':react-native-fcm')
     implementation project(':stringee-react-native')

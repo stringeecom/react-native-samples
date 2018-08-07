@@ -5,8 +5,6 @@ import android.util.Log;
 
 import com.evollu.react.fcm.MessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-import com.stringee.StringeeClient;
-import com.stringeereactnative.StringeeManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,12 +26,9 @@ public class MyFirebaseMessagingService extends MessagingService {
                     JSONObject jsonObject = new JSONObject(data);
                     String callStatus = jsonObject.getString("callStatus");
                     if (callStatus != null && callStatus.equals("started")) {
-                        StringeeClient client = StringeeManager.getInstance().getClient();
-                        if (client == null || !client.isConnected()) {
-                            Intent i = new Intent(this, MyReactActivity.class);
-                            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(i);
-                        }
+                        Intent i = new Intent(this, MyReactActivity.class);
+                        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(i);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
