@@ -87,6 +87,7 @@ typedef NS_ENUM(NSInteger, CallDTMF) {
 @property (assign, nonatomic, readonly) BOOL answeredOnAnotherDevice;
 @property (assign, nonatomic, readonly) CallType callType;
 @property (strong, nonatomic) NSString *customData;
+@property (strong, nonatomic, readonly) NSString *customDataFromYourServer;
 @property (assign, nonatomic) BOOL isVideoCall;
 @property (assign, nonatomic) VideoResolution videoResolution;
 @property (strong, nonatomic, readonly) StringeeLocalVideoView *localVideoView;
@@ -95,23 +96,23 @@ typedef NS_ENUM(NSInteger, CallDTMF) {
 
 // MARK: - Init
 
-- (instancetype)initWithStringeeClient:(StringeeClient *) stringeeClient from:(NSString *) from to:(NSString *) to;
+- (instancetype)initWithStringeeClient:(StringeeClient *)stringeeClient from:(NSString *)from to:(NSString *)to;
 
 // MARK: - Public
 
-- (void)makeCallWithCompletionHandler:(void(^)(BOOL status, int code, NSString * message)) completionHandler;
+- (void)makeCallWithCompletionHandler:(void(^)(BOOL status, int code, NSString *message, NSString *data))completionHandler;
 
 - (void)initAnswerCall;
 
-- (void)answerCallWithCompletionHandler:(void(^)(BOOL status, int code, NSString * message)) completionHandler;
+- (void)answerCallWithCompletionHandler:(void(^)(BOOL status, int code, NSString *message))completionHandler;
 
-- (void)hangupWithCompletionHandler:(void(^)(BOOL status, int code, NSString * message)) completionHandler;
+- (void)hangupWithCompletionHandler:(void(^)(BOOL status, int code, NSString *message))completionHandler;
 
-- (void)rejectWithCompletionHandler:(void(^)(BOOL status, int code, NSString * message)) completionHandler;
+- (void)rejectWithCompletionHandler:(void(^)(BOOL status, int code, NSString *message))completionHandler;
 
-- (void)sendDTMF:(CallDTMF)callDTMF completionHandler:(void(^)(BOOL status, int code, NSString * message))completionHandler;
+- (void)sendDTMF:(CallDTMF)callDTMF completionHandler:(void(^)(BOOL status, int code, NSString *message))completionHandler;
 
-- (void)sendCallInfo:(NSDictionary *)info completionHandler:(void(^)(BOOL status, int code, NSString * message))completionHandler;
+- (void)sendCallInfo:(NSDictionary *)info completionHandler:(void(^)(BOOL status, int code, NSString *message))completionHandler;
 
 - (void)switchCamera;
 
