@@ -10,7 +10,7 @@
     "react": "^16.3.1",
     "react-native": "0.55.4",
     "react-navigation": "^1.5.11",
-    "stringee-react-native": "^1.1.6",
+    "stringee-react-native": "^1.1.8",
     "underscore": "^1.9.1"
   },
   "devDependencies": {

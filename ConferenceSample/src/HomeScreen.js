@@ -13,7 +13,8 @@ import {
 import { StringeeClient } from "stringee-react-native";
 
 const user1 = "YOUR_TOKEN";
-const user2 = "YOUR_TOKEN";
+const user2 =
+  "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyLTE1MzM4Njg3NDciLCJpc3MiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyIiwiZXhwIjoxNTM2NDYwNzQ3LCJ1c2VySWQiOiJ1c2VyMiJ9.-PXqJZlv8cbQvko6xLrD5s0qlXEf3975qiHOas-ZdgE";
 
 const iOS = Platform.OS === "ios" ? true : false;
 
@@ -35,7 +36,7 @@ export default class HomeScreen extends Component {
   componentWillMount() {}
 
   async componentDidMount() {
-    await this.refs.client.connect(user1);
+    await this.refs.client.connect(user2);
   }
 
   // Connection

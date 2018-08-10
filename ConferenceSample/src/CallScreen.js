@@ -69,7 +69,7 @@ export default class CallScreen extends Component {
   state = {
     roomId: "",
     remoteStreamId: "",
-    localStreamId:"",
+    localStreamId: "",
     isMute: false,
     isSpeaker: true,
     isEnableVideo: true,
@@ -160,7 +160,14 @@ export default class CallScreen extends Component {
       config,
       (status, code, message, streamId) => {
         console.log(
-          "publishLocalStream -- status:" + status + ", message:" + message
+          "publishLocalStream -- status:" +
+            status +
+            ", code:" +
+            code +
+            ", message:" +
+            message +
+            ", streamId:" +
+            streamId
         );
         this.setState({
           hasPublishedLocalStream: true,
@@ -171,7 +178,7 @@ export default class CallScreen extends Component {
   };
 
   _onRoomDisConnect = ({ roomId }) => {
-    console.log("_onRoomDisConnect " + roomId);    
+    console.log("_onRoomDisConnect " + roomId);
   };
 
   _onRoomError = ({ code, message }) => {
@@ -263,7 +270,12 @@ export default class CallScreen extends Component {
     return (
       <View style={styles.container}>
         {this.state.hasPublishedLocalStream && (
-          <StringeeVideoView style={styles.localView} local={true} streamId = {this.state.localStreamId} overlay = {false} />
+          <StringeeVideoView
+            style={styles.localView}
+            local={true}
+            streamId={this.state.localStreamId}
+            overlay={false}
+          />
         )}
 
         <Text style={styles.roomId}>{this.state.roomId}</Text>
@@ -276,7 +288,7 @@ export default class CallScreen extends Component {
                 style={styles.remoteView}
                 streamId={streamId}
                 local={false}
-                overlay = {true}
+                overlay={true}
               />
             );
           })}
