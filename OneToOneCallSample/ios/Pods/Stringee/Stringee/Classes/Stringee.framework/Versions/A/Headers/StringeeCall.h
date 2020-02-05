@@ -122,6 +122,10 @@ typedef NS_ENUM(NSInteger, CallDTMF) {
 
 - (void)mute:(BOOL)isMute;
 
+- (void)transferToUserId:(NSString *)userId completionHandler:(void(^)(BOOL status, int code, NSString *message))completionHandler;
+
+- (void)hold:(BOOL)isHold completionHandler:(void(^)(BOOL status, int code, NSString *message))completionHandler;
+
 - (void)statsWithCompletionHandler:
 (void (^)( NSDictionary<NSString *, NSString *> *values ))completionHandler;
 

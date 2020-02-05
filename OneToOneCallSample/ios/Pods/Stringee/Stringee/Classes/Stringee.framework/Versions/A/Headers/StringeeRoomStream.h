@@ -25,7 +25,7 @@
 
 - (void)mute:(BOOL)mute;
 
-- (void)turnOnCammera:(BOOL)isOn;
+- (void)turnOnCamera:(BOOL)isOn;
 
 - (void)autoOrientationOfLocalVideoViewWithSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator;
 

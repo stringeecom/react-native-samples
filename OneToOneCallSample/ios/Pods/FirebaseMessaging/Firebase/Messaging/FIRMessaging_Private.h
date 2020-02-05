@@ -27,9 +27,12 @@ typedef NS_ENUM(int8_t, FIRMessagingNetworkStatus) {
 
 FOUNDATION_EXPORT NSString *const kFIRMessagingPlistAutoInitEnabled;
 FOUNDATION_EXPORT NSString *const kFIRMessagingUserDefaultsKeyAutoInitEnabled;
+FOUNDATION_EXPORT NSString *const kFIRMessagingUserDefaultsKeyUseMessagingDelegate;
+FOUNDATION_EXPORT NSString *const kFIRMessagingPlistUseMessagingDelegate;
 
 @interface FIRMessagingRemoteMessage ()
 
+@property(nonatomic, copy) NSString *messageID;
 @property(nonatomic, strong) NSDictionary *appData;
 
 @end
@@ -37,9 +40,6 @@ FOUNDATION_EXPORT NSString *const kFIRMessagingUserDefaultsKeyAutoInitEnabled;
 @interface FIRMessaging ()
 
 #pragma mark - Private API
-
-// The data collection flag from Core.
-@property(nonatomic, readwrite, getter=isGlobalAutomaticDataCollectionEnabled) BOOL globalAutomaticDataCollectionEnabled;
 
 - (NSString *)defaultFcmToken;
 - (FIRMessagingClient *)client;
