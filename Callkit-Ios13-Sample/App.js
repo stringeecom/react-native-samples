@@ -6,15 +6,10 @@ import VoipPushNotification from "react-native-voip-push-notification";
 import uuid from 'react-native-uuid';
 import CallScreen from './src/CallScreen';
 
+const iOS = Platform.OS === "ios" ? true : false;
 const options = {
   ios: {
     appName: 'Stringee',
-  },
-  android: {
-    alertTitle: 'Permissions required',
-    alertDescription: 'This application needs to access your phone accounts',
-    cancelButton: 'Cancel',
-    okButton: 'ok',
   }
 };
 
@@ -75,8 +70,6 @@ class App extends Component {
     super(props);
     console.disableYellowBox = true
 
-    RNCallKeep.setup(options);
-
     this.clientEventHandlers = {
       onConnect: this._clientDidConnect,
       onDisConnect: this._clientDidDisConnect,
@@ -95,76 +88,51 @@ class App extends Component {
       onHandleOnAnotherDevice: this._didHandleOnAnotherDevice
     };
 
+    if (iOS) {
+      RNCallKeep.setup(options);
+      VoipPushNotification.requestPermissions();
 
-    VoipPushNotification.requestPermissions();
+      VoipPushNotification.addEventListener('register', (token) => {
+        // --- send token to your apn provider server
+        console.log("Thinhnt register VOIP: " + token);
 
-    VoipPushNotification.addEventListener('register', (token) => {
-      // --- send token to your apn provider server
-      console.log("Thinhnt register VOIP: " + token);
-
-      // send token to your apn provider server
-      this.refs.stringeeClient.registerPush(
-        token,
-        false, // isProduction: false: In development, true: In Production.
-        true, // (iOS) isVoip: true: Voip PushNotification. Stringee supports this push notification.
-        (status, code, message) => {
-          console.log("Thinhnt Stringee register VOIP: " + message);
-        }
-      );
-    });
-
-    VoipPushNotification.addEventListener('notification', (notification) => {
-      callKitUUID = notification.getData().uuid;
-      if (this.state.currentCallKitId == "") {
-        console.log("Thinhnt set uuid: " + callKitUUID);
-        this.setState({ currentCallKitId: callKitUUID });
-      } else {
-        console.log("Thinhnt end call uuid: " + callKitUUID);
-        RNCallKeep.endCall(callKitUUID);
-      }
-    });
-
-
-    RNCallKeep.addEventListener('didReceiveStartCallAction', ({ handle, callUUID, name }) => {
-
-    });
-
-    RNCallKeep.addEventListener('answerCall', ({ callUUID }) => {
-      if (callUUID != this.state.currentCallKitId) { return; }
-
-      if (this.state.currentStringeeCallId == "") {
-        this.setState({ cacheAction: 1 });
-      } else {
-        this.refs.stringeeCall.answer(this.state.currentStringeeCallId, (status, code, message) => {
-          console.log(message);
-          this.setState({ isAnswered: true });
-          if (status) {
-            // Sucess
-          } else {
-            // Fail
+        // send token to your apn provider server
+        this.refs.stringeeClient.registerPush(
+          token,
+          false, // isProduction: false: In development, true: In Production.
+          true, // (iOS) isVoip: true: Voip PushNotification. Stringee supports this push notification.
+          (status, code, message) => {
+            console.log("Thinhnt Stringee register VOIP: " + message);
           }
-        });
-      }
-    });
+        );
+      });
 
-    RNCallKeep.addEventListener('endCall', ({ callUUID }) => {
-      if (callUUID != this.state.currentCallKitId) { return; }
-      
-      if (this.state.currentStringeeCallId == "") {
-        this.setState({ cacheAction: 2 });
-      } else {
-        if (this.state.isAnswered) {
-          this.refs.stringeeCall.hangup(this.state.currentStringeeCallId, (status, code, message) => {
-            console.log(message);
-            if (status) {
-              // Sucess
-            } else {
-              // Fail
-            }
-          });
+      VoipPushNotification.addEventListener('notification', (notification) => {
+        callKitUUID = notification.getData().uuid;
+        if (this.state.currentCallKitId == "") {
+          console.log("Thinhnt set uuid: " + callKitUUID);
+          this.setState({ currentCallKitId: callKitUUID });
         } else {
-          this.refs.stringeeCall.reject(this.state.currentStringeeCallId, (status, code, message) => {
+          // if Callkit already exists then end Callkit wiht the callKitUUID
+          console.log("Thinhnt end call uuid: " + callKitUUID);
+          RNCallKeep.endCall(callKitUUID);
+        }
+      });
+
+
+      RNCallKeep.addEventListener('didReceiveStartCallAction', ({ handle, callUUID, name }) => {
+
+      });
+
+      RNCallKeep.addEventListener('answerCall', ({ callUUID }) => {
+        if (callUUID != this.state.currentCallKitId) { return; }
+
+        if (this.state.currentStringeeCallId == "") {
+          this.setState({ cacheAction: 1 });
+        } else {
+          this.refs.stringeeCall.answer(this.state.currentStringeeCallId, (status, code, message) => {
             console.log(message);
+            this.setState({ isAnswered: true });
             if (status) {
               // Sucess
             } else {
@@ -172,11 +140,38 @@ class App extends Component {
             }
           });
         }
-      }
+      });
 
-      this.setState({ currentCallKitId: "" });
-    });
+      RNCallKeep.addEventListener('endCall', ({ callUUID }) => {
+        if (callUUID != this.state.currentCallKitId) { return; }
 
+        if (this.state.currentStringeeCallId == "") {
+          this.setState({ cacheAction: 2 });
+        } else {
+          if (this.state.isAnswered) {
+            this.refs.stringeeCall.hangup(this.state.currentStringeeCallId, (status, code, message) => {
+              console.log(message);
+              if (status) {
+                // Sucess
+              } else {
+                // Fail
+              }
+            });
+          } else {
+            this.refs.stringeeCall.reject(this.state.currentStringeeCallId, (status, code, message) => {
+              console.log(message);
+              if (status) {
+                // Sucess
+              } else {
+                // Fail
+              }
+            });
+          }
+        }
+
+        this.setState({ currentCallKitId: "" });
+      });
+    }
   }
 
   /// MARK: - CONNECT EVENT HANDLER
@@ -185,7 +180,9 @@ class App extends Component {
     console.log('_clientDidConnect - ' + userId);
     this.setState({ currentUserId: userId });
 
-    VoipPushNotification.registerVoipToken();
+    if (iOS) {
+      VoipPushNotification.registerVoipToken();
+    }
   }
 
   // The client disconnects from Stringee server
@@ -211,7 +208,7 @@ class App extends Component {
     this.refs.stringeeCall.initAnswer(callId, (status, code, message) => {
       console.log(message);
     });
-    
+
     this.setState({ currentStringeeCallId: callId });
 
     switch (this.state.cacheAction) {
@@ -311,10 +308,10 @@ class App extends Component {
 
   async componentDidMount() {
     //user1
-    // token = "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTSzRPNEVRa2J0VDdkTFBFSzBBbGJOTEdTaGpUcjBnaVFOLTE1ODkyNTQ1NzkiLCJpc3MiOiJTSzRPNEVRa2J0VDdkTFBFSzBBbGJOTEdTaGpUcjBnaVFOIiwiZXhwIjoxNTkxODQ2NTc5LCJ1c2VySWQiOiJ1c2VyMSJ9.A9Cd8IMYG-W_o0Wa266xfiA86WgsZyRKWuSLiylsZK8"
+    // token = "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0Z1enZyQ3o0NUNoY0RZOEFOdkRKUnRCeG9oY3lCdmdoLTE1OTI2NDA5NDYiLCJpc3MiOiJTS0Z1enZyQ3o0NUNoY0RZOEFOdkRKUnRCeG9oY3lCdmdoIiwiZXhwIjoxNTk1MjMyOTQ2LCJ1c2VySWQiOiJVc2VyMSJ9.4_oX6Z23w5CTMpBAVH3lGvQK2dbgkalMQNBxCJcHRso"
 
     //user2
-    token = "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTSzRPNEVRa2J0VDdkTFBFSzBBbGJOTEdTaGpUcjBnaVFOLTE1ODkyNTQ1OTkiLCJpc3MiOiJTSzRPNEVRa2J0VDdkTFBFSzBBbGJOTEdTaGpUcjBnaVFOIiwiZXhwIjoxNTkxODQ2NTk5LCJ1c2VySWQiOiJ1c2VyMiJ9.IhqYvSs_af1TbU4Fh73ZZNtNQYzar5Y52yru2okhX6o"
+    token = "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0Z1enZyQ3o0NUNoY0RZOEFOdkRKUnRCeG9oY3lCdmdoLTE1OTI2NDA5NjQiLCJpc3MiOiJTS0Z1enZyQ3o0NUNoY0RZOEFOdkRKUnRCeG9oY3lCdmdoIiwiZXhwIjoxNTk1MjMyOTY0LCJ1c2VySWQiOiJVc2VyMiJ9.4QU5xgnR2tVZVqDDvdJoZTpMNrk56QXIVxXtK8X_vLs"
 
     console.log("Thinhnt connecting");
     await this.refs.stringeeClient.connect(token);
@@ -345,7 +342,7 @@ class App extends Component {
                 });
               }}
             />
-          </View> }
+          </View>}
         </Modal>
 
         <Text style={{ height: 40, marginBottom: 10, textAlign: "center" }}>

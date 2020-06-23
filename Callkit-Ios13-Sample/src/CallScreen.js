@@ -17,14 +17,14 @@ class CallScreen extends Component {
             />}
           </View>
 
-          <View style={styles.videoView}>
+          {/* <View style={styles.videoView}> */}
             {this.props.hasRemoteStream && this.props.stringeeCallId != '' && <StringeeVideoView
               style={{ flex: 1 }}
               callId={this.props.stringeeCallId}
               streamId=''
               local={false}
             />}
-          </View>
+          {/* </View> */}
         </View>
 
         <View style={styles.buttonGroupView}>

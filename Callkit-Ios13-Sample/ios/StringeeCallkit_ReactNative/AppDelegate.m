@@ -52,11 +52,11 @@ static void InitializeFlipper(UIApplication *application) {
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
 {
-//#if DEBUG
-//  return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
-//#else
+  #if DEBUG
+    return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
+  #else
   return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
-//#endif
+  #endif
 }
 
 
@@ -77,10 +77,10 @@ static void InitializeFlipper(UIApplication *application) {
 // --- Handle incoming pushes (for ios >= 11)
 - (void)pushRegistry:(PKPushRegistry *)registry didReceiveIncomingPushWithPayload:(PKPushPayload *)payload forType:(PKPushType)type withCompletionHandler:(void (^)(void))completion {
   NSLog(@"Thinhnt didReceiveIncomingPushWithPayload có complete");
-    NSString *uuid = [[NSUUID UUID] UUIDString];
-    NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
-    [dict setObject:uuid forKey:@"uuid"];
-    
+  NSString *uuid = [[NSUUID UUID] UUIDString];
+  NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+  [dict setObject:uuid forKey:@"uuid"];
+  
   if ([[CXCallObserver alloc] init].calls.count == 0) {
     // --- Process the received push
     [[NSNotificationCenter defaultCenter] postNotificationName:@"voipRemoteNotificationReceived" object:self userInfo:dict];
