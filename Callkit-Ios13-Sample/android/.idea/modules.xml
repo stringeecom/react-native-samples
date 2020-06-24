@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/StringeeCallkit_ReactNative.iml" filepath="$PROJECT_DIR$/.idea/modules/StringeeCallkit_ReactNative.iml" group="StringeeCallkit_ReactNative" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/app.iml" group="StringeeCallkit_ReactNative/app" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/2038906300/notifee_react-native.iml" filepath="$PROJECT_DIR$/.idea/modules/2038906300/notifee_react-native.iml" group="StringeeCallkit_ReactNative/notifee_react-native" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/731917827/react-native-callkeep.iml" filepath="$PROJECT_DIR$/.idea/modules/731917827/react-native-callkeep.iml" group="StringeeCallkit_ReactNative/react-native-callkeep" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/361993673/react-native-firebase_app.iml" filepath="$PROJECT_DIR$/.idea/modules/361993673/react-native-firebase_app.iml" group="StringeeCallkit_ReactNative/react-native-firebase_app" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-523654740/react-native-firebase_messaging.iml" filepath="$PROJECT_DIR$/.idea/modules/-523654740/react-native-firebase_messaging.iml" group="StringeeCallkit_ReactNative/react-native-firebase_messaging" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/1875500129/react-native-uuid-generator.iml" filepath="$PROJECT_DIR$/.idea/modules/1875500129/react-native-uuid-generator.iml" group="StringeeCallkit_ReactNative/react-native-uuid-generator" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/1756738681/stringee-react-native.iml" filepath="$PROJECT_DIR$/.idea/modules/1756738681/stringee-react-native.iml" group="StringeeCallkit_ReactNative/stringee-react-native" />
+    </modules>
+  </component>
+</project>

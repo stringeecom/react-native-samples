@@ -1,0 +1,15 @@
+<component name="libraryTable">
+  <library name="Gradle: com.stringee.sdk.android:stringee-android-sdk:1.4.1@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/013a072a20fbb7ad9333103c2cc9a89a/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/013a072a20fbb7ad9333103c2cc9a89a/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/013a072a20fbb7ad9333103c2cc9a89a/jars/libs/stringee-sdk-1.4.1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.stringee.sdk.android/stringee-android-sdk/1.4.1/6549fd5e650df447e307eb3a184c7565f741efb2/stringee-android-sdk-1.4.1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.stringee.sdk.android/stringee-android-sdk/1.4.1/6549fd5e650df447e307eb3a184c7565f741efb2/stringee-android-sdk-1.4.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
