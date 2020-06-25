@@ -35,20 +35,13 @@ class CallScreen extends Component {
 
     callId: '',
 
-    isMute: false,
-    isSpeaker: false,
-
     isOutgoingCall: false,
     isShowOptionView: true,
     isShowDeclineBt: false,
     isShowEndBt: false,
     isShowAcceptBt: false,
 
-    isEnableVideo: true,
-    hasReceivedLocalStream: false,
-    hasReceivedRemoteStream: false,
-
-    answered: true,
+    answered: false,
     mediaConnected: false,
   };
 
@@ -83,7 +76,7 @@ class CallScreen extends Component {
         </View>
 
         <TouchableOpacity
-          onPress={this._onSwitchCameraPress}
+          onPress={this.props.switchCameraHandler}
           style={styles.camera}>
           <Image
             source={require('../resource/camera_switch.png')}
@@ -95,30 +88,29 @@ class CallScreen extends Component {
         <Text style={styles.callState}>{this.state.callState}</Text>
 
         <View style={styles.callOptionContainer}>
-          <TouchableOpacity onPress={this._onMutePress}>
+          <TouchableOpacity onPress={this.props.muteButtonHandler}>
             {this.renderMuteImage()}
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={this._onVideoPress}>
+          <TouchableOpacity onPress={this.props.enableVideoButtonHandler}>
             {this.renderVideoImage()}
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={this._onSpeakerPress}>
+          <TouchableOpacity onPress={this.props.peakerButtonHandler}>
             {this.renderSpeakerImage()}
           </TouchableOpacity>
         </View>
 
-        {this.state.answered ? null : (
+        {this.props.isAnswered ? null : (
         <View style={styles.callActionContainer}>
-            <TouchableOpacity onPress={this._onDeclinePress}>
+            <TouchableOpacity onPress={this.props.rejectButtonHandler}>
               <Image
                 source={require('../resource/end_call.png')}
                 style={styles.button}
               />
             </TouchableOpacity>
           
-          
-            <TouchableOpacity invisible onPress={this._onAcceptCallPress}>
+            <TouchableOpacity invisible onPress={this.props.acceptButtonHandler}>
               <Image
                 source={require('../resource/accept_call.png')}
                 style={styles.button}
@@ -127,7 +119,7 @@ class CallScreen extends Component {
         </View>
         )}
 
-        {!this.state.answered ? null : (
+        {!this.props.isAnswered ? null : (
           <View style={styles.buttonEnd}>
             <TouchableOpacity
               onPress={() => {
@@ -146,17 +138,17 @@ class CallScreen extends Component {
   }
 
   renderMuteImage = () => {
-    var imgSource = muteImg;
+    var imgSource = this.props.isMute ? muteImg_selected : muteImg;
     return <Image style={styles.button} source={imgSource} />;
   };
 
   renderSpeakerImage = () => {
-    var imgSource = speakerImg;
+    var imgSource = this.props.isSpeaker ? speakerImg_selected : speakerImg;
     return <Image style={styles.button} source={imgSource} />;
   };
 
   renderVideoImage = () => {
-    var imgSource = videoDisableImg;
+    var imgSource = this.props.enableVideo ? videoEnableImg : videoDisableImg;
     return <Image style={styles.button} source={imgSource} />;
   };
 }

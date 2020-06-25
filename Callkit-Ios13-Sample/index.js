@@ -37,4 +37,4 @@ import CallScreen from './src/CallScreen';
 //     messaging().onMessage(onMessageReceived);
 // }
 
-AppRegistry.registerComponent(appName, () => CallScreen);
+AppRegistry.registerComponent(appName, () => App);
