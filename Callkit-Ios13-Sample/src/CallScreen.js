@@ -1,4 +1,4 @@
-import React, {Component, useState} from 'react';
+import React, { Component, useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -38,7 +38,7 @@ class CallScreen extends Component {
     isMute: false,
     isSpeaker: false,
 
-    isOutgoingCall: true,
+    isOutgoingCall: false,
     isShowOptionView: true,
     isShowDeclineBt: false,
     isShowEndBt: false,
@@ -48,7 +48,7 @@ class CallScreen extends Component {
     hasReceivedLocalStream: false,
     hasReceivedRemoteStream: false,
 
-    answered: false,
+    answered: true,
     mediaConnected: false,
   };
 
@@ -63,7 +63,7 @@ class CallScreen extends Component {
         <View style={styles.localView}>
           {this.props.hasLocalStream && this.props.stringeeCallId != '' && (
             <StringeeVideoView
-              style={{flex: 1}}
+              style={{ flex: 1 }}
               callId={this.props.stringeeCallId}
               streamId=""
               local={true}
@@ -74,7 +74,7 @@ class CallScreen extends Component {
         <View style={styles.remoteView}>
           {this.props.hasRemoteStream && this.props.stringeeCallId != '' && (
             <StringeeVideoView
-              style={{flex: 1}}
+              style={{ flex: 1 }}
               callId={this.props.stringeeCallId}
               streamId=""
               local={false}
@@ -108,38 +108,39 @@ class CallScreen extends Component {
           </TouchableOpacity>
         </View>
 
+        {this.state.answered ? null : (
         <View style={styles.callActionContainer}>
-          {this.state.answered ? (
             <TouchableOpacity onPress={this._onDeclinePress}>
               <Image
                 source={require('../resource/end_call.png')}
                 style={styles.button}
               />
             </TouchableOpacity>
-          ) : null}
-
-          {this.state.answered ? (
+          
+          
             <TouchableOpacity invisible onPress={this._onAcceptCallPress}>
               <Image
                 source={require('../resource/accept_call.png')}
                 style={styles.button}
               />
             </TouchableOpacity>
-          ) : null}
         </View>
-        {!this.state.answered ? (
-          <TouchableOpacity
-            style={styles.buttonEnd}
-            onPress={() => {
-              console.log('end button');
-              this.props.endButtonHandler();
-            }}>
-            <Image
-              source={require('../resource/end_call.png')}
-              style={styles.button}
-            />
-          </TouchableOpacity>
-        ) : null}
+        )}
+
+        {!this.state.answered ? null : (
+          <View style={styles.buttonEnd}>
+            <TouchableOpacity
+              onPress={() => {
+                console.log('end button');
+                this.props.endButtonHandler();
+              }}>
+              <Image
+                source={require('../resource/end_call.png')}
+                style={styles.button}
+              />
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     );
   }
@@ -180,9 +181,8 @@ const styles = StyleSheet.create({
   callActionContainer: {
     position: 'absolute',
     height: 70,
-    bottom: 40,
-    left: 40,
-    right: 40,
+    bottom: 80,
+    width: 230,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -191,9 +191,8 @@ const styles = StyleSheet.create({
   buttonEnd: {
     position: 'absolute',
     height: 70,
-    bottom: 40,
-    left: 40,
-    right: 40,
+    bottom: 80,
+    width: 230,
     alignItems: 'center',
   },
 
@@ -218,8 +217,8 @@ const styles = StyleSheet.create({
   localView: {
     backgroundColor: 'grey',
     position: 'absolute',
-    top: 20,
-    right: 20,
+    top: 50,
+    right: 30,
     width: 100,
     height: 150,
     zIndex: 1,

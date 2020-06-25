@@ -470,7 +470,7 @@ class App extends Component {
   };
 
   async componentDidMount() {
-    if (iOS) {
+    if (!iOS) {
       requestPermission();
     }
     //user1
