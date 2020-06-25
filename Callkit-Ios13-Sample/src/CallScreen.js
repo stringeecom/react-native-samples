@@ -118,17 +118,6 @@ class CallScreen extends Component {
             </TouchableOpacity>
           ) : null}
 
-          <TouchableOpacity
-            onPress={() => {
-              console.log('end button');
-              this.props.endButtonHandler();
-            }}>
-            <Image
-              source={require('../resource/end_call.png')}
-              style={styles.button}
-            />
-          </TouchableOpacity>
-
           {this.state.answered ? (
             <TouchableOpacity invisible onPress={this._onAcceptCallPress}>
               <Image
@@ -138,6 +127,19 @@ class CallScreen extends Component {
             </TouchableOpacity>
           ) : null}
         </View>
+        {!this.state.answered ? (
+          <TouchableOpacity
+            style={styles.buttonEnd}
+            onPress={() => {
+              console.log('end button');
+              this.props.endButtonHandler();
+            }}>
+            <Image
+              source={require('../resource/end_call.png')}
+              style={styles.button}
+            />
+          </TouchableOpacity>
+        ) : null}
       </View>
     );
   }
@@ -176,15 +178,22 @@ const styles = StyleSheet.create({
   },
 
   callActionContainer: {
-    backgroundColor: '#00A6AD',
     position: 'absolute',
     height: 70,
     bottom: 40,
     left: 40,
     right: 40,
-    flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+
+  buttonEnd: {
+    position: 'absolute',
+    height: 70,
+    bottom: 40,
+    left: 40,
+    right: 40,
     alignItems: 'center',
   },
 
