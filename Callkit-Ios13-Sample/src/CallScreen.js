@@ -1,20 +1,13 @@
-import React, { Component, useState } from 'react';
+import React, {Component} from 'react';
 import {
   StyleSheet,
   Text,
-  TouchableHighlight,
   View,
   TouchableOpacity,
   Image,
   Dimensions,
-  TextInput,
 } from 'react-native';
-import {
-  StringeeClient,
-  StringeeCall,
-  StringeeVideoView,
-  StringeeRemoteVideoView,
-} from 'stringee-react-native';
+import {StringeeVideoView} from 'stringee-react-native';
 
 var height = Dimensions.get('window').height;
 var width = Dimensions.get('window').width;
@@ -29,34 +22,13 @@ const videoDisableImg = require('../resource/video_disable.png');
 const videoEnableImg = require('../resource/video_enable.png');
 
 class CallScreen extends Component {
-  state = {
-    userId: this.props.userId,
-    callState: this.props.signalState,
-
-    callId: '',
-
-    isOutgoingCall: false,
-    isShowOptionView: true,
-    isShowDeclineBt: false,
-    isShowEndBt: false,
-    isShowAcceptBt: false,
-
-    answered: false,
-    mediaConnected: false,
-  };
-
-  async componentDidMount() {
-    console.log('userId: ' + this.state.userId);
-    console.log('callState: ' + this.state.callState);
-  }
-
   render() {
     return (
       <View style={styles.container}>
         <View style={styles.localView}>
           {this.props.hasLocalStream && this.props.stringeeCallId != '' && (
             <StringeeVideoView
-              style={{ flex: 1 }}
+              style={{flex: 1}}
               callId={this.props.stringeeCallId}
               streamId=""
               local={true}
@@ -67,7 +39,7 @@ class CallScreen extends Component {
         <View style={styles.remoteView}>
           {this.props.hasRemoteStream && this.props.stringeeCallId != '' && (
             <StringeeVideoView
-              style={{ flex: 1 }}
+              style={{flex: 1}}
               callId={this.props.stringeeCallId}
               streamId=""
               local={false}
@@ -84,8 +56,8 @@ class CallScreen extends Component {
           />
         </TouchableOpacity>
 
-        <Text style={styles.userId}>{this.state.userId}</Text>
-        <Text style={styles.callState}>{this.state.callState}</Text>
+        <Text style={styles.userId}>{this.props.userId}</Text>
+        <Text style={styles.callState}>{this.props.callState}</Text>
 
         <View style={styles.callOptionContainer}>
           <TouchableOpacity onPress={this.props.muteButtonHandler}>
@@ -102,21 +74,23 @@ class CallScreen extends Component {
         </View>
 
         {this.props.isAnswered ? null : (
-        <View style={styles.callActionContainer}>
+          <View style={styles.callActionContainer}>
             <TouchableOpacity onPress={this.props.rejectButtonHandler}>
               <Image
                 source={require('../resource/end_call.png')}
                 style={styles.button}
               />
             </TouchableOpacity>
-          
-            <TouchableOpacity invisible onPress={this.props.acceptButtonHandler}>
+
+            <TouchableOpacity
+              invisible
+              onPress={this.props.acceptButtonHandler}>
               <Image
                 source={require('../resource/accept_call.png')}
                 style={styles.button}
               />
             </TouchableOpacity>
-        </View>
+          </View>
         )}
 
         {!this.props.isAnswered ? null : (

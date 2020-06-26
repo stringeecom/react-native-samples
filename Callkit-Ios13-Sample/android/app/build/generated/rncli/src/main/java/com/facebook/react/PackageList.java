@@ -17,8 +17,6 @@ import io.invertase.notifee.NotifeePackage;
 import io.invertase.firebase.app.ReactNativeFirebaseAppPackage;
 // @react-native-firebase/messaging
 import io.invertase.firebase.messaging.ReactNativeFirebaseMessagingPackage;
-// react-native-callkeep
-import io.wazo.callkeep.RNCallKeepPackage;
 // stringee-react-native
 import com.stringeereactnative.RNStringeeReactPackage;
 
@@ -69,7 +67,6 @@ public class PackageList {
       new NotifeePackage(),
       new ReactNativeFirebaseAppPackage(),
       new ReactNativeFirebaseMessagingPackage(),
-      new RNCallKeepPackage(),
       new RNStringeeReactPackage()
     ));
   }

@@ -8,13 +8,12 @@ MERGED from E:\Android\Android App\react-native-samples\Callkit-Ios13-Sample\and
 MERGED from [com.facebook.flipper:flipper:0.33.1] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\dd64b1a7a403e01151e9d31b9234e001\AndroidManifest.xml:8:1-18:12
 MERGED from [com.facebook.flipper:flipper-network-plugin:0.33.1] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\9d77e3e4b339075cd6d2ea9aeb4a9b4f\AndroidManifest.xml:8:1-15:12
 MERGED from [com.facebook.flipper:flipper-fresco-plugin:0.33.1] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\ce1f8466d0aec257e1c4d002e687ee9c\AndroidManifest.xml:8:1-15:12
+MERGED from [:stringee-react-native] E:\Android\Android App\react-native-samples\Callkit-Ios13-Sample\node_modules\stringee-react-native\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:2:1-11:12
 MERGED from [:notifee_react-native] E:\Android\Android App\react-native-samples\Callkit-Ios13-Sample\node_modules\@notifee\react-native\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:2:1-19:12
 MERGED from [notifee_core_release.aar] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\306aa810fdcb530bcbcb50c776aa6391\AndroidManifest.xml:2:1-42:12
-MERGED from [:react-native-firebase_messaging] E:\Android\Android App\react-native-samples\Callkit-Ios13-Sample\node_modules\@react-native-firebase\messaging\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:2:1-45:12
 MERGED from [:react-native-firebase_app] E:\Android\Android App\react-native-samples\Callkit-Ios13-Sample\node_modules\@react-native-firebase\app\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:2:1-11:12
-MERGED from [androidx.multidex:multidex:2.0.0] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\6d8a9efdd55920a712d77bbf6cbec02e\AndroidManifest.xml:17:1-22:12
-MERGED from [:stringee-react-native] E:\Android\Android App\react-native-samples\Callkit-Ios13-Sample\node_modules\stringee-react-native\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:2:1-11:12
-MERGED from [:react-native-callkeep] E:\Android\Android App\react-native-samples\Callkit-Ios13-Sample\node_modules\react-native-callkeep\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:2:1-14:12
+MERGED from [:react-native-firebase_messaging] E:\Android\Android App\react-native-samples\Callkit-Ios13-Sample\node_modules\@react-native-firebase\messaging\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:2:1-45:12
+MERGED from [:@react-native-firebase_app] E:\Android\Android App\react-native-samples\Callkit-Ios13-Sample\node_modules\@react-native-firebase\app\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:2:1-11:12
 MERGED from [com.facebook.react:react-native:0.62.2] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\7dc5cf049a5c24e7b2a5db07b1aefeb8\AndroidManifest.xml:2:1-13:12
 MERGED from [androidx.swiperefreshlayout:swiperefreshlayout:1.0.0] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\0dcdb9d4385bda6b9efb9659e4a8bf8f\AndroidManifest.xml:17:1-22:12
 MERGED from [org.webkit:android-jsc:r245459] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\51af93cc23ed369d81465fc5bf463d5d\AndroidManifest.xml:2:1-11:12
@@ -85,6 +84,7 @@ MERGED from [androidx.localbroadcastmanager:localbroadcastmanager:1.0.0] C:\User
 MERGED from [androidx.print:print:1.0.0] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\6965a5833541ce8d795d483f640f5509\AndroidManifest.xml:17:1-22:12
 MERGED from [com.stringee.sdk.android:stringee-android-sdk:1.4.1] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\013a072a20fbb7ad9333103c2cc9a89a\AndroidManifest.xml:2:1-9:12
 MERGED from [com.android.volley:volley:1.1.0] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\c52b1f9e10defddf48c7dd24d3aebe50\AndroidManifest.xml:2:1-11:12
+MERGED from [androidx.multidex:multidex:2.0.0] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\6d8a9efdd55920a712d77bbf6cbec02e\AndroidManifest.xml:17:1-22:12
 MERGED from [com.facebook.soloader:annotation:0.8.2] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\51ca27125f57b1f040600f53935120de\AndroidManifest.xml:2:1-13:12
 MERGED from [com.facebook.fresco:fbcore:2.0.0] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\66a6061e5162857da1acd120e0aecfa7\AndroidManifest.xml:2:1-9:12
 MERGED from [com.google.android.datatransport:transport-api:2.2.0] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\5d8f1b77ca8d2bff714d4e3d680324b8\AndroidManifest.xml:15:1-22:12
@@ -306,20 +306,18 @@ MERGED from [com.facebook.flipper:flipper-network-plugin:0.33.1] C:\Users\Rin\.g
 MERGED from [com.facebook.flipper:flipper-network-plugin:0.33.1] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\9d77e3e4b339075cd6d2ea9aeb4a9b4f\AndroidManifest.xml:11:5-13:41
 MERGED from [com.facebook.flipper:flipper-fresco-plugin:0.33.1] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\ce1f8466d0aec257e1c4d002e687ee9c\AndroidManifest.xml:11:5-13:41
 MERGED from [com.facebook.flipper:flipper-fresco-plugin:0.33.1] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\ce1f8466d0aec257e1c4d002e687ee9c\AndroidManifest.xml:11:5-13:41
+MERGED from [:stringee-react-native] E:\Android\Android App\react-native-samples\Callkit-Ios13-Sample\node_modules\stringee-react-native\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:7:5-9:41
+MERGED from [:stringee-react-native] E:\Android\Android App\react-native-samples\Callkit-Ios13-Sample\node_modules\stringee-react-native\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:7:5-9:41
 MERGED from [:notifee_react-native] E:\Android\Android App\react-native-samples\Callkit-Ios13-Sample\node_modules\@notifee\react-native\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:7:5-9:41
 MERGED from [:notifee_react-native] E:\Android\Android App\react-native-samples\Callkit-Ios13-Sample\node_modules\@notifee\react-native\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:7:5-9:41
 MERGED from [notifee_core_release.aar] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\306aa810fdcb530bcbcb50c776aa6391\AndroidManifest.xml:7:5-9:41
 MERGED from [notifee_core_release.aar] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\306aa810fdcb530bcbcb50c776aa6391\AndroidManifest.xml:7:5-9:41
-MERGED from [:react-native-firebase_messaging] E:\Android\Android App\react-native-samples\Callkit-Ios13-Sample\node_modules\@react-native-firebase\messaging\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:7:5-9:41
-MERGED from [:react-native-firebase_messaging] E:\Android\Android App\react-native-samples\Callkit-Ios13-Sample\node_modules\@react-native-firebase\messaging\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:7:5-9:41
 MERGED from [:react-native-firebase_app] E:\Android\Android App\react-native-samples\Callkit-Ios13-Sample\node_modules\@react-native-firebase\app\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:7:5-9:41
 MERGED from [:react-native-firebase_app] E:\Android\Android App\react-native-samples\Callkit-Ios13-Sample\node_modules\@react-native-firebase\app\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:7:5-9:41
-MERGED from [androidx.multidex:multidex:2.0.0] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\6d8a9efdd55920a712d77bbf6cbec02e\AndroidManifest.xml:20:5-43
-MERGED from [androidx.multidex:multidex:2.0.0] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\6d8a9efdd55920a712d77bbf6cbec02e\AndroidManifest.xml:20:5-43
-MERGED from [:stringee-react-native] E:\Android\Android App\react-native-samples\Callkit-Ios13-Sample\node_modules\stringee-react-native\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:7:5-9:41
-MERGED from [:stringee-react-native] E:\Android\Android App\react-native-samples\Callkit-Ios13-Sample\node_modules\stringee-react-native\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:7:5-9:41
-MERGED from [:react-native-callkeep] E:\Android\Android App\react-native-samples\Callkit-Ios13-Sample\node_modules\react-native-callkeep\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:7:5-9:41
-MERGED from [:react-native-callkeep] E:\Android\Android App\react-native-samples\Callkit-Ios13-Sample\node_modules\react-native-callkeep\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:7:5-9:41
+MERGED from [:react-native-firebase_messaging] E:\Android\Android App\react-native-samples\Callkit-Ios13-Sample\node_modules\@react-native-firebase\messaging\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:7:5-9:41
+MERGED from [:react-native-firebase_messaging] E:\Android\Android App\react-native-samples\Callkit-Ios13-Sample\node_modules\@react-native-firebase\messaging\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:7:5-9:41
+MERGED from [:@react-native-firebase_app] E:\Android\Android App\react-native-samples\Callkit-Ios13-Sample\node_modules\@react-native-firebase\app\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:7:5-9:41
+MERGED from [:@react-native-firebase_app] E:\Android\Android App\react-native-samples\Callkit-Ios13-Sample\node_modules\@react-native-firebase\app\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:7:5-9:41
 MERGED from [com.facebook.react:react-native:0.62.2] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\7dc5cf049a5c24e7b2a5db07b1aefeb8\AndroidManifest.xml:7:5-9:41
 MERGED from [com.facebook.react:react-native:0.62.2] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\7dc5cf049a5c24e7b2a5db07b1aefeb8\AndroidManifest.xml:7:5-9:41
 MERGED from [androidx.swiperefreshlayout:swiperefreshlayout:1.0.0] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\0dcdb9d4385bda6b9efb9659e4a8bf8f\AndroidManifest.xml:20:5-44
@@ -460,6 +458,8 @@ MERGED from [com.stringee.sdk.android:stringee-android-sdk:1.4.1] C:\Users\Rin\.
 MERGED from [com.stringee.sdk.android:stringee-android-sdk:1.4.1] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\013a072a20fbb7ad9333103c2cc9a89a\AndroidManifest.xml:5:5-7:41
 MERGED from [com.android.volley:volley:1.1.0] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\c52b1f9e10defddf48c7dd24d3aebe50\AndroidManifest.xml:7:5-43
 MERGED from [com.android.volley:volley:1.1.0] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\c52b1f9e10defddf48c7dd24d3aebe50\AndroidManifest.xml:7:5-43
+MERGED from [androidx.multidex:multidex:2.0.0] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\6d8a9efdd55920a712d77bbf6cbec02e\AndroidManifest.xml:20:5-43
+MERGED from [androidx.multidex:multidex:2.0.0] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\6d8a9efdd55920a712d77bbf6cbec02e\AndroidManifest.xml:20:5-43
 MERGED from [com.facebook.soloader:annotation:0.8.2] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\51ca27125f57b1f040600f53935120de\AndroidManifest.xml:7:5-9:41
 MERGED from [com.facebook.soloader:annotation:0.8.2] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\51ca27125f57b1f040600f53935120de\AndroidManifest.xml:7:5-9:41
 MERGED from [com.facebook.fresco:fbcore:2.0.0] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\66a6061e5162857da1acd120e0aecfa7\AndroidManifest.xml:5:5-7:41
@@ -602,14 +602,6 @@ ADDED from [:react-native-firebase_messaging] E:\Android\Android App\react-nativ
 		ADDED from [:react-native-firebase_messaging] E:\Android\Android App\react-native-samples\Callkit-Ios13-Sample\node_modules\@react-native-firebase\messaging\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:42:13-44
 	android:name
 		ADDED from [:react-native-firebase_messaging] E:\Android\Android App\react-native-samples\Callkit-Ios13-Sample\node_modules\@react-native-firebase\messaging\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:41:13-84
-uses-permission#android.permission.CALL_PHONE
-ADDED from [:react-native-callkeep] E:\Android\Android App\react-native-samples\Callkit-Ios13-Sample\node_modules\react-native-callkeep\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:11:5-69
-	android:name
-		ADDED from [:react-native-callkeep] E:\Android\Android App\react-native-samples\Callkit-Ios13-Sample\node_modules\react-native-callkeep\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:11:22-66
-uses-permission#android.permission.READ_PHONE_STATE
-ADDED from [:react-native-callkeep] E:\Android\Android App\react-native-samples\Callkit-Ios13-Sample\node_modules\react-native-callkeep\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:12:5-75
-	android:name
-		ADDED from [:react-native-callkeep] E:\Android\Android App\react-native-samples\Callkit-Ios13-Sample\node_modules\react-native-callkeep\android\build\intermediates\library_manifest\debug\AndroidManifest.xml:12:22-72
 service#com.google.firebase.messaging.FirebaseMessagingService
 ADDED from [com.google.firebase:firebase-messaging:20.1.7] C:\Users\Rin\.gradle\caches\transforms-2\files-2.1\31257ac5224d82d998534c89002aff01\AndroidManifest.xml:28:9-34:19
 	android:exported
