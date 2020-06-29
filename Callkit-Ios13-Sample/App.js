@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
   Alert,
   Modal,
@@ -11,13 +11,13 @@ import {
   AsyncStorage,
   Platform,
 } from 'react-native';
-import {StringeeClient, StringeeCall} from 'stringee-react-native';
+import { StringeeClient, StringeeCall } from 'stringee-react-native';
 import RNCallKeep from 'react-native-callkeep';
 import VoipPushNotification from 'react-native-voip-push-notification';
 import uuid from 'react-native-uuid';
 import CallScreen from './src/CallScreen';
 import messaging from '@react-native-firebase/messaging';
-import {each} from 'underscore';
+import { each } from 'underscore';
 
 const options = {
   ios: {
@@ -88,19 +88,20 @@ class App extends Component {
       (status, code, message, callId) => {
         console.log(
           'status-' +
-            status +
-            ' code-' +
-            code +
-            ' message-' +
-            message +
-            'callId-' +
-            callId,
+          status +
+          ' code-' +
+          code +
+          ' message-' +
+          message +
+          'callId-' +
+          callId,
         );
         if (status) {
           this.setState({
             currentStringeeCallId: callId,
             showCallingView: true,
             userId: this.state.toUserId,
+            isAnswered: true,
             callState: 'Outgoing Call',
           });
         } else {
@@ -112,20 +113,23 @@ class App extends Component {
   endcallAction = () => {
     if (this.state.currentCallKitId != '') {
       RNCallKeep.endCall(this.state.currentCallKitId);
-      this.setState({currentCallKitId: ''});
+      this.setState({ currentCallKitId: '' });
     }
-    this.setState({callState: 'Ended'});
+    this.setState({ callState: 'Ended' });
     setTimeout(() => {
       this.setState({
         showCallingView: false,
         hasReceivedLocalStream: false,
         hasReceivedRemoteStream: false,
+        enableVideo: true,
+        isSpeaker: true,
+        isMute: false
       });
     }, 500);
   };
 
   onChangeText = text => {
-    this.setState({toUserId: text});
+    this.setState({ toUserId: text });
     console.log(text);
   };
 
@@ -174,7 +178,7 @@ class App extends Component {
         const callKitUUID = notification.getData().uuid;
         if (this.state.currentCallKitId == '') {
           console.log('set uuid: ' + callKitUUID);
-          this.setState({currentCallKitId: callKitUUID});
+          this.setState({ currentCallKitId: callKitUUID });
         } else {
           // if Callkit already exists then end Callkit wiht the callKitUUID
           console.log('end call uuid: ' + callKitUUID);
@@ -184,22 +188,28 @@ class App extends Component {
 
       RNCallKeep.addEventListener(
         'didReceiveStartCallAction',
-        ({handle, callUUID, name}) => {},
+        ({ handle, callUUID, name }) => { },
       );
 
-      RNCallKeep.addEventListener('answerCall', ({callUUID}) => {
+      RNCallKeep.addEventListener('didPerformSetMutedCallAction', ({ muted, callUUID }) => {
+        if (muted != this.state.isMute) {
+          this._muteAction()
+        }
+      });
+
+      RNCallKeep.addEventListener('answerCall', ({ callUUID }) => {
         if (callUUID != this.state.currentCallKitId) {
           return;
         }
 
         if (this.state.currentStringeeCallId == '') {
-          this.setState({cacheAction: 1});
+          this.setState({ cacheAction: 1 });
         } else {
           this.refs.stringeeCall.answer(
             this.state.currentStringeeCallId,
             (status, code, message) => {
               console.log(message);
-              this.setState({isAnswered: true});
+              this.setState({ isAnswered: true });
               if (status) {
                 // Sucess
               } else {
@@ -210,13 +220,13 @@ class App extends Component {
         }
       });
 
-      RNCallKeep.addEventListener('endCall', ({callUUID}) => {
+      RNCallKeep.addEventListener('endCall', ({ callUUID }) => {
         if (callUUID != this.state.currentCallKitId) {
           return;
         }
 
         if (this.state.currentStringeeCallId == '') {
-          this.setState({cacheAction: 2});
+          this.setState({ cacheAction: 2 });
         } else {
           if (this.state.isAnswered) {
             this.refs.stringeeCall.hangup(
@@ -245,16 +255,16 @@ class App extends Component {
           }
         }
 
-        this.setState({currentCallKitId: ''});
+        this.setState({ currentCallKitId: '' });
       });
     }
   }
 
   /// MARK: - CONNECT EVENT HANDLER
   // The client connects to Stringee server
-  _clientDidConnect = ({userId}) => {
+  _clientDidConnect = ({ userId }) => {
     console.log('_clientDidConnect - ' + userId);
-    this.setState({currentUserId: userId});
+    this.setState({ currentUserId: userId });
 
     if (Platform.OS === 'ios') {
       VoipPushNotification.registerVoipToken();
@@ -321,10 +331,7 @@ class App extends Component {
   };
 
   // IncomingCall event
-  _callIncomingCall = ({
-    callId,
-    from,
-    to,
+  _callIncomingCall = ({ callId, from, to,
     fromAlias,
     toAlias,
     callType,
@@ -332,26 +339,26 @@ class App extends Component {
   }) => {
     console.log(
       'IncomingCallId-' +
-        callId +
-        ' from-' +
-        from +
-        ' to-' +
-        to +
-        ' fromAlias-' +
-        fromAlias +
-        ' toAlias-' +
-        toAlias +
-        ' isVideoCall-' +
-        isVideoCall +
-        'callType-' +
-        callType,
+      callId +
+      ' from-' +
+      from +
+      ' to-' +
+      to +
+      ' fromAlias-' +
+      fromAlias +
+      ' toAlias-' +
+      toAlias +
+      ' isVideoCall-' +
+      isVideoCall +
+      'callType-' +
+      callType,
     );
 
     this.refs.stringeeCall.initAnswer(callId, (status, code, message) => {
       console.log(message);
     });
 
-    this.setState({currentStringeeCallId: callId});
+    this.setState({ currentStringeeCallId: callId });
 
     if (Platform.OS === 'android') {
       this.setState({
@@ -363,7 +370,7 @@ class App extends Component {
     } else {
       switch (this.state.cacheAction) {
         case 0: // Trường hợp bình thường
-          this.setState({showCallingView: true});
+          this.setState({ showCallingView: true });
           if (this.state.currentCallKitId != '') {
             RNCallKeep.updateDisplay(
               this.state.currentCallKitId,
@@ -373,7 +380,7 @@ class App extends Component {
             console.log('Call + Update');
           } else {
             var callKitUUID = uuid.v1();
-            this.setState({currentCallKitId: callKitUUID});
+            this.setState({ currentCallKitId: callKitUUID });
             RNCallKeep.displayIncomingCall(
               callKitUUID,
               'Stringee',
@@ -386,12 +393,12 @@ class App extends Component {
           break;
 
         case 1: // Trường hợp đã bấm answer
-          this.setState({showCallingView: true});
+          this.setState({ showCallingView: true });
           this.refs.stringeeCall.answer(
             this.state.currentStringeeCallId,
             (status, code, message) => {
               console.log(message);
-              this.setState({isAnswered: true});
+              this.setState({ isAnswered: true });
             },
           );
           break;
@@ -422,53 +429,53 @@ class App extends Component {
   }) => {
     console.log(
       '_callDidChangeSignalingState ' +
-        ' callId-' +
-        callId +
-        'code-' +
-        code +
-        ' reason-' +
-        reason +
-        ' sipCode-' +
-        sipCode +
-        ' sipReason-' +
-        sipReason,
+      ' callId-' +
+      callId +
+      'code-' +
+      code +
+      ' reason-' +
+      reason +
+      ' sipCode-' +
+      sipCode +
+      ' sipReason-' +
+      sipReason,
     );
 
     switch (code) {
       case 0:
-        this.setState({callState: reason});
+        this.setState({ callState: reason });
         break;
       case 1:
-        this.setState({callState: reason});
+        this.setState({ callState: reason });
         break;
       case 2:
-        this.setState({callState: reason});
+        this.setState({ callState: reason });
         break;
       case 3:
-        this.setState({callState: reason});
+        this.setState({ callState: reason });
         this.endcallAction();
         break;
       case 4:
-        this.setState({callState: reason});
+        this.setState({ callState: reason });
         this.endcallAction();
         break;
     }
   };
 
   // Invoked when the call media state changes
-  _callDidChangeMediaState = ({callId, code, description}) => {
+  _callDidChangeMediaState = ({ callId, code, description }) => {
     console.log(
       '_callDidChangeMediaState' +
-        ' callId-' +
-        callId +
-        'code-' +
-        code +
-        ' description-' +
-        description,
+      ' callId-' +
+      callId +
+      'code-' +
+      code +
+      ' description-' +
+      description,
     );
     switch (code) {
       case 0:
-        this.setState({callState: 'Started'});
+        this.setState({ callState: 'Started' });
         break;
       case 1:
         break;
@@ -484,39 +491,83 @@ class App extends Component {
   };
 
   // Invoked when the local stream is available
-  _callDidReceiveLocalStream = ({callId}) => {
-    this.setState({hasReceivedLocalStream: true});
+  _callDidReceiveLocalStream = ({ callId }) => {
+    this.setState({ hasReceivedLocalStream: true });
   };
   // Invoked when the remote stream is available
-  _callDidReceiveRemoteStream = ({callId}) => {
-    this.setState({hasReceivedRemoteStream: true});
+  _callDidReceiveRemoteStream = ({ callId }) => {
+    this.setState({ hasReceivedRemoteStream: true });
   };
 
   // Invoked when receives a DMTF
-  _didReceiveDtmfDigit = ({callId, dtmf}) => {};
+  _didReceiveDtmfDigit = ({ callId, dtmf }) => { };
 
   // Invoked when receives info from other clients
-  _didReceiveCallInfo = ({callId, data}) => {};
+  _didReceiveCallInfo = ({ callId, data }) => { };
 
   // Invoked when the call is handled on another device
-  _didHandleOnAnotherDevice = ({callId, code, description}) => {
+  _didHandleOnAnotherDevice = ({ callId, code, description }) => {
     console.log(
       '_didHandleOnAnotherDevice ' +
-        callId +
-        '***' +
-        code +
-        '***' +
-        description,
+      callId +
+      '***' +
+      code +
+      '***' +
+      description,
     );
   };
 
-  async componentDidMount() {
-    //user1
-    // const token = "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTSzRPNEVRa2J0VDdkTFBFSzBBbGJOTEdTaGpUcjBnaVFOLTE1OTMwNTc4OTIiLCJpc3MiOiJTSzRPNEVRa2J0VDdkTFBFSzBBbGJOTEdTaGpUcjBnaVFOIiwiZXhwIjoxNTk1NjQ5ODkyLCJ1c2VySWQiOiJ1c2VyMSJ9.dKOCqUyuoVVoC4P6S2YKfLriYrAk6JHICpW_yI0yExQ"
+  // Action handler
 
-    //user2
-    const token =
-      'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZULTE1OTMwODI5MTkiLCJpc3MiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZUIiwiZXhwIjoxNTk1Njc0OTE5LCJ1c2VySWQiOiJ1c2VyMSJ9.Tl1DdD1XesGD5KvCAGQvXbufP95miLHGn6ZW3RgxCxs';
+  _muteAction = () => {
+    this.refs.stringeeCall.mute(
+      this.state.currentStringeeCallId,
+      !this.state.isMute,
+      (status, code, message) => {
+        this.setState({ isMute: !this.state.isMute });
+        if (this.state.currentCallKitId != '') {
+          RNCallKeep.setMutedCall(this.state.currentCallKitId, this.state.isMute);
+        }
+      },
+    );
+  };
+
+  _speakerAction = () => {
+    this.refs.stringeeCall.setSpeakerphoneOn(
+      this.state.currentStringeeCallId,
+      !this.state.isSpeaker,
+      (status, code, message) => {
+        this.setState({ isSpeaker: !this.state.isSpeaker });
+      },
+    );
+  }
+
+  _enableVideoAction = () => {
+    this.refs.stringeeCall.enableVideo(
+      this.state.currentStringeeCallId,
+      !this.state.enableVideo,
+      (status, code, message) => {
+        this.setState({ enableVideo: !this.state.enableVideo });
+      },
+    );
+  }
+
+  _switchCameraAction = () => {
+    this.refs.stringeeCall.switchCamera(
+      this.state.currentStringeeCallId,
+      (status, code, message) => {
+        console.log(message);
+      },
+    );
+  }
+
+
+  async componentDidMount() {
+    //user5
+    // const token = "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTSzRPNEVRa2J0VDdkTFBFSzBBbGJOTEdTaGpUcjBnaVFOLTE1OTMxNjM2NzEiLCJpc3MiOiJTSzRPNEVRa2J0VDdkTFBFSzBBbGJOTEdTaGpUcjBnaVFOIiwiZXhwIjoxNTk1NzU1NjcxLCJ1c2VySWQiOiJ1c2VyNSJ9.pOqGT7Nngm5nMC5fcqhF8Sj-kqqQ3nYR0pQmpI-Dsfk"
+
+    //user6
+    const token = 'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTSzRPNEVRa2J0VDdkTFBFSzBBbGJOTEdTaGpUcjBnaVFOLTE1OTMxNjM2ODUiLCJpc3MiOiJTSzRPNEVRa2J0VDdkTFBFSzBBbGJOTEdTaGpUcjBnaVFOIiwiZXhwIjoxNTk1NzU1Njg1LCJ1c2VySWQiOiJ1c2VyNiJ9.3GJc3m296lk9D5-5a0GnOaiKjQHje2clfl4uUA31HKI';
 
     await this.refs.stringeeClient.connect(token);
     if (Platform.OS === 'android') {
@@ -525,7 +576,7 @@ class App extends Component {
   }
 
   render() {
-    const {showCallingView} = this.state;
+    const { showCallingView } = this.state;
     return (
       <View style={styles.topCenteredView}>
         <Modal
@@ -536,7 +587,7 @@ class App extends Component {
             Alert.alert('Modal has been closed.');
           }}>
           {this.state.showCallingView && (
-            <View style={{flex: 1}}>
+            <View style={{ flex: 1 }}>
               <CallScreen
                 hasLocalStream={this.state.hasReceivedLocalStream}
                 hasRemoteStream={this.state.hasReceivedRemoteStream}
@@ -564,54 +615,27 @@ class App extends Component {
                   this.refs.stringeeCall.answer(
                     this.state.currentStringeeCallId,
                     (status, code, message) => {
-                      this.setState({isAnswered: true});
+                      this.setState({ isAnswered: true });
                     },
                   );
                 }}
-                switchCameraHandler={() => {
-                  this.refs.stringeeCall.switchCamera(
-                    this.state.currentStringeeCallId,
-                    (status, code, message) => {
-                      console.log(message);
-                    },
-                  );
-                }}
+
+                switchCameraHandler={this._switchCameraAction}
+
                 isSpeaker={this.state.isSpeaker}
-                peakerButtonHandler={() => {
-                  this.refs.stringeeCall.setSpeakerphoneOn(
-                    this.state.currentStringeeCallId,
-                    !this.state.isSpeaker,
-                    (status, code, message) => {
-                      this.setState({isSpeaker: !this.state.isSpeaker});
-                    },
-                  );
-                }}
+                peakerButtonHandler={this._speakerAction}
+
                 isMute={this.state.isMute}
-                muteButtonHandler={() => {
-                  this.refs.stringeeCall.mute(
-                    this.state.currentStringeeCallId,
-                    !this.state.isMute,
-                    (status, code, message) => {
-                      this.setState({isMute: !this.state.isMute});
-                    },
-                  );
-                }}
+                muteButtonHandler={this._muteAction}
+
                 enableVideo={this.state.enableVideo}
-                enableVideoButtonHandler={() => {
-                  this.refs.stringeeCall.enableVideo(
-                    this.state.currentStringeeCallId,
-                    !this.state.enableVideo,
-                    (status, code, message) => {
-                      this.setState({enableVideo: !this.state.enableVideo});
-                    },
-                  );
-                }}
+                enableVideoButtonHandler={this._enableVideoAction}
               />
             </View>
           )}
         </Modal>
 
-        <Text style={{height: 40, marginBottom: 10, textAlign: 'center'}}>
+        <Text style={{ height: 40, marginBottom: 10, textAlign: 'center' }}>
           {this.state.currentUserId}
         </Text>
 
