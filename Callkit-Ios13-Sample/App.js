@@ -1,16 +1,6 @@
 import React, { Component } from 'react';
-import {
-  Alert,
-  Modal,
-  StyleSheet,
-  Text,
-  TouchableHighlight,
-  View,
-  TextInput,
-  PermissionsAndroid,
-  AsyncStorage,
-  Platform,
-} from 'react-native';
+import { Alert, Modal, StyleSheet, Text, TouchableHighlight, View, TextInput, PermissionsAndroid } from 'react-native';
+import { AsyncStorage, Platform, AppState, } from 'react-native';
 import { StringeeClient, StringeeCall } from 'stringee-react-native';
 import RNCallKeep from 'react-native-callkeep';
 import VoipPushNotification from 'react-native-voip-push-notification';
@@ -24,6 +14,8 @@ const options = {
     appName: 'Stringee',
   },
 };
+
+const speakerPromise = RNCallKeep.checkSpeaker;
 
 const requestPermission = async () =>
   new Promise((resolve, reject) => {
@@ -53,6 +45,8 @@ const requestPermission = async () =>
 
 class App extends Component {
   state = {
+    appState: AppState.currentState,
+
     toUserId: '',
     currentUserId: '',
     currentStringeeCallId: '',
@@ -573,7 +567,30 @@ class App extends Component {
     if (Platform.OS === 'android') {
       requestPermission();
     }
+
+    AppState.addEventListener('change', this._handleAppStateChange);
   }
+
+  async componentWillUnmount() {
+    AppState.removeEventListener('change', this._handleAppStateChange);
+  }
+
+  _handleAppStateChange = (nextAppState) => {
+    var thisInstance = this;
+    if ((Platform.OS === 'ios') && (this.state.appState.match(/inactive|background/) && nextAppState === 'active')) {
+      console.log('App has come to the foreground!');
+      RNCallKeep.checkSpeaker().then(function (speaker) {
+        console.log('RNCallKeep.checkSpeaker ' + speaker);
+        thisInstance.setState({ isSpeaker: speaker });
+      }, function (error) {
+        console.log(error.message);
+      });
+    }
+
+    this.setState({ appState: nextAppState });
+    console.log('App state ' + this.state.appState);
+  }
+
 
   render() {
     const { showCallingView } = this.state;
