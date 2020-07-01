@@ -24,8 +24,6 @@ const videoDisableImg = require('../resource/video_disable.png');
 const videoEnableImg = require('../resource/video_enable.png');
 
 class CallScreen extends Component {
-
-  
   render() {
     return (
       <View style={styles.container}>
@@ -36,6 +34,7 @@ class CallScreen extends Component {
               callId={this.props.stringeeCallId}
               streamId=""
               local={true}
+              overlay={true}
             />
           )}
         </View>
