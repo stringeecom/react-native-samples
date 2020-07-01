@@ -12,6 +12,7 @@ import { each } from 'underscore';
 const options = {
   ios: {
     appName: 'Stringee',
+    includesCallsInRecents: false,
   },
 };
 
@@ -77,19 +78,9 @@ class App extends Component {
 
     const parameters = JSON.stringify(myObj);
 
-    this.refs.stringeeCall.makeCall(
-      parameters,
-      (status, code, message, callId) => {
-        console.log(
-          'status-' +
-          status +
-          ' code-' +
-          code +
-          ' message-' +
-          message +
-          'callId-' +
-          callId,
-        );
+    console.log("callButtonClicked");
+    this.refs.stringeeCall.makeCall(parameters, (status, code, message, callId) => {
+        console.log( 'status-' + status + ' code-' + code + ' message-' + message + 'callId-' + callId);
         if (status) {
           this.setState({
             currentStringeeCallId: callId,
@@ -99,6 +90,7 @@ class App extends Component {
             callState: 'Outgoing Call',
           });
         } else {
+          Alert.alert('Make call fail: ' + message);
         }
       },
     );
@@ -226,7 +218,7 @@ class App extends Component {
             this.refs.stringeeCall.hangup(
               this.state.currentStringeeCallId,
               (status, code, message) => {
-                console.log(message);
+                console.log('stringeeCall.hangup: ' + message);
                 if (status) {
                   // Sucess
                 } else {
@@ -238,7 +230,7 @@ class App extends Component {
             this.refs.stringeeCall.reject(
               this.state.currentStringeeCallId,
               (status, code, message) => {
-                console.log(message);
+                console.log('stringeeCall.reject: ' + message);
                 if (status) {
                   // Sucess
                 } else {
@@ -331,22 +323,8 @@ class App extends Component {
     callType,
     isVideoCall,
   }) => {
-    console.log(
-      'IncomingCallId-' +
-      callId +
-      ' from-' +
-      from +
-      ' to-' +
-      to +
-      ' fromAlias-' +
-      fromAlias +
-      ' toAlias-' +
-      toAlias +
-      ' isVideoCall-' +
-      isVideoCall +
-      'callType-' +
-      callType,
-    );
+    console.log( 'IncomingCallId-' + callId + ' from-' + from + ' to-' + to + ' fromAlias-' + 
+    fromAlias + ' toAlias-' + toAlias + ' isVideoCall-' + isVideoCall + 'callType-' + callType,);
 
     this.refs.stringeeCall.initAnswer(callId, (status, code, message) => {
       console.log(message);
@@ -414,27 +392,9 @@ class App extends Component {
 
   /// MARK: - CALL EVENT HANDLER
   // Invoked when the call signaling state changes
-  _callDidChangeSignalingState = ({
-    callId,
-    code,
-    reason,
-    sipCode,
-    sipReason,
-  }) => {
-    console.log(
-      '_callDidChangeSignalingState ' +
-      ' callId-' +
-      callId +
-      'code-' +
-      code +
-      ' reason-' +
-      reason +
-      ' sipCode-' +
-      sipCode +
-      ' sipReason-' +
-      sipReason,
-    );
-
+  _callDidChangeSignalingState = ({ callId, code, reason, sipCode, sipReason }) => {
+    console.log('_callDidChangeSignalingState ' + ' callId-' + callId + 'code-' +
+     code + ' reason-' + reason + ' sipCode-' + sipCode + ' sipReason-' + sipReason);
     switch (code) {
       case 0:
         this.setState({ callState: reason });
@@ -458,15 +418,7 @@ class App extends Component {
 
   // Invoked when the call media state changes
   _callDidChangeMediaState = ({ callId, code, description }) => {
-    console.log(
-      '_callDidChangeMediaState' +
-      ' callId-' +
-      callId +
-      'code-' +
-      code +
-      ' description-' +
-      description,
-    );
+    console.log('_callDidChangeMediaState' + ' callId-' + callId + 'code-' + code + ' description-' + description);
     switch (code) {
       case 0:
         this.setState({ callState: 'Started' });
@@ -558,10 +510,10 @@ class App extends Component {
 
   async componentDidMount() {
     //user5
-    // const token = "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTSzRPNEVRa2J0VDdkTFBFSzBBbGJOTEdTaGpUcjBnaVFOLTE1OTMxNjM2NzEiLCJpc3MiOiJTSzRPNEVRa2J0VDdkTFBFSzBBbGJOTEdTaGpUcjBnaVFOIiwiZXhwIjoxNTk1NzU1NjcxLCJ1c2VySWQiOiJ1c2VyNSJ9.pOqGT7Nngm5nMC5fcqhF8Sj-kqqQ3nYR0pQmpI-Dsfk"
+    const token = "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTSzRPNEVRa2J0VDdkTFBFSzBBbGJOTEdTaGpUcjBnaVFOLTE1OTM0OTk2MTkiLCJpc3MiOiJTSzRPNEVRa2J0VDdkTFBFSzBBbGJOTEdTaGpUcjBnaVFOIiwiZXhwIjoxNTk2MDkxNjE5LCJ1c2VySWQiOiJ1c2VyNSJ9.ykTc1_nBgl00fmMgKax0beMhIp6kYx3czRqXZKs7HnQ"
 
     //user6
-    const token = 'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTSzRPNEVRa2J0VDdkTFBFSzBBbGJOTEdTaGpUcjBnaVFOLTE1OTMxNjM2ODUiLCJpc3MiOiJTSzRPNEVRa2J0VDdkTFBFSzBBbGJOTEdTaGpUcjBnaVFOIiwiZXhwIjoxNTk1NzU1Njg1LCJ1c2VySWQiOiJ1c2VyNiJ9.3GJc3m296lk9D5-5a0GnOaiKjQHje2clfl4uUA31HKI';
+    // const token = 'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTSzRPNEVRa2J0VDdkTFBFSzBBbGJOTEdTaGpUcjBnaVFOLTE1OTM0OTk2MzEiLCJpc3MiOiJTSzRPNEVRa2J0VDdkTFBFSzBBbGJOTEdTaGpUcjBnaVFOIiwiZXhwIjoxNTk2MDkxNjMxLCJ1c2VySWQiOiJ1c2VyNiJ9.LwGAqw_oEbDpjL0Bmg0rOdBF_I2QWQnrF-p_9ZDbJmU';
 
     await this.refs.stringeeClient.connect(token);
     if (Platform.OS === 'android') {
@@ -671,7 +623,7 @@ class App extends Component {
         />
 
         <TouchableHighlight
-          style={styles.openButton}
+          style={styles.callButton}
           onPress={() => {
             this.callButtonClick();
           }}>
@@ -722,7 +674,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
-  openButton: {
+  callButton: {
     backgroundColor: 'green',
     borderRadius: 20,
     padding: 10,

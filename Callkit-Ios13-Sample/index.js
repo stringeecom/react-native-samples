@@ -8,8 +8,8 @@ import {name as appName} from './app.json';
 import CallScreen from './src/CallScreen';
 
 // Android only ----------
-import messaging from '@react-native-firebase/messaging';
-import notifee from '@notifee/react-native';
+// import messaging from '@react-native-firebase/messaging';
+// import notifee from '@notifee/react-native';
 // -----------------------
 
 if (Platform.OS === 'android') {
