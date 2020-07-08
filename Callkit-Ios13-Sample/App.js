@@ -55,6 +55,8 @@ class App extends Component {
     userId: '',
 
     isAnswered: false,
+    isActivateAudioSession: false,
+    callWaitingAudioSection: false,
     cacheAction: 0, // 0: Không có, 1: Đã bấm answer, 2: Đã bấm end
 
     callState: '',
@@ -80,19 +82,19 @@ class App extends Component {
 
     console.log("callButtonClicked");
     this.refs.stringeeCall.makeCall(parameters, (status, code, message, callId) => {
-        console.log( 'status-' + status + ' code-' + code + ' message-' + message + 'callId-' + callId);
-        if (status) {
-          this.setState({
-            currentStringeeCallId: callId,
-            showCallingView: true,
-            userId: this.state.toUserId,
-            isAnswered: true,
-            callState: 'Outgoing Call',
-          });
-        } else {
-          Alert.alert('Make call fail: ' + message);
-        }
-      },
+      console.log('status-' + status + ' code-' + code + ' message-' + message + 'callId-' + callId);
+      if (status) {
+        this.setState({
+          currentStringeeCallId: callId,
+          showCallingView: true,
+          userId: this.state.toUserId,
+          isAnswered: true,
+          callState: 'Outgoing Call',
+        });
+      } else {
+        Alert.alert('Make call fail: ' + message);
+      }
+    },
     );
   };
 
@@ -101,7 +103,11 @@ class App extends Component {
       RNCallKeep.endCall(this.state.currentCallKitId);
       this.setState({ currentCallKitId: '' });
     }
-    this.setState({ callState: 'Ended' });
+    this.setState({
+      callState: 'Ended',
+      currentStringeeCallId: '',
+      isActivateAudioSession: false,
+    });
     setTimeout(() => {
       this.setState({
         showCallingView: false,
@@ -112,6 +118,25 @@ class App extends Component {
         isMute: false
       });
     }, 500);
+  };
+
+  answerCallAction = () => {
+    if (this.state.isActivateAudioSession) {
+      this.refs.stringeeCall.answer(
+        this.state.currentStringeeCallId,
+        (status, code, message) => {
+          console.log(message);
+          this.setState({ isAnswered: true });
+          if (status) {
+            // Sucess
+          } else {
+            // Fail
+          }
+        },
+      );
+    } else {
+      this.setState({ callWaitingAudioSection: true })
+    }
   };
 
   onChangeText = text => {
@@ -172,6 +197,14 @@ class App extends Component {
         }
       });
 
+      RNCallKeep.addEventListener('didActivateAudioSession', (data) => {
+        this.setState({ isActivateAudioSession: true })
+        if (this.state.callWaitingAudioSection) {
+          this.answerCallAction();
+          this.setState({ callWaitingAudioSection: false });
+        }
+      });
+
       RNCallKeep.addEventListener(
         'didReceiveStartCallAction',
         ({ handle, callUUID, name }) => { },
@@ -191,18 +224,7 @@ class App extends Component {
         if (this.state.currentStringeeCallId == '') {
           this.setState({ cacheAction: 1 });
         } else {
-          this.refs.stringeeCall.answer(
-            this.state.currentStringeeCallId,
-            (status, code, message) => {
-              console.log(message);
-              this.setState({ isAnswered: true });
-              if (status) {
-                // Sucess
-              } else {
-                // Fail
-              }
-            },
-          );
+          this.answerCallAction();
         }
       });
 
@@ -323,23 +345,22 @@ class App extends Component {
     callType,
     isVideoCall,
   }) => {
-    console.log( 'IncomingCallId-' + callId + ' from-' + from + ' to-' + to + ' fromAlias-' + 
-    fromAlias + ' toAlias-' + toAlias + ' isVideoCall-' + isVideoCall + 'callType-' + callType,);
+    console.log('IncomingCallId-' + callId + ' from-' + from + ' to-' + to + ' fromAlias-' +
+      fromAlias + ' toAlias-' + toAlias + ' isVideoCall-' + isVideoCall + 'callType-' + callType);
 
     this.refs.stringeeCall.initAnswer(callId, (status, code, message) => {
       console.log(message);
     });
 
-    this.setState({ currentStringeeCallId: callId });
+    this.setState({
+      currentStringeeCallId: callId,
+      showCallingView: true,
+      isAnswered: false,
+      userId: from,
+      callState: 'Incoming Call',
+    });
 
-    if (Platform.OS === 'android') {
-      this.setState({
-        showCallingView: true,
-        isAnswered: false,
-        userId: from,
-        callState: 'Incoming Call',
-      });
-    } else {
+    if (Platform.OS === 'ios') {
       switch (this.state.cacheAction) {
         case 0: // Trường hợp bình thường
           this.setState({ showCallingView: true });
@@ -366,13 +387,7 @@ class App extends Component {
 
         case 1: // Trường hợp đã bấm answer
           this.setState({ showCallingView: true });
-          this.refs.stringeeCall.answer(
-            this.state.currentStringeeCallId,
-            (status, code, message) => {
-              console.log(message);
-              this.setState({ isAnswered: true });
-            },
-          );
+          this.answerCallAction();
           break;
 
         case 2: // Trường hợp đã bấm Reject
@@ -387,6 +402,8 @@ class App extends Component {
         default:
           break;
       }
+
+      this.setState({ cacheAction: 0 });
     }
   };
 
@@ -394,7 +411,7 @@ class App extends Component {
   // Invoked when the call signaling state changes
   _callDidChangeSignalingState = ({ callId, code, reason, sipCode, sipReason }) => {
     console.log('_callDidChangeSignalingState ' + ' callId-' + callId + 'code-' +
-     code + ' reason-' + reason + ' sipCode-' + sipCode + ' sipReason-' + sipReason);
+      code + ' reason-' + reason + ' sipCode-' + sipCode + ' sipReason-' + sipReason);
     switch (code) {
       case 0:
         this.setState({ callState: reason });
@@ -581,12 +598,7 @@ class App extends Component {
                   );
                 }}
                 acceptButtonHandler={() => {
-                  this.refs.stringeeCall.answer(
-                    this.state.currentStringeeCallId,
-                    (status, code, message) => {
-                      this.setState({ isAnswered: true });
-                    },
-                  );
+                  this.answerCallAction();
                 }}
 
                 switchCameraHandler={this._switchCameraAction}

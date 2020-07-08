@@ -7,15 +7,15 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "C2DC611E-AF03-4335-A930-AFD22B0EC01A"
+            uuid = "4FA3D6A7-701B-4355-9F9D-117CB0A19A2F"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "StringeeCallkit_ReactNative/AppDelegate.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "89"
-            endingLineNumber = "89"
+            startingLineNumber = "79"
+            endingLineNumber = "79"
             landmarkName = "-pushRegistry:didReceiveIncomingPushWithPayload:forType:withCompletionHandler:"
             landmarkType = "7">
          </BreakpointContent>
