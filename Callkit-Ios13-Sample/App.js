@@ -125,8 +125,8 @@ class App extends Component {
       this.refs.stringeeCall.answer(
         this.state.currentStringeeCallId,
         (status, code, message) => {
-          console.log(message);
           this.setState({ isAnswered: true });
+          console.log('call did answer ' + status + ' - message: ' + message);
           if (status) {
             // Sucess
           } else {
@@ -527,10 +527,12 @@ class App extends Component {
 
   async componentDidMount() {
     //user5
-    const token = "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTSzRPNEVRa2J0VDdkTFBFSzBBbGJOTEdTaGpUcjBnaVFOLTE1OTM0OTk2MTkiLCJpc3MiOiJTSzRPNEVRa2J0VDdkTFBFSzBBbGJOTEdTaGpUcjBnaVFOIiwiZXhwIjoxNTk2MDkxNjE5LCJ1c2VySWQiOiJ1c2VyNSJ9.ykTc1_nBgl00fmMgKax0beMhIp6kYx3czRqXZKs7HnQ"
+    // const token = "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTSzRPNEVRa2J0VDdkTFBFSzBBbGJOTEdTaGpUcjBnaVFOLTE1OTM0OTk2MTkiLCJpc3MiOiJTSzRPNEVRa2J0VDdkTFBFSzBBbGJOTEdTaGpUcjBnaVFOIiwiZXhwIjoxNTk2MDkxNjE5LCJ1c2VySWQiOiJ1c2VyNSJ9.ykTc1_nBgl00fmMgKax0beMhIp6kYx3czRqXZKs7HnQ"
 
     //user6
     // const token = 'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTSzRPNEVRa2J0VDdkTFBFSzBBbGJOTEdTaGpUcjBnaVFOLTE1OTM0OTk2MzEiLCJpc3MiOiJTSzRPNEVRa2J0VDdkTFBFSzBBbGJOTEdTaGpUcjBnaVFOIiwiZXhwIjoxNTk2MDkxNjMxLCJ1c2VySWQiOiJ1c2VyNiJ9.LwGAqw_oEbDpjL0Bmg0rOdBF_I2QWQnrF-p_9ZDbJmU';
+
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6InN0cmluZ2VlLWFwaTt2PTEifQ.eyJqdGkiOiJTS2w5MEdjSkJPWHdleW1oMHc4cmJuRlkwbml0eXZuS05oLTE1OTQyNjMyNzkiLCJpc3MiOiJTS2w5MEdjSkJPWHdleW1oMHc4cmJuRlkwbml0eXZuS05oIiwiZXhwIjoxNTk2ODU1Mjc5LCJpY2NfYXBpIjp0cnVlLCJpYXQiOjE1OTQyNjIzNzksInVzZXJJZCI6Im5pdGNvLmFwcCJ9.6UPtXtTzUseBeAKTFhCt3Bdpep0RDpWeKtjW0OLyNbU"
 
     await this.refs.stringeeClient.connect(token);
     if (Platform.OS === 'android') {
@@ -582,20 +584,13 @@ class App extends Component {
                 isAnswered={this.state.isAnswered}
                 callState={this.state.callState}
                 endButtonHandler={() => {
+                  this.endcallAction();
                   this.refs.stringeeCall.hangup(
-                    this.state.currentStringeeCallId,
-                    (status, code, message) => {
-                      this.endcallAction();
-                    },
-                  );
+                    this.state.currentStringeeCallId, (status, code, message) => { });
                 }}
                 rejectButtonHandler={() => {
-                  this.refs.stringeeCall.reject(
-                    this.state.currentStringeeCallId,
-                    (status, code, message) => {
-                      this.endcallAction();
-                    },
-                  );
+                  this.endcallAction();
+                  this.refs.stringeeCall.reject(this.state.currentStringeeCallId, (status, code, message) => { });
                 }}
                 acceptButtonHandler={() => {
                   this.answerCallAction();
