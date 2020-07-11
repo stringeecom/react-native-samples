@@ -14,8 +14,8 @@ import { StringeeClient } from "stringee-react-native";
 import FCM from "react-native-fcm";
 import { FCMEvent } from "react-native-fcm";
 
-const user1 = "YOUR_TOKEN";
-const user2 = "YOUR_TOKEN";
+const user1 = "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyLTE1OTAwNTEzNjUiLCJpc3MiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyIiwiZXhwIjoxNTkyNjQzMzY1LCJ1c2VySWQiOiJ1c2VyMSJ9.D_cjTUqdoWuTEXoEqzHYs8NlGPgRZYnV6VDduW1Lhjc";
+const user2 = "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyLTE1OTAwNTEzNzQiLCJpc3MiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyIiwiZXhwIjoxNTkyNjQzMzc0LCJ1c2VySWQiOiJ1c2VyMiJ9.I2WHHUZ9LqnV31vLzRM3-hrNsce6Ax3AzsMvQhwIW_E";
 
 const iOS = Platform.OS === "ios" ? true : false;
 

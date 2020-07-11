@@ -595,7 +595,7 @@
 				ORGANIZATIONNAME = Facebook;
 				TargetAttributes = {
 					13B07F861A680F5B00A75B9A = {
-						DevelopmentTeam = 8MA9F9A86E;
+						DevelopmentTeam = 9L439MV268;
 						ProvisioningStyle = Manual;
 					};
 				};
@@ -605,6 +605,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);
@@ -1021,7 +1022,7 @@
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
-				DEVELOPMENT_TEAM = 8MA9F9A86E;
+				DEVELOPMENT_TEAM = 9L439MV268;
 				ENABLE_BITCODE = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1040,10 +1041,10 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.stringee.CallkitDemo;
+				PRODUCT_BUNDLE_IDENTIFIER = com.stringee.CallkitSample;
 				PRODUCT_NAME = OneToOneCallSample;
 				PROVISIONING_PROFILE = "cf8caa6b-c105-491f-b555-b0e1e0ed701a";
-				PROVISIONING_PROFILE_SPECIFIER = Callkit_develop_provision;
+				PROVISIONING_PROFILE_SPECIFIER = CallkitSampleDev;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
 			name = Debug;

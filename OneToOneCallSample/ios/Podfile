@@ -3,8 +3,9 @@ platform :ios, '8.0'
 target 'OneToOneCallSample' do
   node_modules_path = '../node_modules'
 
-  pod 'yoga', path: "#{node_modules_path}/react-native/ReactCommon/yoga/yoga.podspec"
-  pod 'React', path: "#{node_modules_path}/react-native", :subspecs => ['DevSupport', 'RCTNetwork']
+  pod 'Yoga', :path => '../node_modules/react-native/ReactCommon/yoga', :modular_headers => true
+  pod 'React-Core/DevSupport', :path => '../node_modules/react-native/'
+  pod 'React-RCTNetwork', :path => '../node_modules/react-native/Libraries/Network'
 
   pod 'RNStringee', path: "#{node_modules_path}/stringee-react-native/ios"
   
