@@ -121,7 +121,6 @@ class CallScreen extends Component {
 
   renderSpeakerImage = () => {
     var imgSource = this.props.isSpeaker ? speakerImg_selected : speakerImg;
-    console.log("this.props.isSpeaker: " + this.props.isSpeaker);
     return <Image style={styles.button} source={imgSource} />;
   };
 
