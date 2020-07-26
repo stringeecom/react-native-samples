@@ -1,7 +1,16 @@
-import React, { Component } from 'react';
-import { Alert, Modal, StyleSheet, Text, TouchableHighlight, View, TextInput, PermissionsAndroid } from 'react-native';
-import { AsyncStorage, Platform, AppState, } from 'react-native';
-import { StringeeClient, StringeeCall } from 'stringee-react-native';
+import React, {Component} from 'react';
+import {
+  Alert,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableHighlight,
+  View,
+  TextInput,
+  PermissionsAndroid,
+} from 'react-native';
+import {AsyncStorage, Platform, AppState} from 'react-native';
+import {StringeeClient, StringeeCall} from 'stringee-react-native';
 import RNCallKeep from 'react-native-callkeep';
 import VoipPushNotification from 'react-native-voip-push-notification';
 import uuid from 'react-native-uuid';
@@ -296,7 +305,7 @@ class App extends Component {
   }
 
   onChangeText = text => {
-    this.setState({ toUserId: text });
+    this.setState({toUserId: text});
     console.log(text);
   };
 
@@ -499,9 +508,9 @@ class App extends Component {
 
   /// MARK: - CONNECT EVENT HANDLER
   // The client connects to Stringee server
-  _clientDidConnect = ({ userId }) => {
+  _clientDidConnect = ({userId}) => {
     console.log('_clientDidConnect - ' + userId);
-    this.setState({ currentUserId: userId });
+    this.setState({currentUserId: userId});
 
     /*
       Handle cho truong hop A goi B, nhung A end call rat nhanh, B nhan duoc push nhung khong nhan duoc incoming call
@@ -577,7 +586,10 @@ class App extends Component {
   };
 
   // IncomingCall event
-  _callIncomingCall = ({ callId, from, to,
+  _callIncomingCall = ({
+    callId,
+    from,
+    to,
     fromAlias,
     toAlias,
     callType,
@@ -741,11 +753,19 @@ class App extends Component {
   };
 
   // Invoked when the call media state changes
-  _callDidChangeMediaState = ({ callId, code, description }) => {
-    console.log('_callDidChangeMediaState' + ' callId-' + callId + 'code-' + code + ' description-' + description);
+  _callDidChangeMediaState = ({callId, code, description}) => {
+    console.log(
+      '_callDidChangeMediaState' +
+        ' callId-' +
+        callId +
+        'code-' +
+        code +
+        ' description-' +
+        description,
+    );
     switch (code) {
       case 0:
-        this.setState({ callState: 'Started' });
+        this.setState({callState: 'Started'});
         break;
       case 1:
         break;
@@ -761,29 +781,29 @@ class App extends Component {
   };
 
   // Invoked when the local stream is available
-  _callDidReceiveLocalStream = ({ callId }) => {
-    this.setState({ hasReceivedLocalStream: true });
+  _callDidReceiveLocalStream = ({callId}) => {
+    this.setState({hasReceivedLocalStream: true});
   };
   // Invoked when the remote stream is available
-  _callDidReceiveRemoteStream = ({ callId }) => {
-    this.setState({ hasReceivedRemoteStream: true });
+  _callDidReceiveRemoteStream = ({callId}) => {
+    this.setState({hasReceivedRemoteStream: true});
   };
 
   // Invoked when receives a DMTF
-  _didReceiveDtmfDigit = ({ callId, dtmf }) => { };
+  _didReceiveDtmfDigit = ({callId, dtmf}) => {};
 
   // Invoked when receives info from other clients
-  _didReceiveCallInfo = ({ callId, data }) => { };
+  _didReceiveCallInfo = ({callId, data}) => {};
 
   // Invoked when the call is handled on another device
-  _didHandleOnAnotherDevice = ({ callId, code, description }) => {
+  _didHandleOnAnotherDevice = ({callId, code, description}) => {
     console.log(
       '_didHandleOnAnotherDevice ' +
-      callId +
-      '***' +
-      code +
-      '***' +
-      description,
+        callId +
+        '***' +
+        code +
+        '***' +
+        description,
     );
   };
 
@@ -815,10 +835,10 @@ class App extends Component {
       this.state.syncCall.callId,
       !this.state.isSpeaker,
       (status, code, message) => {
-        this.setState({ isSpeaker: !this.state.isSpeaker });
+        this.setState({isSpeaker: !this.state.isSpeaker});
       },
     );
-  }
+  };
 
   _enableVideoAction = () => {
     if (this.state.syncCall == null || this.state.syncCall.callId == '') {
@@ -829,10 +849,10 @@ class App extends Component {
       this.state.syncCall.callId,
       !this.state.enableVideo,
       (status, code, message) => {
-        this.setState({ enableVideo: !this.state.enableVideo });
+        this.setState({enableVideo: !this.state.enableVideo});
       },
     );
-  }
+  };
 
   _switchCameraAction = () => {
     if (this.state.syncCall == null || this.state.syncCall.callId == '') {
@@ -845,8 +865,7 @@ class App extends Component {
         console.log(message);
       },
     );
-  }
-
+  };
 
   async componentDidMount() {
     const user1 = "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyLTE1OTQ3MTY0NDYiLCJpc3MiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyIiwiZXhwIjoxNTk3MzA4NDQ2LCJ1c2VySWQiOiJ1c2VyMSJ9.vx10_R_kz12JKhtzC9f_U90ZstayQ_gMAxsrLagcqqk";
@@ -864,25 +883,31 @@ class App extends Component {
     AppState.removeEventListener('change', this._handleAppStateChange);
   }
 
-  _handleAppStateChange = (nextAppState) => {
+  _handleAppStateChange = nextAppState => {
     var thisInstance = this;
-    if ((Platform.OS === 'ios') && (this.state.appState.match(/inactive|background/) && nextAppState === 'active')) {
+    if (
+      Platform.OS === 'ios' &&
+      (this.state.appState.match(/inactive|background/) &&
+        nextAppState === 'active')
+    ) {
       console.log('App has come to the foreground!');
-      RNCallKeep.checkSpeaker().then(function (speaker) {
-        console.log('RNCallKeep.checkSpeaker ' + speaker);
-        thisInstance.setState({ isSpeaker: speaker });
-      }, function (error) {
-        console.log(error.message);
-      });
+      RNCallKeep.checkSpeaker().then(
+        function(speaker) {
+          console.log('RNCallKeep.checkSpeaker ' + speaker);
+          thisInstance.setState({isSpeaker: speaker});
+        },
+        function(error) {
+          console.log(error.message);
+        },
+      );
     }
 
-    this.setState({ appState: nextAppState });
+    this.setState({appState: nextAppState});
     console.log('App state ' + this.state.appState);
-  }
-
+  };
 
   render() {
-    const { showCallingView } = this.state;
+    const {showCallingView} = this.state;
     return (
       <View style={styles.topCenteredView}>
         <Modal
@@ -893,7 +918,7 @@ class App extends Component {
             Alert.alert('Modal has been closed.');
           }}>
           {this.state.showCallingView && (
-            <View style={{ flex: 1 }}>
+            <View style={{flex: 1}}>
               <CallScreen
                 hasLocalStream={this.state.hasReceivedLocalStream}
                 hasRemoteStream={this.state.hasReceivedRemoteStream}
@@ -949,15 +974,11 @@ class App extends Component {
 
                   this.answerCallAction();
                 }}
-
                 switchCameraHandler={this._switchCameraAction}
-
                 isSpeaker={this.state.isSpeaker}
                 peakerButtonHandler={this._speakerAction}
-
                 isMute={this.state.isMute}
                 muteButtonHandler={this._muteAction}
-
                 enableVideo={this.state.enableVideo}
                 enableVideoButtonHandler={this._enableVideoAction}
               />
@@ -965,7 +986,7 @@ class App extends Component {
           )}
         </Modal>
 
-        <Text style={{ height: 40, marginBottom: 10, textAlign: 'center' }}>
+        <Text style={{height: 40, marginBottom: 10, textAlign: 'center'}}>
           {this.state.currentUserId}
         </Text>
 
