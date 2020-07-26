@@ -8,8 +8,8 @@ import {
   Dimensions,
 } from 'react-native';
 import {StringeeVideoView} from 'stringee-react-native';
-import RNCallKeep from 'react-native-callkeep';
-import App from '../App';
+// import RNCallKeep from 'react-native-callkeep';
+// import App from '../App';
 
 var height = Dimensions.get('window').height;
 var width = Dimensions.get('window').width;

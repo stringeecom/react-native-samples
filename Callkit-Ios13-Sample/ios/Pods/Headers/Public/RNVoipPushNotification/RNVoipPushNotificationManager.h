@@ -1,1 +1,0 @@
-../../../../../node_modules/react-native-voip-push-notification/ios/RNVoipPushNotification/RNVoipPushNotificationManager.h

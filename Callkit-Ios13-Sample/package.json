@@ -7,7 +7,8 @@
     "ios": "react-native run-ios",
     "start": "react-native start",
     "test": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "build:ios": "react-native bundle --entry-file='index.js' --bundle-output='./ios/main.jsbundle' --dev=false --platform='ios'"
   },
   "dependencies": {
     "@notifee/react-native": "^0.7.2",
@@ -19,7 +20,7 @@
     "react-native-callkeep": "^3.0.12",
     "react-native-uuid": "^1.4.9",
     "react-native-voip-push-notification": "^2.1.0",
-    "stringee-react-native": "^1.3.1"
+    "stringee-react-native": "^1.3.2"
   },
   "devDependencies": {
     "@babel/core": "7.9.6",

@@ -52,11 +52,11 @@ static void InitializeFlipper(UIApplication *application) {
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
 {
-#if DEBUG
-  return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
-#else
+//#if DEBUG
+//  return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
+//#else
   return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
-#endif
+//#endif
 }
 
 
@@ -76,27 +76,29 @@ static void InitializeFlipper(UIApplication *application) {
 
 // --- Handle incoming pushes (for ios >= 11)
 - (void)pushRegistry:(PKPushRegistry *)registry didReceiveIncomingPushWithPayload:(PKPushPayload *)payload forType:(PKPushType)type withCompletionHandler:(void (^)(void))completion {
-  NSLog(@"Thinhnt didReceiveIncomingPushWithPayload có complete");
+  NSLog(@"Thinhnt didReceiveIncomingPushWithPayload có complete: %@", payload.dictionaryPayload);
   
   NSDictionary *payloadDataDic = payload.dictionaryPayload[@"data"][@"map"][@"data"][@"map"];
   NSString *callId = payloadDataDic[@"callId"];
+  NSNumber *serial = payloadDataDic[@"serial"];
   NSString *callStatus = payloadDataDic[@"callStatus"];
   
   NSString *fromAlias = payloadDataDic[@"from"][@"map"][@"alias"];
   NSString *fromNumber = payloadDataDic[@"from"][@"map"][@"number"];
   NSString *callName = fromAlias != NULL ? fromAlias : fromNumber != NULL ? fromNumber : @"Connecting...";
   
-  NSString *uuid = [[NSUUID UUID] UUIDString];
+  NSString *uuid = [[[NSUUID UUID] UUIDString] lowercaseString];
   NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
   [dict setObject:uuid forKey:@"uuid"];
-  
+  [dict setObject:serial forKey:@"serial"];
+  [dict setObject:callId forKey:@"callId"];
+    
   if (callId != NULL && [callStatus isEqual: @"started"]) {
     // --- Process the received push
     [[NSNotificationCenter defaultCenter] postNotificationName:@"voipRemoteNotificationReceived" object:self userInfo:dict];
     
     // --- You should make sure to report to callkit BEFORE execute `completion()`
     [RNCallKeep reportNewIncomingCall:uuid handle:@"Stringee" handleType:@"generic" hasVideo:true localizedCallerName:callName fromPushKit: YES payload:nil];
-    NSLog(@"Thinhnt didReceiveIncomingPushWithPayload có Gọi nhé");
   } else {
     // Show fake call
     NSLog(@"Thinhnt show fake call");

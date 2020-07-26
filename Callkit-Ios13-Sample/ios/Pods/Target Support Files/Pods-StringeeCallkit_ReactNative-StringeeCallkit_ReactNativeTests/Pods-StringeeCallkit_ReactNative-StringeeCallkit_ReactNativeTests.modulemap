@@ -1,6 +1,0 @@
-module Pods_StringeeCallkit_ReactNative_StringeeCallkit_ReactNativeTests {
-  umbrella header "Pods-StringeeCallkit_ReactNative-StringeeCallkit_ReactNativeTests-umbrella.h"
-
-  export *
-  module * { export * }
-}

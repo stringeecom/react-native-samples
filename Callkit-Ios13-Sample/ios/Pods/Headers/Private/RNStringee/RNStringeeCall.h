@@ -1,1 +1,0 @@
-../../../../../node_modules/stringee-react-native/ios/RNStringeeCall.h

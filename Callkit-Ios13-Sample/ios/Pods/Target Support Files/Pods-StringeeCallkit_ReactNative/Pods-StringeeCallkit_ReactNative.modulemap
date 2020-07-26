@@ -1,6 +1,0 @@
-module Pods_StringeeCallkit_ReactNative {
-  umbrella header "Pods-StringeeCallkit_ReactNative-umbrella.h"
-
-  export *
-  module * { export * }
-}

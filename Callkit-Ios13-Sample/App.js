@@ -6,8 +6,9 @@ import RNCallKeep from 'react-native-callkeep';
 import VoipPushNotification from 'react-native-voip-push-notification';
 import uuid from 'react-native-uuid';
 import CallScreen from './src/CallScreen';
-import messaging from '@react-native-firebase/messaging';
+// import messaging from '@react-native-firebase/messaging';
 import { each } from 'underscore';
+import SyncCall from './src/SyncCall';
 
 const options = {
   ios: {
@@ -50,16 +51,21 @@ class App extends Component {
 
     toUserId: '',
     currentUserId: '',
-    currentStringeeCallId: '',
-    currentCallKitId: '',
     userId: '',
 
-    isAnswered: false,
-    isActivateAudioSession: false,
-    callWaitingAudioSection: false,
-    cacheAction: 0, // 0: Không có, 1: Đã bấm answer, 2: Đã bấm end
+    syncCall: null,
+    allSyncCalls: [], // luu lai tat ca cac sync da tung xu ly
+    fakeCallIds: [], // luu uuid cua tat ca fake call da show
+    endTimeout: null,
 
-    callState: '',
+    answeredCall: false, // da answer call cua stringee
+    isActivateAudioSession: false,
+
+    // Push notification
+    pushToken: '',
+    registeredToken: false, // da register push token vs Stringee
+
+    callState: '', // Su dung de hien thi text cho trang thai call
 
     showCallingView: false,
     hasReceivedLocalStream: false,
@@ -84,11 +90,16 @@ class App extends Component {
     this.refs.stringeeCall.makeCall(parameters, (status, code, message, callId) => {
       console.log('status-' + status + ' code-' + code + ' message-' + message + 'callId-' + callId);
       if (status) {
+        var newSyncCall = new SyncCall();
+        newSyncCall.callId = callId;
+        newSyncCall.callCode = 0;
+        newSyncCall.answered = true;
+
         this.setState({
-          currentStringeeCallId: callId,
+          syncCall: newSyncCall,
           showCallingView: true,
           userId: this.state.toUserId,
-          isAnswered: true,
+          answeredCall: true,
           callState: 'Outgoing Call',
         });
       } else {
@@ -98,46 +109,191 @@ class App extends Component {
     );
   };
 
-  endcallAction = () => {
-    if (this.state.currentCallKitId != '') {
-      RNCallKeep.endCall(this.state.currentCallKitId);
-      this.setState({ currentCallKitId: '' });
+  endCallAndUpdateView = () => {
+    // End callkit call
+    if (this.state.syncCall != null && this.state.syncCall.callkitId != '') {
+      RNCallKeep.endCall(this.state.syncCall.callkitId);
     }
+
+    // End tat ca ongoing call cho chac
+    RNCallKeep.endAllCalls();
+
+    // reset trang thai va view
     this.setState({
-      callState: 'Ended',
-      currentStringeeCallId: '',
-      isActivateAudioSession: false,
+      callState: 'Ended'
     });
+
+    // Xoa sync call neu can
+    this.deleteSyncCallIfNeed();
+
+    // Show CallScreen them 0.5s de hien thi trang thai ended (Cho giong native call cua ios)
     setTimeout(() => {
       this.setState({
         showCallingView: false,
         hasReceivedLocalStream: false,
         hasReceivedRemoteStream: false,
+        isActivateAudioSession: false,
+        answeredCall: false,
         enableVideo: true,
         isSpeaker: true,
-        isMute: false
+        isMute: false,
       });
     }, 500);
   };
 
-  answerCallAction = () => {
-    if (this.state.isActivateAudioSession) {
-      this.refs.stringeeCall.answer(
-        this.state.currentStringeeCallId,
-        (status, code, message) => {
-          this.setState({ isAnswered: true });
-          console.log('call did answer ' + status + ' - message: ' + message);
-          if (status) {
-            // Sucess
-          } else {
-            // Fail
-          }
-        },
-      );
+  deleteSyncCallIfNeed = () => {
+    if (this.state.syncCall == null) {
+      console.log('SyncCall is deleted');
+      return;
+    }
+
+    if (this.state.syncCall.isEnded()) {
+      // cache lai call da xu ly
+      this.addSyncCallToCacheArray(this.state.syncCall);
+
+      this.setState({
+        syncCall: null
+      });
     } else {
-      this.setState({ callWaitingAudioSection: true })
+      console.log('deleteSyncCallIfNeed, endedCallkit: ' + this.state.syncCall.endedCallkit + ' endedStringeeCall: ' + this.state.syncCall.endedStringeeCall);
     }
   };
+
+  addSyncCallToCacheArray = (sCall) => {
+    // Xoa call cu neu da save
+    var newAllSyncCalls = this.state.allSyncCalls.filter(call => !(call.callId == sCall.callId && call.serial == sCall.serial));
+    
+    newAllSyncCalls.push(sCall);
+    this.setState({
+      allSyncCalls: newAllSyncCalls
+    });
+  };
+
+  removeSyncCallInCacheArray = (callId, serial) => {
+    // Xoa call cu neu da save
+    var newAllSyncCalls = this.state.allSyncCalls.filter(call => !(call.callId == callId && call.serial == serial));
+    
+    this.setState({
+      allSyncCalls: newAllSyncCalls
+    });
+  };
+
+  // Kiem tra xem call da duoc xu ly lan nao chua
+  handledCall = (callId, serial) => {
+    // Xoa call cu neu da save
+    var newAllSyncCalls = this.state.allSyncCalls.filter(call => call.callId == callId && call.serial == serial);
+    return newAllSyncCalls != null && newAllSyncCalls.length > 0
+  };
+
+  
+  answerCallAction = () => {
+    /*
+      Voi iOS, Answer StringeeCall khi thoa man cac yeu to:
+      1. Da nhan duoc su kien onIncomingCall (có callId)
+      2. User da click answer
+      3. Chua goi ham answer cua StringeeCall lan nao
+      3. AudioSession da active
+    **/ 
+    if (this.state.syncCall == null || this.state.syncCall.callId == '' || !this.state.isActivateAudioSession || !this.state.syncCall.answered || this.state.answeredCall) {
+      console.log('Chua du dieu kien de answer call, AudioSessionActived: ' + this.state.isActivateAudioSession
+       + ' - syncCall: ' + this.state.syncCall
+       + ' - syncCall.callId: ' + this.state.syncCall.callId
+       + ' - AnsweredAction: ' + this.state.syncCall.answered
+       + ' - AnsweredCall: ' + this.state.answeredCall
+       );
+
+      return;
+    }
+
+    this.refs.stringeeCall.answer(
+      this.state.syncCall.callId,
+      (status, code, message) => {
+        this.setState({ answeredCall: true });
+        console.log('call did answer ' + status + ' - message: ' + message);
+        if (status) {
+          // Sucess
+        } else {
+          // Fail
+        }
+      },
+    );
+  };
+
+  registerTokenForStringee = () => {
+    if (this.state.pushToken == '') {
+      console.log('PUSH TOKEN IS INVALID');
+      return;
+    }
+
+    if (this.state.registeredToken) {
+      console.log('DA GUI PUSH TOKEN TOI STRINGEE SERVER');
+      return;
+    }
+
+    var thisInstance = this;
+    this.refs.stringeeClient.registerPush(
+      this.state.pushToken,
+      false, // isProduction: false: In development, true: In Production.
+      true, // (iOS) isVoip: true: Voip PushNotification. Stringee supports this push notification.
+      (status, code, message) => {
+        console.log('Stringee register VOIP: ' + message);
+        thisInstance.setState({ registeredToken: status });
+      },
+    );
+  }
+
+  showFakeCall = () => {
+    // rule moi cua apple la nhan duoc Voip push bat buoc phai show callkit => voi cac truong hop khong can thiet thi show roi end luon
+    var callKitUUID = uuid.v1();
+    RNCallKeep.displayIncomingCall(
+          callKitUUID,
+          'Stringee',
+          'CallEnded',
+          'generic',
+          true,
+    );
+    var newFakeCallIds = this.state.fakeCallIds.push(callKitUUID);
+    this.setState({ fakeCallIds: newFakeCallIds});
+    console.log('SHOW FAKE CALL, UUID: ' + callKitUUID + ' fakeCallIds: ' + this.state.fakeCallIds.toString);
+  }
+
+  startEndTimeout = () => {
+    if (this.state.endTimeout == null || this.state.syncCall != null) {
+
+      var endTimeout = setTimeout(() => {
+        if (this.state.syncCall == null) {
+          return;
+        }
+
+        // Sau 3s tu khi connected ma chua nhan duoc call thi end call
+        if (!this.state.syncCall.receivedStringeeCall) {
+          // End callkit
+          if (this.state.syncCall.callkitId != '') {
+            RNCallKeep.endCall(this.state.syncCall.callkitId);
+          }
+          this.addSyncCallToCacheArray(this.state.syncCall);
+
+          this.setState({
+            syncCall: null
+          });
+        }
+
+      }, 5000);
+
+      this.setState({
+        endTimeout: endTimeout
+      });
+    }
+  }
+
+  stopEndTimeout = () => {
+    if (this.state.endTimeout != null) {
+      clearTimeout(this.state.endTimeout);
+      this.setState({
+        endTimeout: null
+      });
+    }
+  }
 
   onChangeText = text => {
     this.setState({ toUserId: text });
@@ -169,40 +325,77 @@ class App extends Component {
     if (Platform.OS === 'ios') {
       RNCallKeep.setup(options);
       VoipPushNotification.requestPermissions();
+      VoipPushNotification.registerVoipToken();
 
       VoipPushNotification.addEventListener('register', token => {
-        // --- send token to your apn provider server
-        console.log('register VOIP: ' + token);
-
-        // send token to your apn provider server
-        this.refs.stringeeClient.registerPush(
-          token,
-          false, // isProduction: false: In development, true: In Production.
-          true, // (iOS) isVoip: true: Voip PushNotification. Stringee supports this push notification.
-          (status, code, message) => {
-            console.log('Stringee register VOIP: ' + message);
-          },
-        );
+        console.log('LAY DUOC VOIP TOKEN: ' + token);
+        this.setState({ pushToken: token })
+        this.registerTokenForStringee();
       });
 
       VoipPushNotification.addEventListener('notification', notification => {
         const callKitUUID = notification.getData().uuid;
-        if (this.state.currentCallKitId == '') {
-          console.log('set uuid: ' + callKitUUID);
-          this.setState({ currentCallKitId: callKitUUID });
-        } else {
-          // if Callkit already exists then end Callkit wiht the callKitUUID
-          console.log('end call uuid: ' + callKitUUID);
+        const callSerial = notification.getData().serial;
+        const callId = notification.getData().callId;
+        console.log('Notification CallSerial: ' + callSerial + ' callId: ' + callId);
+        // Neu call da duoc xu ly roi thi end callkit vua show
+        if (this.handledCall(callId, callSerial)) {
           RNCallKeep.endCall(callKitUUID);
+          this.removeSyncCallInCacheArray(callId, callSerial);
+          this.deleteSyncCallIfNeed();
+          return;
         }
+
+        // Chua co sync call thi tao
+        if (this.state.syncCall == null) {
+          // Chua co call thi khoi tao
+          var newSyncCall = new SyncCall();
+          newSyncCall.callId = callId;
+          newSyncCall.serial = callSerial;
+          newSyncCall.callkitId = callKitUUID;
+          this.setState({ syncCall: newSyncCall });
+          return
+        }
+
+        // Co sync call roi nhung thong tin cuoc goi khong trung khop => end callkit vua show
+        if (!this.state.syncCall.isThisCall(callId, callSerial)) {
+          console.log('END CALLKIT KHI NHAN DUOC PUSH, PUSH MOI KHONG PHAI SYNC CALL');
+          RNCallKeep.endCall(callKitUUID);
+          return;
+        }
+
+        // Co sync call roi + thong tin cuoc goi trung khop nhung da show callkit roi => end callkit vua show
+        if (this.state.syncCall.showedCallkit() && !this.state.syncCall.showedFor(callKitUUID)) {
+          console.log('END CALLKIT KHI NHAN DUOC PUSH, SYNC CALL DA SHOW CALLKIT');
+          RNCallKeep.endCall(callKitUUID);
+          return;
+        }
+
+        // if (this.state.currentCallKitId == '') {
+        //   console.log('set uuid: ' + callKitUUID);
+        //   this.setState({ currentCallKitId: callKitUUID });
+        // } else {
+        //   // if Callkit already exists then end Callkit wiht the callKitUUID
+        //   console.log('end call uuid: ' + callKitUUID);
+        //   RNCallKeep.endCall(callKitUUID);
+        // }
+      });
+
+      RNCallKeep.addEventListener('didDisplayIncomingCall', ({ error, callUUID, handle, localizedCallerName, hasVideo, fromPushKit, payload }) => {
+        // Call back khi show callkit cho incoming call thanh cong, end fakeCall da show o day
+        if (this.state.fakeCallIds.includes(callUUID)) {
+          RNCallKeep.endCall(callUUID);
+          var newFakeCallIds = this.state.fakeCallIds.filter(uuid => uuid != callUUID);
+          this.setState({ fakeCallIds: newFakeCallIds});
+          console.log('END FAKE CALL, UUID: ' + callUUID + ' fakeCallIds: ' + this.state.fakeCallIds.toString);
+        }
+
+        this.deleteSyncCallIfNeed();
       });
 
       RNCallKeep.addEventListener('didActivateAudioSession', (data) => {
         this.setState({ isActivateAudioSession: true })
-        if (this.state.callWaitingAudioSection) {
-          this.answerCallAction();
-          this.setState({ callWaitingAudioSection: false });
-        }
+        this.answerCallAction();
       });
 
       RNCallKeep.addEventListener(
@@ -217,28 +410,57 @@ class App extends Component {
       });
 
       RNCallKeep.addEventListener('answerCall', ({ callUUID }) => {
-        if (callUUID != this.state.currentCallKitId) {
+        if (this.state.syncCall == null) {
+          return;
+        }
+        // Alert.alert('Người dùng click answer, Sync CallKitId: ' + this.state.syncCall.callkitId + ' callUUID: ' + callUUID.toLowerCase());
+
+        if (callUUID != this.state.syncCall.callkitId) {
           return;
         }
 
-        if (this.state.currentStringeeCallId == '') {
-          this.setState({ cacheAction: 1 });
-        } else {
-          this.answerCallAction();
-        }
+        // Luu lai hanh dong answer cua nguoi dung
+        var newSyncCall = this.state.syncCall;
+        newSyncCall.answered = true;
+
+        this.setState({ 
+          // cacheAction: 1,
+          syncCall: newSyncCall
+        });
+
+        // Answer call neu can
+        this.answerCallAction();
       });
 
       RNCallKeep.addEventListener('endCall', ({ callUUID }) => {
-        if (callUUID != this.state.currentCallKitId) {
+        console.log('EVENT END CALLKIT, callUUID: ' + callUUID);
+
+        if (this.state.syncCall == null) {
+          console.log('EVENT END CALLKIT - syncCall = null');
           return;
         }
 
-        if (this.state.currentStringeeCallId == '') {
-          this.setState({ cacheAction: 2 });
-        } else {
-          if (this.state.isAnswered) {
+        if (this.state.syncCall.callkitId == '' || callUUID != this.state.syncCall.callkitId) {
+          console.log('EVENT END CALLKIT - uuid khac, callkitId: ' + this.state.syncCall.callkitId);
+          return;
+        }
+
+        // Cap nhat trang thai cho syncCall
+        var newSyncCall = this.state.syncCall;
+        newSyncCall.endedCallkit = true;
+        newSyncCall.rejected = true;
+
+        this.setState({
+          syncCall: newSyncCall
+        });
+        
+        // StringeeCall van chua duoc end thi can end
+        console.log('EVENT END CALLKIT, syncCall: ' + this.state.syncCall + ' callId: ' + this.state.syncCall.callId + ' callCode: ' + this.state.syncCall.callCode);
+        if (this.state.syncCall.callId != '' && this.state.syncCall.callCode != 3 && this.state.syncCall.callCode != 4) {
+          if (this.state.answeredCall) {
+            console.log('HANGUP CALL KHI END CALLKIT');
             this.refs.stringeeCall.hangup(
-              this.state.currentStringeeCallId,
+              this.state.syncCall.callId,
               (status, code, message) => {
                 console.log('stringeeCall.hangup: ' + message);
                 if (status) {
@@ -249,8 +471,9 @@ class App extends Component {
               },
             );
           } else {
+            console.log('REJECT CALL KHI END CALLKIT');
             this.refs.stringeeCall.reject(
-              this.state.currentStringeeCallId,
+              this.state.syncCall.callId,
               (status, code, message) => {
                 console.log('stringeeCall.reject: ' + message);
                 if (status) {
@@ -261,9 +484,15 @@ class App extends Component {
               },
             );
           }
+
+          // var newSCall = this.state.syncCall;
+          // newSCall.endedStringeeCall = true;
+          // this.setState({
+          //   syncCall: newSCall
+          // });
         }
 
-        this.setState({ currentCallKitId: '' });
+        this.deleteSyncCallIfNeed();
       });
     }
   }
@@ -274,8 +503,14 @@ class App extends Component {
     console.log('_clientDidConnect - ' + userId);
     this.setState({ currentUserId: userId });
 
+    /*
+      Handle cho truong hop A goi B, nhung A end call rat nhanh, B nhan duoc push nhung khong nhan duoc incoming call
+      ==> Sau khi ket noi den Stringee server 3s ma chua nhan duoc cuoc goi thi xoa Callkit Call va syncCall
+    **/
+    // this.startEndTimeout();
+
     if (Platform.OS === 'ios') {
-      VoipPushNotification.registerVoipToken();
+      this.registerTokenForStringee();
     } else {
       AsyncStorage.getItem('isPushTokenRegistered').then(value => {
         if (value !== 'true') {
@@ -320,11 +555,14 @@ class App extends Component {
         );
       });
     }
+
+    // Fix loi A goi B, nhung A End luon
   };
 
   // The client disconnects from Stringee server
   _clientDidDisConnect = () => {
     console.log('_clientDidDisConnect');
+    this.stopEndTimeout();
   };
 
   // The client fails to connects to Stringee server
@@ -344,66 +582,125 @@ class App extends Component {
     toAlias,
     callType,
     isVideoCall,
+    customDataFromYourServer,
+    serial
   }) => {
     console.log('IncomingCallId-' + callId + ' from-' + from + ' to-' + to + ' fromAlias-' +
-      fromAlias + ' toAlias-' + toAlias + ' isVideoCall-' + isVideoCall + 'callType-' + callType);
-
-    this.refs.stringeeCall.initAnswer(callId, (status, code, message) => {
-      console.log(message);
-    });
+      fromAlias + ' toAlias-' + toAlias + ' isVideoCall-' + isVideoCall + 'callType-' + callType + 'serial-' + serial);
+    // Alert.alert('_callIncomingCall');
 
     this.setState({
-      currentStringeeCallId: callId,
-      showCallingView: true,
-      isAnswered: false,
       userId: from,
       callState: 'Incoming Call',
     });
 
     if (Platform.OS === 'ios') {
-      switch (this.state.cacheAction) {
-        case 0: // Trường hợp bình thường
-          this.setState({ showCallingView: true });
-          if (this.state.currentCallKitId != '') {
-            RNCallKeep.updateDisplay(
-              this.state.currentCallKitId,
-              fromAlias,
-              '',
-            );
-            console.log('Call + Update');
-          } else {
-            var callKitUUID = uuid.v1();
-            this.setState({ currentCallKitId: callKitUUID });
-            RNCallKeep.displayIncomingCall(
-              callKitUUID,
-              'Stringee',
-              fromAlias,
-              'generic',
-              true,
-            );
-            console.log('Call + Show new call kit');
-          }
-          break;
+      // Chua show callkit thi show
+      if (this.state.syncCall == null) {
+        console.log('Call + Show new call kit');
+        var newSyncCall = new SyncCall();
+        newSyncCall.callId = callId;
+        newSyncCall.serial = serial;
+        newSyncCall.callkitId = uuid.v1();
+        newSyncCall.receivedStringeeCall = true;
 
-        case 1: // Trường hợp đã bấm answer
-          this.setState({ showCallingView: true });
-          this.answerCallAction();
-          break;
+        // Callkit
+        RNCallKeep.displayIncomingCall(
+          newSyncCall.callkitId,
+          'Stringee',
+          fromAlias,
+          'generic',
+          true,
+        );
 
-        case 2: // Trường hợp đã bấm Reject
-          this.refs.stringeeCall.reject(
-            this.state.currentStringeeCallId,
-            (status, code, message) => {
-              console.log(message);
-            },
-          );
-          break;
+        // Call screen
+        this.setState({
+          syncCall: newSyncCall,
+          showCallingView: true
+        });
+        
+        this.refs.stringeeCall.initAnswer(callId, (status, code, message) => {
+          console.log(message);
+        });
+        
+        this.answerCallAction();
+        return;
+      }
+      
+      // Cuoc goi moi toi khong phai la current sync call
+      // Alert.alert('INCOMING CALL, callId: ' + this.state.syncCall.callId + ' serial: ' + this.state.syncCall.serial);
 
-        default:
-          break;
+      if (!this.state.syncCall.isThisCall(callId, serial)) {
+        console.log('INCOMING CALL -> REJECT, CUOC GOI MOI KHONG TRUNG VOI SYNC CALL');
+        this.refs.stringeeCall.reject(callId, (status, code, message) => {});
+        return;
       }
 
-      this.setState({ cacheAction: 0 });
+      if (this.state.syncCall.rejected) {
+        // nguoi dung da click nut reject cuoc goi
+        console.log('INCOMING CALL -> REJECT, NGUOI DUNG DA REJECT CUOC GOI');
+        this.refs.stringeeCall.reject(callId, (status, code, message) => {});
+        return;
+      }
+
+      // Da show callkit => update UI
+      if (this.state.syncCall.callkitId != '') {
+        console.log('Call + Update');
+        RNCallKeep.updateDisplay(
+          this.state.syncCall.callkitId,
+          fromAlias,
+          '',
+        );
+
+        var newSyncCall = this.state.syncCall;
+        newSyncCall.callId = callId;
+        newSyncCall.receivedStringeeCall = true;
+
+        this.setState({
+          syncCall: newSyncCall,
+          showCallingView: true
+        });
+
+        this.refs.stringeeCall.initAnswer(callId, (status, code, message) => {
+          console.log(message);
+        });
+
+        this.answerCallAction();
+        return;
+      }
+
+      // Chua show callkit thi show
+      var newSyncCall = this.state.syncCall;
+      newSyncCall.callId = callId;
+      newSyncCall.serial = serial;
+      newSyncCall.callkitId = uuid.v1();
+      newSyncCall.receivedStringeeCall = true;
+
+      // Callkit
+      RNCallKeep.displayIncomingCall(
+        newSyncCall.callkitId,
+        'Stringee',
+        fromAlias,
+        'generic',
+        true,
+      );
+
+      // Call screen
+      this.setState({
+        syncCall: newSyncCall,
+        showCallingView: true
+      });
+      
+      this.refs.stringeeCall.initAnswer(callId, (status, code, message) => {
+        console.log(message);
+      });
+      
+      this.answerCallAction();
+      
+    } else {
+      this.refs.stringeeCall.initAnswer(callId, (status, code, message) => {
+        console.log(message);
+      });
     }
   };
 
@@ -412,23 +709,33 @@ class App extends Component {
   _callDidChangeSignalingState = ({ callId, code, reason, sipCode, sipReason }) => {
     console.log('_callDidChangeSignalingState ' + ' callId-' + callId + 'code-' +
       code + ' reason-' + reason + ' sipCode-' + sipCode + ' sipReason-' + sipReason);
+    if (this.state.syncCall != null) {
+      var newSyncCall = this.state.syncCall;
+      newSyncCall.callCode = code;
+      
+      // Neu la end hoac reject call thi cap nhat trang thai endedStringeeCall cho sync call
+      if (code == 3 || code == 4) {
+        newSyncCall.endedStringeeCall = true;
+      }
+
+      this.setState({ 
+        callState: reason,
+        syncCall: newSyncCall
+      });
+    } else {
+      this.setState({ 
+        callState: reason,
+      });
+    }
+
     switch (code) {
-      case 0:
-        this.setState({ callState: reason });
-        break;
-      case 1:
-        this.setState({ callState: reason });
-        break;
-      case 2:
-        this.setState({ callState: reason });
-        break;
       case 3:
-        this.setState({ callState: reason });
-        this.endcallAction();
+        // Rejected
+        this.endCallAndUpdateView();
         break;
       case 4:
-        this.setState({ callState: reason });
-        this.endcallAction();
+        // Ended
+        this.endCallAndUpdateView();
         break;
     }
   };
@@ -483,21 +790,29 @@ class App extends Component {
   // Action handler
 
   _muteAction = () => {
+    if (this.state.syncCall == null || this.state.syncCall.callId == '') {
+      return;
+    }
+
     this.refs.stringeeCall.mute(
-      this.state.currentStringeeCallId,
+      this.state.syncCall.callId,
       !this.state.isMute,
       (status, code, message) => {
         this.setState({ isMute: !this.state.isMute });
-        if (this.state.currentCallKitId != '') {
-          RNCallKeep.setMutedCall(this.state.currentCallKitId, this.state.isMute);
+        if (this.state.syncCall != null && this.state.syncCall.callkitId != '') {
+          RNCallKeep.setMutedCall(this.state.syncCall.callkitId, this.state.isMute);
         }
       },
     );
   };
 
   _speakerAction = () => {
+    if (this.state.syncCall == null || this.state.syncCall.callId == '') {
+      return;
+    }
+
     this.refs.stringeeCall.setSpeakerphoneOn(
-      this.state.currentStringeeCallId,
+      this.state.syncCall.callId,
       !this.state.isSpeaker,
       (status, code, message) => {
         this.setState({ isSpeaker: !this.state.isSpeaker });
@@ -506,8 +821,12 @@ class App extends Component {
   }
 
   _enableVideoAction = () => {
+    if (this.state.syncCall == null || this.state.syncCall.callId == '') {
+      return;
+    }
+
     this.refs.stringeeCall.enableVideo(
-      this.state.currentStringeeCallId,
+      this.state.syncCall.callId,
       !this.state.enableVideo,
       (status, code, message) => {
         this.setState({ enableVideo: !this.state.enableVideo });
@@ -516,8 +835,12 @@ class App extends Component {
   }
 
   _switchCameraAction = () => {
+    if (this.state.syncCall == null || this.state.syncCall.callId == '') {
+      return;
+    }
+
     this.refs.stringeeCall.switchCamera(
-      this.state.currentStringeeCallId,
+      this.state.syncCall.callId,
       (status, code, message) => {
         console.log(message);
       },
@@ -526,15 +849,10 @@ class App extends Component {
 
 
   async componentDidMount() {
-    //user5
-    // const token = "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTSzRPNEVRa2J0VDdkTFBFSzBBbGJOTEdTaGpUcjBnaVFOLTE1OTM0OTk2MTkiLCJpc3MiOiJTSzRPNEVRa2J0VDdkTFBFSzBBbGJOTEdTaGpUcjBnaVFOIiwiZXhwIjoxNTk2MDkxNjE5LCJ1c2VySWQiOiJ1c2VyNSJ9.ykTc1_nBgl00fmMgKax0beMhIp6kYx3czRqXZKs7HnQ"
+    const user1 = "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyLTE1OTQ3MTY0NDYiLCJpc3MiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyIiwiZXhwIjoxNTk3MzA4NDQ2LCJ1c2VySWQiOiJ1c2VyMSJ9.vx10_R_kz12JKhtzC9f_U90ZstayQ_gMAxsrLagcqqk";
+    const user2 = "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyLTE1OTQ3MTY0NTYiLCJpc3MiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyIiwiZXhwIjoxNTk3MzA4NDU2LCJ1c2VySWQiOiJ1c2VyMiJ9.mWoqyI9M0O8sZKiYPSJarWHVBCD2lUQLpBJZXKOiyuM";
 
-    //user6
-    // const token = 'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTSzRPNEVRa2J0VDdkTFBFSzBBbGJOTEdTaGpUcjBnaVFOLTE1OTM0OTk2MzEiLCJpc3MiOiJTSzRPNEVRa2J0VDdkTFBFSzBBbGJOTEdTaGpUcjBnaVFOIiwiZXhwIjoxNTk2MDkxNjMxLCJ1c2VySWQiOiJ1c2VyNiJ9.LwGAqw_oEbDpjL0Bmg0rOdBF_I2QWQnrF-p_9ZDbJmU';
-
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCIsImN0eSI6InN0cmluZ2VlLWFwaTt2PTEifQ.eyJqdGkiOiJTS2w5MEdjSkJPWHdleW1oMHc4cmJuRlkwbml0eXZuS05oLTE1OTQyNjMyNzkiLCJpc3MiOiJTS2w5MEdjSkJPWHdleW1oMHc4cmJuRlkwbml0eXZuS05oIiwiZXhwIjoxNTk2ODU1Mjc5LCJpY2NfYXBpIjp0cnVlLCJpYXQiOjE1OTQyNjIzNzksInVzZXJJZCI6Im5pdGNvLmFwcCJ9.6UPtXtTzUseBeAKTFhCt3Bdpep0RDpWeKtjW0OLyNbU"
-
-    await this.refs.stringeeClient.connect(token);
+    await this.refs.stringeeClient.connect(user2);
     if (Platform.OS === 'android') {
       requestPermission();
     }
@@ -579,20 +897,56 @@ class App extends Component {
               <CallScreen
                 hasLocalStream={this.state.hasReceivedLocalStream}
                 hasRemoteStream={this.state.hasReceivedRemoteStream}
-                stringeeCallId={this.state.currentStringeeCallId}
+                stringeeCallId={this.state.syncCall != null ? this.state.syncCall.callId : ''}
                 userId={this.state.userId}
-                isAnswered={this.state.isAnswered}
+                isAnswered={this.state.syncCall != null ? this.state.syncCall.answered : this.state.answeredCall}
                 callState={this.state.callState}
                 endButtonHandler={() => {
-                  this.endcallAction();
-                  this.refs.stringeeCall.hangup(
-                    this.state.currentStringeeCallId, (status, code, message) => { });
+                  if (this.state.syncCall != null && this.state.syncCall.callId != '') {
+                    this.refs.stringeeCall.hangup(
+                      this.state.syncCall.callId, (status, code, message) => {
+                        if (!status) {
+                          // That bai thi update UI
+                          this.endCallAndUpdateView();
+                        }
+                      }
+                    );
+                  } else {
+                    // Update UI
+                    this.endCallAndUpdateView();
+                    console.log('KHONG THE END CALL, syncCall: ' + this.state.syncCall + ' callId: ' + this.state.syncCall.callId);
+                  }
                 }}
                 rejectButtonHandler={() => {
-                  this.endcallAction();
-                  this.refs.stringeeCall.reject(this.state.currentStringeeCallId, (status, code, message) => { });
+                  // Cap nhat trang that rejected cho syncCall
+                  var newSyncCall = this.state.syncCall;
+                  newSyncCall.rejected = true;
+                  this.setState({
+                    syncCall: newSyncCall
+                  });
+
+                  if (this.state.syncCall != null && this.state.syncCall.callId != '') {
+                    this.refs.stringeeCall.reject(
+                      this.state.syncCall.callId, (status, code, message) => { 
+                        if (!status) {
+                          // That bai thi update UI
+                          this.endCallAndUpdateView();
+                        }
+                      }
+                    );
+                  } else {
+                    // Update UI
+                    this.endCallAndUpdateView();
+                    console.log('KHONG THE REJECT CALL, syncCall: ' + this.state.syncCall + ' callId: ' + this.state.syncCall.callId);
+                  }
                 }}
                 acceptButtonHandler={() => {
+                  var newSyncCall = this.state.syncCall;
+                  newSyncCall.answered = true;
+                  this.setState({ 
+                    syncCall: newSyncCall
+                  });
+
                   this.answerCallAction();
                 }}
 
