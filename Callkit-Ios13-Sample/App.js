@@ -516,7 +516,7 @@ class App extends Component {
       Handle cho truong hop A goi B, nhung A end call rat nhanh, B nhan duoc push nhung khong nhan duoc incoming call
       ==> Sau khi ket noi den Stringee server 3s ma chua nhan duoc cuoc goi thi xoa Callkit Call va syncCall
     **/
-    // this.startEndTimeout();
+    this.startEndTimeout();
 
     if (Platform.OS === 'ios') {
       this.registerTokenForStringee();
@@ -870,8 +870,9 @@ class App extends Component {
   async componentDidMount() {
     const user1 = "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyLTE1OTQ3MTY0NDYiLCJpc3MiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyIiwiZXhwIjoxNTk3MzA4NDQ2LCJ1c2VySWQiOiJ1c2VyMSJ9.vx10_R_kz12JKhtzC9f_U90ZstayQ_gMAxsrLagcqqk";
     const user2 = "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyLTE1OTQ3MTY0NTYiLCJpc3MiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyIiwiZXhwIjoxNTk3MzA4NDU2LCJ1c2VySWQiOiJ1c2VyMiJ9.mWoqyI9M0O8sZKiYPSJarWHVBCD2lUQLpBJZXKOiyuM";
+    // const stringeeDevUser = "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS3JTaWZRWlVJa3ZPY2Q0RHdZT2c1Y2lpQUJma01kTTJOLTE1OTU5MDQxNDQiLCJpc3MiOiJTS3JTaWZRWlVJa3ZPY2Q0RHdZT2c1Y2lpQUJma01kTTJOIiwiZXhwIjoxNTk1OTkwNTQ0LCJ1c2VySWQiOiJhY19ranpvY2d0b29kb2N5MGM0IiwiaWNjX2FwaSI6dHJ1ZSwiZGlzcGxheU5hbWUiOiJIb2FuZ0R1b2MiLCJhdmF0YXJVcmwiOiJodHRwczpcL1wvYXBpLnN0cmluZ2VleC5jb21cL2FjX2tqem9jZ3Rvb2RvY3kwYzRcL0RWVlhNR0lRSkEtMTU3ODQ1NDYzNjIwNS5qcGciLCJzdWJzY3JpYmUiOiJvbmxpbmVfc3RhdHVzX0dSWE1LNzBLLEFMTF9DQUxMX1NUQVRVUyxhZ2VudF9tYW51YWxfc3RhdHVzIiwiYXR0cmlidXRlcyI6Ilt7XCJhdHRyaWJ1dGVcIjpcIm9ubGluZVN0YXR1c1wiLFwidG9waWNcIjpcIm9ubGluZV9zdGF0dXNfR1JYTUs3MEtcIn0se1wiYXR0cmlidXRlXCI6XCJjYWxsXCIsXCJ0b3BpY1wiOlwiY2FsbF9HUlhNSzcwS1wifV0ifQ.iJUqqFcfpORSTSEuoGe59FgGvg0y7mlJb2BJmyvo5aY";
 
-    await this.refs.stringeeClient.connect(user2);
+    await this.refs.stringeeClient.connect(user1);
     if (Platform.OS === 'android') {
       requestPermission();
     }
