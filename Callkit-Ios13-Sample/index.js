@@ -4,13 +4,14 @@
 
 import {AppRegistry, Platform} from 'react-native';
 import App from './App';
+import AppAndroid from './AppAndroid';
 import {name as appName} from './app.json';
 import CallScreen from './src/CallScreen';
 import RNCallKeep from 'react-native-callkeep';
 
 // Android only ----------
-// import messaging from '@react-native-firebase/messaging';
-// import notifee from '@notifee/react-native';
+import messaging from '@react-native-firebase/messaging';
+import notifee from '@notifee/react-native';
 // -----------------------
 
 const options = {
@@ -54,9 +55,11 @@ if (Platform.OS === 'android') {
   }
 
   messaging().setBackgroundMessageHandler(onMessageReceived);
-}
 
-AppRegistry.registerComponent(appName, () => App);
+  AppRegistry.registerComponent(appName, () => AppAndroid);
+} else {
+  AppRegistry.registerComponent(appName, () => App);
+}
 
 AppRegistry.registerHeadlessTask('CallBackgroundActions', () => {
   RNCallKeep.setup(options);
