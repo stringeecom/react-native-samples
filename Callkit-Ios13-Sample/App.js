@@ -7,7 +7,6 @@ import {
   TouchableHighlight,
   View,
   TextInput,
-  PermissionsAndroid,
 } from 'react-native';
 import {AsyncStorage, AppState} from 'react-native';
 import {StringeeClient, StringeeCall} from 'stringee-react-native';
@@ -15,7 +14,6 @@ import RNCallKeep from 'react-native-callkeep';
 import VoipPushNotification from 'react-native-voip-push-notification';
 import uuid from 'react-native-uuid';
 import CallScreen from './src/CallScreen';
-import {each} from 'underscore';
 import SyncCall from './src/SyncCall';
 
 const options = {
@@ -26,32 +24,6 @@ const options = {
 };
 
 const speakerPromise = RNCallKeep.checkSpeaker;
-
-const requestPermission = async () =>
-  new Promise((resolve, reject) => {
-    PermissionsAndroid.requestMultiple([
-      PermissionsAndroid.PERMISSIONS.CAMERA,
-      PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
-    ])
-      .then(result => {
-        const permissionsError = {};
-        permissionsError.permissionsDenied = [];
-        each(result, (permissionValue, permissionType) => {
-          if (permissionValue === 'denied') {
-            permissionsError.permissionsDenied.push(permissionType);
-            permissionsError.type = 'Permissions error';
-          }
-        });
-        if (permissionsError.permissionsDenied.length > 0) {
-          reject(permissionsError);
-        } else {
-          resolve();
-        }
-      })
-      .catch(error => {
-        reject(error);
-      });
-  });
 
 class App extends Component {
   state = {
