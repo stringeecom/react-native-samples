@@ -57,81 +57,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fbe15303-f931-44d5-a238-c1d737a62554" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/.buckconfig" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/.editorconfig" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/.eslintrc.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/.flowconfig" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/.gitattributes" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/.prettierrc.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/.watchmanconfig" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/__tests__/App-test.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/android/app/BUCK" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/android/app/build.gradle" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/android/app/build_defs.bzl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/android/app/debug.keystore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/android/app/google-services.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/android/app/proguard-rules.pro" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/android/app/src/debug/AndroidManifest.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/android/app/src/debug/java/com/pushnotificationandroidsample/ReactNativeFlipper.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/android/app/src/main/AndroidManifest.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/android/app/src/main/java/com/pushnotificationandroidsample/MainActivity.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/android/app/src/main/java/com/pushnotificationandroidsample/MainApplication.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/android/app/src/main/res/mipmap-hdpi/ic_launcher.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/android/app/src/main/res/mipmap-mdpi/ic_launcher.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/android/app/src/main/res/values/strings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/android/app/src/main/res/values/styles.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/android/build.gradle" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/android/gradle.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/android/gradle/wrapper/gradle-wrapper.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/android/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/android/gradlew" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/android/gradlew.bat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/android/settings.gradle" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/app.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/babel.config.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/index.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/ios/Podfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/ios/PushNotificationAndroidSample.xcodeproj/project.pbxproj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/ios/PushNotificationAndroidSample.xcodeproj/xcshareddata/xcschemes/PushNotificationAndroidSample.xcscheme" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/ios/PushNotificationAndroidSample/AppDelegate.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/ios/PushNotificationAndroidSample/AppDelegate.m" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/ios/PushNotificationAndroidSample/Images.xcassets/AppIcon.appiconset/Contents.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/ios/PushNotificationAndroidSample/Images.xcassets/Contents.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/ios/PushNotificationAndroidSample/Info.plist" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/ios/PushNotificationAndroidSample/LaunchScreen.storyboard" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/ios/PushNotificationAndroidSample/main.m" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/ios/PushNotificationAndroidSampleTests/Info.plist" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/ios/PushNotificationAndroidSampleTests/PushNotificationAndroidSampleTests.m" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/metro.config.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/package-lock.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/resource/accept_call.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/resource/camera_switch.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/resource/end_call.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/resource/mute.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/resource/mute_selected.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/resource/speaker.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/resource/speaker_selected.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/resource/video_disable.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/resource/video_enable.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/src/CallScreen.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/yarn.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AppAndroid.js" beforeDir="false" afterPath="$PROJECT_DIR$/../PushNotificationAndroidSample/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/index.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/react-native.config.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/app/proguard-rules.pro" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/proguard-rules.pro" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ChatSample/android/app/proguard-rules.pro" beforeDir="false" afterPath="$PROJECT_DIR$/../ChatSample/android/app/proguard-rules.pro" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ChatSample/android/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../ChatSample/android/app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ChatSample/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/../ChatSample/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../ChatSample/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../ChatSample/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -202,6 +132,7 @@
       <workItem from="1615188898815" duration="1390000" />
       <workItem from="1620126227289" duration="638000" />
       <workItem from="1620185216763" duration="1056000" />
+      <workItem from="1620188779943" duration="5000" />
     </task>
     <servers />
   </component>
