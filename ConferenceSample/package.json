@@ -11,7 +11,7 @@
     "react-native": "0.55.4",
     "react-navigation": "^1.5.11",
     "stringee-react-native": "^1.1.8",
-    "underscore": "^1.9.1"
+    "underscore": "^1.12.1"
   },
   "devDependencies": {
     "babel-jest": "23.4.2",
