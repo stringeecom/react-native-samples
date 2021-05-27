@@ -60,3 +60,4 @@ yarn-error.log
 
 # workspace
 */.idea/workspace.xml
+PushNotificationAndroidSample/android/app/release/

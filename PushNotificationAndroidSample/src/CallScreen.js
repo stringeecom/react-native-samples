@@ -25,37 +25,41 @@ class CallScreen extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <View style={styles.localView}>
-          {this.props.hasLocalStream && this.props.stringeeCallId != '' && (
+        {this.props.isVideoCall &&
+          this.props.hasLocalStream &&
+          this.props.stringeeCallId != '' && (
             <StringeeVideoView
-              style={{flex: 1}}
+              style={styles.localView}
               callId={this.props.stringeeCallId}
               streamId=""
               local={true}
               overlay={true}
             />
           )}
-        </View>
 
         <View style={styles.remoteView}>
-          {this.props.hasRemoteStream && this.props.stringeeCallId != '' && (
-            <StringeeVideoView
-              style={{flex: 1}}
-              callId={this.props.stringeeCallId}
-              streamId=""
-              local={false}
-            />
-          )}
+          {this.props.isVideoCall &&
+            this.props.hasRemoteStream &&
+            this.props.stringeeCallId != '' && (
+              <StringeeVideoView
+                style={{flex: 1}}
+                callId={this.props.stringeeCallId}
+                streamId=""
+                local={false}
+              />
+            )}
         </View>
 
-        <TouchableOpacity
-          onPress={this.props.switchCameraHandler}
-          style={styles.camera}>
-          <Image
-            source={require('../resource/camera_switch.png')}
-            style={styles.switchCamera}
-          />
-        </TouchableOpacity>
+        {this.props.isVideoCall && (
+          <TouchableOpacity
+            onPress={this.props.switchCameraHandler}
+            style={styles.camera}>
+            <Image
+              source={require('../resource/camera_switch.png')}
+              style={styles.switchCamera}
+            />
+          </TouchableOpacity>
+        )}
 
         <Text style={styles.userId}>{this.props.userId}</Text>
         <Text style={styles.callState}>{this.props.callState}</Text>
@@ -65,7 +69,7 @@ class CallScreen extends Component {
             {this.renderMuteImage()}
           </TouchableOpacity>
 
-          {this.props.enableVideo && (
+          {this.props.isVideoCall && (
             <TouchableOpacity onPress={this.props.enableVideoButtonHandler}>
               {this.renderVideoImage()}
             </TouchableOpacity>

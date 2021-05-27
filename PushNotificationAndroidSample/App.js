@@ -77,8 +77,9 @@ class App extends Component {
     hasReceivedRemoteStream: false,
 
     enableVideo: false,
-    isSpeaker: true,
+    isSpeaker: false,
     isMute: false,
+    isVideoCall: false,
   };
 
   constructor(props) {
@@ -103,12 +104,13 @@ class App extends Component {
       onReceiveDtmfDigit: this._didReceiveDtmfDigit,
       onReceiveCallInfo: this._didReceiveCallInfo,
       onHandleOnAnotherDevice: this._didHandleOnAnotherDevice,
+      onAudioDeviceChange: this._didAudioDeviceChange, ///only available on android
     };
   }
 
   async componentDidMount() {
     const token =
-      'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZULTE2MjAxMTU1MDAiLCJpc3MiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZUIiwiZXhwIjoxNjIyNzA3NTAwLCJ1c2VySWQiOiJ1c2VyMSJ9.rQhfY-z2jn0bNWxZ_LdxCYMyikeVXQMrYLAfl52_QZs';
+      'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZULTE2MjIxMDY5NjQiLCJpc3MiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZUIiwiZXhwIjoxNjI0Njk4OTY0LCJ1c2VySWQiOiJ1c2VyMiJ9.qr5FPylsTZLYThB0HerHGIHt7CguRZTxqkXl4jSX5zM';
 
     await this.refs.stringeeClient.connect(token);
     this.setState({clientId: this.refs.stringeeClient.getId()});
@@ -129,8 +131,6 @@ class App extends Component {
   /// MARK: - CONNECT EVENT HANDLER
   // The client connects to Stringee server
   _clientDidConnect = ({userId}) => {
-    this.refs.stringeeClient.getId();
-
     console.log('_clientDidConnect - ' + userId);
     this.setState({currentUserId: userId});
     AsyncStorage.getItem('isPushTokenRegistered').then(value => {
@@ -247,6 +247,7 @@ class App extends Component {
       showCallingView: true,
       callId: callId,
       isStringeeCall: true,
+      isVideoCall: isVideoCall,
       enableVideo: isVideoCall,
       isSpeaker: isVideoCall,
     });
@@ -293,6 +294,7 @@ class App extends Component {
       showCallingView: true,
       callId: callId,
       isStringeeCall: false,
+      isVideoCall: isVideoCall,
       enableVideo: isVideoCall,
       isSpeaker: isVideoCall,
     });
@@ -363,7 +365,7 @@ class App extends Component {
     if (this.state.isStringeeCall) {
       this.refs.stringeeCall.setSpeakerphoneOn(
         callId,
-        true,
+        this.state.isSpeaker,
         (status, code, message) => {
           console.log(message);
         },
@@ -371,7 +373,7 @@ class App extends Component {
     } else {
       this.refs.stringeeCall2.setSpeakerphoneOn(
         callId,
-        true,
+        this.state.isSpeaker,
         (status, code, message) => {
           console.log(message);
         },
@@ -386,6 +388,7 @@ class App extends Component {
   };
   // Invoked when the remote stream is available
   _callDidReceiveRemoteStream = ({callId}) => {
+    console.log('_callDidReceiveRemoteStream');
     this.setState({hasReceivedRemoteStream: true});
   };
 
@@ -407,6 +410,16 @@ class App extends Component {
     );
   };
 
+  // Invoked when audio device has change
+  _didAudioDeviceChange = ({selectedAudioDevice, availableAudioDevices}) => {
+    console.log(
+      '_didHandleOnAnotherDevice selectedAudioDevice-k' +
+        selectedAudioDevice +
+        ' availableAudioDevices-' +
+        availableAudioDevices,
+    );
+  };
+
   // Action handler
 
   onChangeText = text => {
@@ -417,6 +430,7 @@ class App extends Component {
   callButtonClick = (isStringeeCall: boolean, isVideoCall: boolean) => {
     this.setState({
       isStringeeCall: isStringeeCall,
+      isVideoCall: isVideoCall,
     });
     const myObj = {
       from: this.state.currentUserId, // caller
@@ -451,6 +465,7 @@ class App extends Component {
                 userId: this.state.toUserId,
                 answeredCall: true,
                 callState: 'Outgoing Call',
+                isVideoCall: isVideoCall,
                 enableVideo: isVideoCall,
                 isSpeaker: isVideoCall,
               });
@@ -480,6 +495,7 @@ class App extends Component {
                 userId: this.state.toUserId,
                 answeredCall: true,
                 callState: 'Outgoing Call',
+                isVideoCall: isVideoCall,
                 enableVideo: isVideoCall,
                 isSpeaker: isVideoCall,
               });
@@ -504,9 +520,10 @@ class App extends Component {
         hasReceivedLocalStream: false,
         hasReceivedRemoteStream: false,
         answeredCall: false,
-        enableVideo: true,
-        isSpeaker: true,
+        enableVideo: false,
+        isSpeaker: false,
         isMute: false,
+        isVideoCall: false,
       });
     }, 500);
   };
@@ -677,6 +694,7 @@ class App extends Component {
                 userId={this.state.userId}
                 isAnswered={this.state.answeredCall}
                 callState={this.state.callState}
+                isVideoCall={this.state.isVideoCall}
                 endButtonHandler={() => {
                   this._endCallAction(true);
                 }}
