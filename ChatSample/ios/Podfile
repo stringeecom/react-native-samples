@@ -34,7 +34,7 @@ target 'ChatSample' do
   pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
   pod 'Folly', :podspec => '../node_modules/react-native/third-party-podspecs/Folly.podspec'
 
-  pod 'RNStringee', path: "../node_modules/stringee-react-native-chat/ios"
+  pod 'RNStringee', path: "../node_modules/stringee-react-native/ios"
 
   use_native_modules!
 end

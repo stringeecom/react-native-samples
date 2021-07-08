@@ -18,7 +18,8 @@
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* StringeeCallkit_ReactNativeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* StringeeCallkit_ReactNativeTests.m */; };
 		476B1E0C375A8206B55A5A3F /* libPods-StringeeCallkit_ReactNative.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 40569F0A21C3F42FF8A9FBF6 /* libPods-StringeeCallkit_ReactNative.a */; };
-		51C500F924BEB85B0043550E /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 008F07F21AC5B25A0029DE68 /* main.jsbundle */; };
+		51F8E22B25C41AAD00201AE9 /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 51F8E22A25C41AAD00201AE9 /* main.jsbundle */; };
+		51F8E22C25C41AAD00201AE9 /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 51F8E22A25C41AAD00201AE9 /* main.jsbundle */; };
 		D484858A246A3ED4001DA750 /* PushKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4848589246A3ED4001DA750 /* PushKit.framework */; };
 		D4C4ADEF24668F3A00839F87 /* CallKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4C4ADEE24668F3A00839F87 /* CallKit.framework */; };
 		D4C4ADF124668F4300839F87 /* Intents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D4C4ADF024668F4300839F87 /* Intents.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -44,7 +45,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		008F07F21AC5B25A0029DE68 /* main.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
 		00E356EE1AD99517003FC87E /* StringeeCallkit_ReactNativeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StringeeCallkit_ReactNativeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* StringeeCallkit_ReactNativeTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = StringeeCallkit_ReactNativeTests.m; sourceTree = "<group>"; };
@@ -61,6 +61,7 @@
 		2D02E4901E0B4A5D006451C7 /* StringeeCallkit_ReactNative-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "StringeeCallkit_ReactNative-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		3A827553E7202275D7C42799 /* libPods-StringeeCallkit_ReactNative-StringeeCallkit_ReactNativeTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-StringeeCallkit_ReactNative-StringeeCallkit_ReactNativeTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		40569F0A21C3F42FF8A9FBF6 /* libPods-StringeeCallkit_ReactNative.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-StringeeCallkit_ReactNative.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		51F8E22A25C41AAD00201AE9 /* main.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
 		6976BED9A5CA230F26B44937 /* Pods-StringeeCallkit_ReactNative.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StringeeCallkit_ReactNative.debug.xcconfig"; path = "Target Support Files/Pods-StringeeCallkit_ReactNative/Pods-StringeeCallkit_ReactNative.debug.xcconfig"; sourceTree = "<group>"; };
 		6A58D310A3E33114DA3D3B67 /* libPods-StringeeCallkit_ReactNative-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-StringeeCallkit_ReactNative-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F2A269819835E3D975CD527 /* Pods-StringeeCallkit_ReactNative-StringeeCallkit_ReactNativeTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StringeeCallkit_ReactNative-StringeeCallkit_ReactNativeTests.release.xcconfig"; path = "Target Support Files/Pods-StringeeCallkit_ReactNative-StringeeCallkit_ReactNativeTests/Pods-StringeeCallkit_ReactNative-StringeeCallkit_ReactNativeTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -136,8 +137,8 @@
 		13B07FAE1A68108700A75B9A /* StringeeCallkit_ReactNative */ = {
 			isa = PBXGroup;
 			children = (
+				51F8E22A25C41AAD00201AE9 /* main.jsbundle */,
 				D4C4ADED24668C6000839F87 /* StringeeCallkit_ReactNative.entitlements */,
-				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -356,7 +357,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				51C500F924BEB85B0043550E /* main.jsbundle in Resources */,
+				51F8E22B25C41AAD00201AE9 /* main.jsbundle in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
 			);
@@ -367,6 +368,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */,
+				51F8E22C25C41AAD00201AE9 /* main.jsbundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -482,10 +484,12 @@
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-StringeeCallkit_ReactNative-StringeeCallkit_ReactNativeTests/Pods-StringeeCallkit_ReactNative-StringeeCallkit_ReactNativeTests-frameworks.sh",
 				"${PODS_ROOT}/GoogleWebRTC/Frameworks/frameworks/WebRTC.framework",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/OpenSSL/OpenSSL.framework/OpenSSL",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/WebRTC.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OpenSSL.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -522,10 +526,12 @@
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-StringeeCallkit_ReactNative/Pods-StringeeCallkit_ReactNative-frameworks.sh",
 				"${PODS_ROOT}/GoogleWebRTC/Frameworks/frameworks/WebRTC.framework",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/OpenSSL/OpenSSL.framework/OpenSSL",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/WebRTC.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/OpenSSL.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

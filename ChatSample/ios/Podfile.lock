@@ -220,8 +220,8 @@ PODS:
     - ReactCommon/jscallinvoker (= 0.61.1)
   - RNStringee (1.0.0):
     - React
-    - StringeeChat (~> 0.2.5)
-  - StringeeChat (0.2.5):
+    - Stringee (~> 1.5.5)
+  - Stringee (1.5.5):
     - GoogleWebRTC (= 1.1.27828)
   - Yoga (1.14.0)
 
@@ -253,14 +253,14 @@ DEPENDENCIES:
   - React-RCTVibration (from `../node_modules/react-native/Libraries/Vibration`)
   - ReactCommon/jscallinvoker (from `../node_modules/react-native/ReactCommon`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
-  - RNStringee (from `../node_modules/stringee-react-native-chat/ios`)
+  - RNStringee (from `../node_modules/stringee-react-native/ios`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
   trunk:
     - boost-for-react-native
     - GoogleWebRTC
-    - StringeeChat
+    - Stringee
 
 EXTERNAL SOURCES:
   DoubleConversion:
@@ -312,7 +312,7 @@ EXTERNAL SOURCES:
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
   RNStringee:
-    :path: "../node_modules/stringee-react-native-chat/ios"
+    :path: "../node_modules/stringee-react-native/ios"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -343,10 +343,10 @@ SPEC CHECKSUMS:
   React-RCTText: 81b62b4e7f11531a5154e4daa5617670d5a2d5de
   React-RCTVibration: 8be61459e3749d1fb02cf414edd05b3007622882
   ReactCommon: 4fba5be89efdf0b5720e0adb3d8d7edf6e532db0
-  RNStringee: 85df3a80fcac6192245f8d07db773c076ea69e50
-  StringeeChat: 69f641ea5845188ecfcae792264420b4b9029efe
+  RNStringee: 639b68c08d3c144afea4762391f4e6736219d45c
+  Stringee: 2b905e54ab1faba1df41495bc6b722c268ef1cd8
   Yoga: d8c572ddec8d05b7dba08e4e5f1924004a177078
 
-PODFILE CHECKSUM: eab4d95ae465efb258bb63101d98ae723663c07c
+PODFILE CHECKSUM: 5e7cb21b79cd2f1d29fb75ae1d0802859b6d6bc9
 
 COCOAPODS: 1.8.4
