@@ -1,4 +1,0 @@
-#Fri Jun 26 09:39:43 ICT 2020
-base.0=E\:\\Android\\Android App\\react-native-samples\\Callkit-Ios13-Sample\\android\\app\\build\\intermediates\\transforms\\dexMerger\\debug\\0
-path.0=classes.dex
-renamed.0=classes.dex

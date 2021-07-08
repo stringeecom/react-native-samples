@@ -12,8 +12,8 @@ import {
 } from "react-native";
 import { StringeeClient } from "stringee-react-native";
 
-const user1 = "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyLTE2MDM3Njk0MDEiLCJpc3MiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyIiwiZXhwIjoxNjA2MzYxNDAxLCJ1c2VySWQiOiJ1c2VyMSJ9.WD4fmAgmyX3Vp7ClQMIl29M6ulTElwPCvGbkU8Mg2us";
-const user3 = "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyLTE1OTQyNzg1ODIiLCJpc3MiOiJTS0xIb2NCdDl6Qk5qc1pLeThZaUVkSzRsU3NBZjhCSHpyIiwiZXhwIjoxNTk2ODcwNTgyLCJ1c2VySWQiOiJ1c2VyMyJ9.e3OQ14uKajOJGPe2gpSgooPnviVxTNAub2LDzoNEaUg";
+const user1 = "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS3RVaTBMZzNLa0lISkVwRTNiakZmMmd6UGtsNzlsU1otMTYyMDE4OTUwNiIsImlzcyI6IlNLdFVpMExnM0trSUhKRXBFM2JqRmYyZ3pQa2w3OWxTWiIsImV4cCI6MTYyMDI3NTkwNiwidXNlcklkIjoiQUM3RlRFTzZHVCIsImljY19hcGkiOnRydWUsImRpc3BsYXlOYW1lIjoiTmd1eVx1MWVjNW4gUXVhbmcgS1x1MWVmMyBBbmgiLCJhdmF0YXJVcmwiOm51bGwsInN1YnNjcmliZSI6Im9ubGluZV9zdGF0dXNfR1I2Nkw3SU4sQUxMX0NBTExfU1RBVFVTLGFnZW50X21hbnVhbF9zdGF0dXMiLCJhdHRyaWJ1dGVzIjoiW3tcImF0dHJpYnV0ZVwiOlwib25saW5lU3RhdHVzXCIsXCJ0b3BpY1wiOlwib25saW5lX3N0YXR1c19HUjY2TDdJTlwifSx7XCJhdHRyaWJ1dGVcIjpcImNhbGxcIixcInRvcGljXCI6XCJjYWxsX0dSNjZMN0lOXCJ9XSJ9.HD4QZn8m4bykcleM1vCfBXBzQTBkjzDyiMYzHpq2Ym0";
+const user3 = "eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS3RVaTBMZzNLa0lISkVwRTNiakZmMmd6UGtsNzlsU1otMTYyMDE4OTUwNiIsImlzcyI6IlNLdFVpMExnM0trSUhKRXBFM2JqRmYyZ3pQa2w3OWxTWiIsImV4cCI6MTYyMDI3NTkwNiwidXNlcklkIjoiQUM3RlRFTzZHVCIsImljY19hcGkiOnRydWUsImRpc3BsYXlOYW1lIjoiTmd1eVx1MWVjNW4gUXVhbmcgS1x1MWVmMyBBbmgiLCJhdmF0YXJVcmwiOm51bGwsInN1YnNjcmliZSI6Im9ubGluZV9zdGF0dXNfR1I2Nkw3SU4sQUxMX0NBTExfU1RBVFVTLGFnZW50X21hbnVhbF9zdGF0dXMiLCJhdHRyaWJ1dGVzIjoiW3tcImF0dHJpYnV0ZVwiOlwib25saW5lU3RhdHVzXCIsXCJ0b3BpY1wiOlwib25saW5lX3N0YXR1c19HUjY2TDdJTlwifSx7XCJhdHRyaWJ1dGVcIjpcImNhbGxcIixcInRvcGljXCI6XCJjYWxsX0dSNjZMN0lOXCJ9XSJ9.HD4QZn8m4bykcleM1vCfBXBzQTBkjzDyiMYzHpq2Ym0";
 
 const iOS = Platform.OS === "ios" ? true : false;
 
@@ -118,7 +118,7 @@ export default class HomeScreen extends Component {
   };
 
   onObjectChange = ({objectType, objectChanges, changeType}) => {
-    console.log("objectType" + objectType  + "\n changeType" + changeType + "\n objectChanges" + JSON.stringify(objectChanges));
+    // console.log("objectType" + objectType  + "\n changeType" + changeType + "\n objectChanges" + JSON.stringify(objectChanges));
   };
 
   // Actions
@@ -211,9 +211,9 @@ export default class HomeScreen extends Component {
     var isAscending = false;
     var client = this.state.isUser1 ? this.refs.client : this.refs.client1;
 
-    client.getConversationsBefore(1581390666891, count, isAscending, (status, code, message, conversations) => {
+    client.getLastConversations(count, isAscending, (status, code, message, conversations) => {
       console.log(
-        "status-" +
+        " status-" +
           status +
           " code-" +
           code +
@@ -221,46 +221,21 @@ export default class HomeScreen extends Component {
           message
       );
 
-      console.log('Conversations == ' + JSON.stringify(conversations));
+      console.log('getLastConversations -- Conversations == ' + JSON.stringify(conversations));
 
       conversations.map((conversation) => {
         if (conversation.id != "") {
           this.setState({
-            convId: conversation.id
+            convId: conversation.id,
+            dateTime: conversation.updatedAt
           });
         }
-        // console.log("conversation - Iden - " + conversation.id + "===== " +conversation.name);
+        // console.log("conversation - Iden - " + conversation.id + "===== " +conversation.name + "lastMsgId" + "===" + conversation.lastMsgId);
         conversation.participants.map((user) => {
           // console.log("Part - UserId - " + user.userId);
         });
       });
     });
-
-    // client.getAllLastConversations(count, isAscending, (status, code, message, conversations) => {
-    //   console.log(
-    //     " status-" +
-    //       status +
-    //       " code-" +
-    //       code +
-    //       " message-" +
-    //       message
-    //   );
-
-    //   console.log('getLastConversations -- Conversations == ' + JSON.stringify(conversations));
-
-    //   conversations.map((conversation) => {
-    //     if (conversation.id != "") {
-    //       this.setState({
-    //         convId: conversation.id,
-    //         dateTime: conversation.updatedAt
-    //       });
-    //     }
-    //     // console.log("conversation - Iden - " + conversation.id + "===== " +conversation.name + "lastMsgId" + "===" + conversation.lastMsgId);
-    //     conversation.participants.map((user) => {
-    //       // console.log("Part - UserId - " + user.userId);
-    //     });
-    //   });
-    // });
 
   };
 
@@ -270,34 +245,8 @@ export default class HomeScreen extends Component {
     var isAscending = false;
     var client = this.state.isUser1 ? this.refs.client : this.refs.client1;
 
-    // if (this.state.dateTime > 0) {
-    //   client.getUnreadConversationsBefore(1602215811388, count, isAscending, (status, code, message, conversations) => {
-    //     console.log(
-    //       "status-" +
-    //         status +
-    //         " code-" +
-    //         code +
-    //         " message-" +
-    //         message
-    //     );
-  
-    //     console.log('Conversations == ' + JSON.stringify(conversations));
-
-    //     conversations.map((conversation) => {
-    //       if (conversation.id != "") {
-    //         this.setState({
-    //           convId: conversation.id
-    //         });
-    //       }
-    //       // console.log("conversation - Iden - " + conversation.id + "===== " +conversation.name);
-    //       conversation.participants.map((user) => {
-    //         // console.log("Part - UserId - " + user.userId);
-    //       });
-    //     });
-    //   });
-    // }
-
-      client.getAllConversationsBefore(1581390666891, count, isAscending, (status, code, message, conversations) => {
+    if (this.state.dateTime > 0) {
+      client.getConversationsBefore(1551235459398, count, isAscending, (status, code, message, conversations) => {
         console.log(
           "status-" +
             status +
@@ -306,7 +255,7 @@ export default class HomeScreen extends Component {
             " message-" +
             message
         );
-  
+
         console.log('Conversations == ' + JSON.stringify(conversations));
 
         conversations.map((conversation) => {
@@ -321,8 +270,7 @@ export default class HomeScreen extends Component {
           });
         });
       });
-    
-
+    }
 
   };
 
@@ -333,7 +281,7 @@ export default class HomeScreen extends Component {
     var client = this.state.isUser1 ? this.refs.client : this.refs.client1;
 
     if (this.state.dateTime > 0) {
-      client.getUnreadConversationsAfter(1602215811388, count, isAscending, (status, code, message, conversations) => {
+      client.getConversationsAfter(1551235459398, count, isAscending, (status, code, message, conversations) => {
         console.log(
           "status-" +
             status +
@@ -344,7 +292,7 @@ export default class HomeScreen extends Component {
         );
 
         console.log('Conversations == ' + JSON.stringify(conversations));
-  
+
         conversations.map((conversation) => {
           if (conversation.id != "") {
             this.setState({
@@ -394,7 +342,7 @@ export default class HomeScreen extends Component {
     var isAscending = false;
     var client = this.state.isUser1 ? this.refs.client : this.refs.client1;
 
-    client.getAllLastMessages('conv-vn-1-WEETF2N6ZC-1552746200582', count, isAscending, true, true, (status, code, message, messages) => {
+    client.getLastMessages('conv-vn-1-NPN1PHYU8X-1550877232011', count, isAscending, true, true, (status, code, message, messages) => {
       console.log(
         "status-" +
           status +
@@ -422,7 +370,7 @@ export default class HomeScreen extends Component {
     var isAscending = false;
     var client = this.state.isUser1 ? this.refs.client : this.refs.client1;
 
-      client.getAllMessagesBefore('conv-vn-1-WEETF2N6ZC-1552746200582', 10, count, isAscending, true, true, (status, code, message, messages) => {
+      client.getMessagesBefore('conv-vn-1-NPN1PHYU8X-1550877232011', 30, count, isAscending, true, true, (status, code, message, messages) => {
         console.log(
           "status-" +
             status +
@@ -431,10 +379,10 @@ export default class HomeScreen extends Component {
             " message-" +
             message
         );
-  
+
         console.log('Messages == ' + JSON.stringify(messages));
       });
-    
+
   };
 
   loadMessagesAfterTapped = () => {
@@ -443,7 +391,7 @@ export default class HomeScreen extends Component {
     var isAscending = false;
     var client = this.state.isUser1 ? this.refs.client : this.refs.client1;
 
-      client.getAllMessagesAfter('conv-vn-1-WEETF2N6ZC-1552746200582', 1, count, isAscending, true, true, (status, code, message, messages) => {
+      client.getMessagesAfter('conv-vn-1-NPN1PHYU8X-1550877232011', 1, count, isAscending, true, true, (status, code, message, messages) => {
         console.log(
           "status-" +
             status +
@@ -452,7 +400,7 @@ export default class HomeScreen extends Component {
             " message-" +
             message
         );
-  
+
         console.log('Messages == ' + JSON.stringify(messages));
       });
   };
@@ -489,7 +437,7 @@ export default class HomeScreen extends Component {
           filename: "Test file",
           length: 20000
         },
-        
+
         location: {
           lat: 21.003465,
           lon: 105.822619,
@@ -501,7 +449,7 @@ export default class HomeScreen extends Component {
 
       },
       type: 1,
-      convId: "conv-vn-1-WEETF2N6ZC-1552746200582"
+      convId: "conv-vn-1-NPN1PHYU8X-1550877232011"
     };
     // const message = JSON.stringify(myObj);
     var client = this.state.isUser1 ? this.refs.client : this.refs.client1;
