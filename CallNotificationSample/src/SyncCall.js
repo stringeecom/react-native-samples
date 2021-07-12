@@ -10,6 +10,7 @@ class SyncCall {
   callId;
   callkitId;
   callCode;
+  isVideoCall;
 
   rejected; // nguoi dung da click reject cuoc goi
   answered; // nguoi dung da click answer cuoc goi

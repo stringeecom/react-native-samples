@@ -57,11 +57,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fbe15303-f931-44d5-a238-c1d737a62554" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/android/app/proguard-rules.pro" beforeDir="false" afterPath="$PROJECT_DIR$/android/app/proguard-rules.pro" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ChatSample/android/app/proguard-rules.pro" beforeDir="false" afterPath="$PROJECT_DIR$/../ChatSample/android/app/proguard-rules.pro" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ChatSample/android/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../ChatSample/android/app/src/main/AndroidManifest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ChatSample/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/../ChatSample/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../ChatSample/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/../ChatSample/package.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../CallNotificationSample/ios/CallNotificationSample/CallNotificationSample.entitlements" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CallNotificationSample/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/../CallNotificationSample/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CallNotificationSample/ios/CallNotificationSample.xcodeproj/project.pbxproj" beforeDir="false" afterPath="$PROJECT_DIR$/../CallNotificationSample/ios/CallNotificationSample.xcodeproj/project.pbxproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CallNotificationSample/ios/CallNotificationSample/AppDelegate.m" beforeDir="false" afterPath="$PROJECT_DIR$/../CallNotificationSample/ios/CallNotificationSample/AppDelegate.m" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CallNotificationSample/ios/CallNotificationSample/Info.plist" beforeDir="false" afterPath="$PROJECT_DIR$/../CallNotificationSample/ios/CallNotificationSample/Info.plist" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CallNotificationSample/ios/Podfile.lock" beforeDir="false" afterPath="$PROJECT_DIR$/../CallNotificationSample/ios/Podfile.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CallNotificationSample/src/CallScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/../CallNotificationSample/src/CallScreen.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/Callkit-Ios13-Sample.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/App.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -78,11 +85,10 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
-  <component name="JsFlowSettings">
-    <service-enabled>true</service-enabled>
-    <exe-path />
-    <other-services-enabled>true</other-services-enabled>
-    <auto-save>true</auto-save>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/src/CallScreen.js" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/package.json" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/SyncCall.js" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="ProjectId" id="1orZZWUESnzSqDI7eoSXOvX2Cp7" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -97,7 +103,7 @@
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="dart.analysis.tool.window.visible" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../OneToOneCallSample" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
@@ -112,6 +118,20 @@
       <recent name="F:\Android\AndroidApp\react-native-samples\Callkit-Ios13-Sample\android" />
     </key>
   </component>
+  <component name="RunManager">
+    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
+      <option name="arquillianRunConfiguration">
+        <value>
+          <option name="containerStateName" value="" />
+        </value>
+      </option>
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
     <configuration />
   </component>
@@ -133,11 +153,15 @@
       <workItem from="1620126227289" duration="638000" />
       <workItem from="1620185216763" duration="1056000" />
       <workItem from="1620188779943" duration="5000" />
+      <workItem from="1625814239082" duration="18000" />
+      <workItem from="1625814273984" duration="5000" />
+      <workItem from="1625814295892" duration="42000" />
+      <workItem from="1625814797975" duration="1395000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="2" />
+    <option name="version" value="3" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -150,19 +174,5 @@
       </map>
     </option>
     <option name="oldMeFiltersMigrated" value="true" />
-  </component>
-  <component name="WindowStateProjectService">
-    <state x="2623" y="321" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1614653322811">
-      <screen x="1920" y="0" width="1920" height="1040" />
-    </state>
-    <state x="2623" y="321" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1920.1040/1920.0.1920.1040@1920.0.1920.1040" timestamp="1614653322811" />
-    <state x="2659" y="274" key="FileChooserDialogImpl" timestamp="1620124377138">
-      <screen x="1920" y="0" width="1920" height="1040" />
-    </state>
-    <state x="2659" y="274" key="FileChooserDialogImpl/0.0.1920.1040/1920.0.1920.1040@1920.0.1920.1040" timestamp="1620124377138" />
-    <state x="2543" y="225" key="search.everywhere.popup" timestamp="1614047507241">
-      <screen x="1920" y="0" width="1920" height="1040" />
-    </state>
-    <state x="2543" y="225" key="search.everywhere.popup/0.0.1920.1040/1920.0.1920.1040@1920.0.1920.1040" timestamp="1614047507241" />
   </component>
 </project>
