@@ -57,11 +57,11 @@ static void InitializeFlipper(UIApplication *application) {
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
 {
-//#if DEBUG
-//  return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
-//#else
+#if DEBUG
+ return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
+#else
   return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
-//#endif
+#endif
 }
 
 /* Add PushKit delegate method */
@@ -80,28 +80,28 @@ static void InitializeFlipper(UIApplication *application) {
 // --- Handle incoming pushes (for ios >= 11)
 - (void)pushRegistry:(PKPushRegistry *)registry didReceiveIncomingPushWithPayload:(PKPushPayload *)payload forType:(PKPushType)type withCompletionHandler:(void (^)(void))completion {
   NSLog(@"didReceiveIncomingPushWithPayload: %@", payload.dictionaryPayload);
-  
+
   NSDictionary *payloadDataDic = payload.dictionaryPayload[@"data"][@"map"][@"data"][@"map"];
   NSString *callId = payloadDataDic[@"callId"];
   NSNumber *serial = payloadDataDic[@"serial"];
   NSString *callStatus = payloadDataDic[@"callStatus"];
-  
+
   NSString *fromAlias = payloadDataDic[@"from"][@"map"][@"alias"];
   NSString *fromNumber = payloadDataDic[@"from"][@"map"][@"number"];
   NSString *callName = fromAlias != NULL ? fromAlias : fromNumber != NULL ? fromNumber : @"Connecting...";
-  
+
   NSString *uuid = [[[NSUUID UUID] UUIDString] lowercaseString];
   NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
   [dict setObject:uuid forKey:@"uuid"];
   [dict setObject:serial forKey:@"serial"];
   [dict setObject:callId forKey:@"callId"];
-    
+
   if (callId != NULL && [callStatus isEqual: @"started"]) {
     // --- Process the received push
     CustomPushPayload *customPayload = [[CustomPushPayload alloc] init];
     customPayload.customDictionaryPayload = dict;
     [RNVoipPushNotificationManager didReceiveIncomingPushWithPayload:customPayload forType:type];
-    
+
     // --- You should make sure to report to callkit BEFORE execute `completion()`
     [RNCallKeep reportNewIncomingCall:uuid handle:@"Stringee" handleType:@"generic" hasVideo:true localizedCallerName:callName supportsHolding:false supportsDTMF:true supportsGrouping:false supportsUngrouping:false fromPushKit:true payload:nil withCompletionHandler:nil];
   } else {
@@ -109,7 +109,7 @@ static void InitializeFlipper(UIApplication *application) {
     [RNCallKeep reportNewIncomingCall:uuid handle:@"Stringee" handleType:@"generic" hasVideo:true localizedCallerName:callName supportsHolding:false supportsDTMF:true supportsGrouping:false supportsUngrouping:false fromPushKit:true payload:nil withCompletionHandler:nil];
     [RNCallKeep endCallWithUUID:uuid reason:1];
   }
-  
+
   if (completion != nil) {
     completion();
   }
