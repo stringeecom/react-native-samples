@@ -4,6 +4,11 @@
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
 
+#import <PushKit/PushKit.h>                    /* <------ add this line */
+#import "RNVoipPushNotificationManager.h"      /* <------ add this line */
+#import "RNCallKeep.h"
+#import "CustomPushPayload.h"
+
 #ifdef FB_SONARKIT_ENABLED
 #import <FlipperKit/FlipperClient.h>
 #import <FlipperKitLayoutPlugin/FlipperKitLayoutPlugin.h>
@@ -11,11 +16,6 @@
 #import <FlipperKitNetworkPlugin/FlipperKitNetworkPlugin.h>
 #import <SKIOSNetworkPlugin/SKIOSNetworkAdapter.h>
 #import <FlipperKitReactPlugin/FlipperKitReactPlugin.h>
-
-#import <PushKit/PushKit.h>                    /* <------ add this line */
-#import "RNVoipPushNotificationManager.h"      /* <------ add this line */
-#import "RNCallKeep.h"
-#import "CustomPushPayload.h"
 
 static void InitializeFlipper(UIApplication *application) {
   FlipperClient *client = [FlipperClient sharedClient];
