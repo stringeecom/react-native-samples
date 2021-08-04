@@ -57,18 +57,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="fbe15303-f931-44d5-a238-c1d737a62554" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../CallNotificationSample/ios/CallNotificationSample/CallNotificationSample.entitlements" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../CallNotificationSample/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/../CallNotificationSample/App.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../CallNotificationSample/ios/CallNotificationSample.xcodeproj/project.pbxproj" beforeDir="false" afterPath="$PROJECT_DIR$/../CallNotificationSample/ios/CallNotificationSample.xcodeproj/project.pbxproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../CallNotificationSample/ios/CallNotificationSample/AppDelegate.m" beforeDir="false" afterPath="$PROJECT_DIR$/../CallNotificationSample/ios/CallNotificationSample/AppDelegate.m" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../CallNotificationSample/ios/CallNotificationSample/Info.plist" beforeDir="false" afterPath="$PROJECT_DIR$/../CallNotificationSample/ios/CallNotificationSample/Info.plist" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../CallNotificationSample/ios/Podfile.lock" beforeDir="false" afterPath="$PROJECT_DIR$/../CallNotificationSample/ios/Podfile.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../CallNotificationSample/src/CallScreen.js" beforeDir="false" afterPath="$PROJECT_DIR$/../CallNotificationSample/src/CallScreen.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/Callkit-Ios13-Sample.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/App.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -118,19 +108,6 @@
       <recent name="F:\Android\AndroidApp\react-native-samples\Callkit-Ios13-Sample\android" />
     </key>
   </component>
-  <component name="RunManager">
-    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
-      <option name="arquillianRunConfiguration">
-        <value>
-          <option name="containerStateName" value="" />
-        </value>
-      </option>
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
     <configuration />
@@ -157,6 +134,8 @@
       <workItem from="1625814273984" duration="5000" />
       <workItem from="1625814295892" duration="42000" />
       <workItem from="1625814797975" duration="1395000" />
+      <workItem from="1626691831006" duration="1000" />
+      <workItem from="1627009337788" duration="1000" />
     </task>
     <servers />
   </component>
