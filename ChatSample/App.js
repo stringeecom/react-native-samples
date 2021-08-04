@@ -7,23 +7,15 @@
  */
 
 import React from 'react';
-import {
-  SafeAreaView,
-  StyleSheet,
-  ScrollView,
-  View,
-  Text,
-  StatusBar,
-} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 
-import {RootStack} from './src/Router'
-
+import {RootStack} from './src/Router';
 
 const App: () => React$Node = () => {
   return (
-      <View style={styles.container}>
-        <RootStack/>
-      </View>
+    <View style={styles.container}>
+      <RootStack />
+    </View>
   );
 };
 
