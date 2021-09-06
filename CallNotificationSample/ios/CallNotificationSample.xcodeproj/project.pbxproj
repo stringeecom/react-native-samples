@@ -13,6 +13,7 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		516A27BE269EE6E200579312 /* PushKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 516A27BD269EE6E200579312 /* PushKit.framework */; };
 		5190CB6E26985BF4008DED73 /* CustomPushPayload.m in Sources */ = {isa = PBXBuildFile; fileRef = 5190CB6D26985BF4008DED73 /* CustomPushPayload.m */; };
+		519506CC26D4EB5300CA2854 /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = 519506CB26D4EB5300CA2854 /* main.jsbundle */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		C640417A24FDF5B8CFFC843F /* libPods-CallNotificationSample.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D892B39F6AEC7A40C013A2E /* libPods-CallNotificationSample.a */; };
 		DFEDD6E08963E0FA08425C42 /* libPods-CallNotificationSample-CallNotificationSampleTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E3921A452CE0434513E7537F /* libPods-CallNotificationSample-CallNotificationSampleTests.a */; };
@@ -43,6 +44,7 @@
 		5190CB6B269841F6008DED73 /* CallNotificationSample.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = CallNotificationSample.entitlements; path = CallNotificationSample/CallNotificationSample.entitlements; sourceTree = "<group>"; };
 		5190CB6C26985BF4008DED73 /* CustomPushPayload.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CustomPushPayload.h; sourceTree = "<group>"; };
 		5190CB6D26985BF4008DED73 /* CustomPushPayload.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CustomPushPayload.m; sourceTree = "<group>"; };
+		519506CB26D4EB5300CA2854 /* main.jsbundle */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
 		773876605F542413B03E99AE /* Pods-CallNotificationSample.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CallNotificationSample.debug.xcconfig"; path = "Target Support Files/Pods-CallNotificationSample/Pods-CallNotificationSample.debug.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = CallNotificationSample/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9D75F0B56A79B02B56F771FE /* Pods-CallNotificationSample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CallNotificationSample.release.xcconfig"; path = "Target Support Files/Pods-CallNotificationSample/Pods-CallNotificationSample.release.xcconfig"; sourceTree = "<group>"; };
@@ -93,6 +95,7 @@
 		13B07FAE1A68108700A75B9A /* CallNotificationSample */ = {
 			isa = PBXGroup;
 			children = (
+				519506CB26D4EB5300CA2854 /* main.jsbundle */,
 				5190CB6B269841F6008DED73 /* CallNotificationSample.entitlements */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
@@ -255,6 +258,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				519506CC26D4EB5300CA2854 /* main.jsbundle in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 			);
@@ -530,14 +534,15 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.stringee.CallkitSample;
+				PRODUCT_BUNDLE_IDENTIFIER = com.stringee.stringeex;
 				PRODUCT_NAME = CallNotificationSample;
-				PROVISIONING_PROFILE_SPECIFIER = CallkitSampleDev;
+				PROVISIONING_PROFILE_SPECIFIER = StringeeX_dev;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -560,14 +565,15 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.stringee.CallkitSample;
+				PRODUCT_BUNDLE_IDENTIFIER = com.stringee.stringeex;
 				PRODUCT_NAME = CallNotificationSample;
-				PROVISIONING_PROFILE_SPECIFIER = CallkitSampleDev;
+				PROVISIONING_PROFILE_SPECIFIER = StringeeX_dev;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};

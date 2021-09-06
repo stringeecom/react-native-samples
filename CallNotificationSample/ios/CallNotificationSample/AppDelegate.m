@@ -57,11 +57,11 @@ static void InitializeFlipper(UIApplication *application) {
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
 {
-#if DEBUG
- return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
-#else
+//#if DEBUG
+// return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
+//#else
   return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
-#endif
+//#endif
 }
 
 /* Add PushKit delegate method */
@@ -113,6 +113,37 @@ static void InitializeFlipper(UIApplication *application) {
   if (completion != nil) {
     completion();
   }
+}
+
+- (void)applicationWillEnterForeground:(UIApplication *)application {
+  [self endBackgroundTask];
+}
+
+- (void)applicationDidEnterBackground:(UIApplication *)application {
+  [self extendBackgroundRunningTime];
+}
+
+- (void)endBackgroundTask {
+  if (self.backgroundUpdateTask != UIBackgroundTaskInvalid) {
+    [[UIApplication sharedApplication] endBackgroundTask:self.backgroundUpdateTask];
+    self.backgroundUpdateTask = UIBackgroundTaskInvalid;
+  }
+}
+
+- (void)extendBackgroundRunningTime {
+  if (self.backgroundUpdateTask != UIBackgroundTaskInvalid) {
+    return;
+  }
+
+  self.backgroundUpdateTask = [[UIApplication sharedApplication] beginBackgroundTaskWithName:@"extendBackgroundRunningTimeForCallKit" expirationHandler:^{
+    [self endBackgroundTask];
+  }];
+
+  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    [NSThread sleepForTimeInterval:5.0f];
+    [[UIApplication sharedApplication] endBackgroundTask:self.backgroundUpdateTask];
+    self.backgroundUpdateTask = UIBackgroundTaskInvalid;
+  });
 }
 
 @end
