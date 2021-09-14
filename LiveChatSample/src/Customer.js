@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import {StringeeClient, Conversation} from 'stringee-react-native';
 
-const widgetKey = 'PUT_YOUR_WIDGET_KEY_HERE';
+const widgetKey = 'YOUR_WIDGET_KEY';
 var _conversation: Conversation;
 
 export default class Customer extends Component {
@@ -43,13 +43,15 @@ export default class Customer extends Component {
     this.client.current.getChatProfile(
       widgetKey,
       (status, code, message, chatProfile) => {
-        console.log('getChatProfile - ' + JSON.stringify(chatProfile));
-        this.state.log.push({
-          data: 'getChatProfile - ' + JSON.stringify(chatProfile),
-        });
-        this.setState({
-          queueId: chatProfile.queues[0].id,
-        });
+        console.log('getChatProfile, msg: ' + message + ' Profile: ' + JSON.stringify(chatProfile));
+        if (chatProfile != null) {
+          this.state.log.push({
+            data: 'getChatProfile - ' + JSON.stringify(chatProfile),
+          });
+          this.setState({
+            queueId: chatProfile.queues[1].id,
+          });
+        }
       },
     );
   }
@@ -238,7 +240,7 @@ export default class Customer extends Component {
               this.state.name,
               this.state.email,
               (status, code, message, token) => {
-                console.log('getLiveChatToken - ' + JSON.stringify(token));
+                console.log('getLiveChatToken: ' + JSON.stringify(token));
                 this.state.log.push({
                   data: 'getLiveChatToken - ' + JSON.stringify(token),
                 });

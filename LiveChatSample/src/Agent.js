@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import {StringeeClient, Conversation, ChatRequest} from 'stringee-react-native';
 
-const token = 'PUT_YOUR_TOKEN_HERE';
+const token = 'YOUR_ACCESS_TOKEN';
 var _conversation: Conversation;
 var _chatRequest: ChatRequest;
 
