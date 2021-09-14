@@ -10,7 +10,7 @@ import {
 import {StringeeClient} from 'stringee-react-native';
 
 const user1 =
-  'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZULTE2MjgwNTI5NTAiLCJpc3MiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZUIiwiZXhwIjoxNjMwNjQ0OTUwLCJ1c2VySWQiOiJ1c2VyMSJ9.ALwovvALuxx5yVLT5iGhllFqVr_KsW9rAuMEuR-D3LI';
+  'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZULTE2MzE0OTgyNTgiLCJpc3MiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZUIiwiZXhwIjoxNjM0MDkwMjU4LCJ1c2VySWQiOiJ1c2VyMSJ9.I_XciSUGpAwnsJmCDQ2ViLV8osdlF0qIuMuhAExYOIE';
 
 export default class HomeScreen extends Component {
   constructor(props) {
@@ -110,7 +110,14 @@ export default class HomeScreen extends Component {
   };
 
   onObjectChange = ({objectType, objectChanges, changeType}) => {
-    // console.log("objectType" + objectType  + "\n changeType" + changeType + "\n objectChanges" + JSON.stringify(objectChanges));
+    console.log(
+      'objectType' +
+        objectType +
+        '\n changeType' +
+        changeType +
+        '\n objectChanges' +
+        JSON.stringify(objectChanges),
+    );
   };
 
   // Actions
@@ -413,7 +420,7 @@ export default class HomeScreen extends Component {
         },
       },
       type: 1,
-      convId: '',
+      convId: 'conv-vn-1-UWNPG461IU-1582821291249',
     };
     // const message = JSON.stringify(myObj);
 
