@@ -4,7 +4,7 @@
 
 # Xcode
 #
-*/build/
+build/
 *.pbxuser
 !default.pbxuser
 *.mode1v3
@@ -23,7 +23,7 @@ DerivedData
 
 # Android/IntelliJ
 #
-*/build/
+build/
 .idea
 .gradle
 local.properties
@@ -31,12 +31,12 @@ local.properties
 
 # node.js
 #
-*/node_modules/
+node_modules/
 npm-debug.log
 yarn-error.log
 
 # BUCK
-*/buck-out/
+buck-out/
 \.buckd/
 *.keystore
 !debug.keystore
@@ -56,11 +56,4 @@ yarn-error.log
 *.jsbundle
 
 # CocoaPods
-*/ios/Pods/
-
-# workspace
-*/.idea/workspace.xml
-PushNotificationAndroidSample/android/app/release/
-CallNotificationSample/ios/CallNotificationSample.xcworkspace
-LiveChatSample/ios/LiveChatSample.xcworkspace/contents.xcworkspacedata
-LiveChatSample/ios/LiveChatSample.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
+/ios/Pods/
