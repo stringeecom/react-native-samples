@@ -417,7 +417,6 @@ export default class Agent extends Component {
         <StringeeClient
           ref={this.client}
           eventHandlers={this.clientEventHandlers}
-          serverAddresses={this.serverAddresses}
         />
       </View>
     );

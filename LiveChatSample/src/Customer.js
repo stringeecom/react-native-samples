@@ -43,7 +43,12 @@ export default class Customer extends Component {
     this.client.current.getChatProfile(
       widgetKey,
       (status, code, message, chatProfile) => {
-        console.log('getChatProfile, msg: ' + message + ' Profile: ' + JSON.stringify(chatProfile));
+        console.log(
+          'getChatProfile, msg: ' +
+            message +
+            ' Profile: ' +
+            JSON.stringify(chatProfile),
+        );
         if (chatProfile != null) {
           this.state.log.push({
             data: 'getChatProfile - ' + JSON.stringify(chatProfile),
@@ -386,7 +391,6 @@ export default class Customer extends Component {
         <StringeeClient
           ref={this.client}
           eventHandlers={this.clientEventHandlers}
-          serverAddresses={this.serverAddresses}
         />
       </View>
     );
