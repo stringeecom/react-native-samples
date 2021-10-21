@@ -139,7 +139,7 @@ export default class RoomScreen extends Component {
       ),
       (status, code, message) => {
         if (status) {
-          var newTrackList = [...this.state.listVideoTrack, videoTrack];
+          const newTrackList = [...this.state.listVideoTrack, videoTrack];
           this.setState({
             listVideoTrack: newTrackList,
           });
