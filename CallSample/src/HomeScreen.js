@@ -10,8 +10,7 @@ import {
 import {StringeeClient, StringeeServerAddress} from 'stringee-react-native';
 
 export default class HomeScreen extends Component {
-  token: string =
-    'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZULTE2MzQ4MDk3MTAiLCJpc3MiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZUIiwiZXhwIjoxNjM3NDAxNzEwLCJ1c2VySWQiOiJ1c2VyMSJ9.vfSt_mVYQ6Ozf0M6iJhP3Bg0f8UU3rTGdl-2ZWBL1eo';
+  token: string = 'PUT YOUR TOKEN HERE';
 
   constructor(props) {
     super(props);

@@ -39,12 +39,12 @@ export default class Call2Screen extends Component {
       showAnswerBtn: props.route.params.isIncoming,
       receivedLocalStream: false,
       receivedRemoteStream: false,
-      listVideoTrack: [],
+      localTrackId: '',
+      remoteTrackId: '',
 
       signalingState: -1,
       mediaState: -1,
     };
-    console.log(JSON.stringify(props));
     this.call2 = React.createRef();
     this.callEvents = {
       onChangeSignalingState: this.callDidChangeSignalingState,
@@ -62,7 +62,7 @@ export default class Call2Screen extends Component {
   componentDidMount(): void {
     // InitAnswer
     if (this.state.isIncoming) {
-      this.call.current.initAnswer(
+      this.call2.current.initAnswer(
         this.state.callId,
         (status, code, message) => {
           console.log('initAnswer ' + message);
@@ -78,7 +78,7 @@ export default class Call2Screen extends Component {
         videoResolution: 'NORMAL',
       });
 
-      this.call.current.makeCall(
+      this.call2.current.makeCall(
         callParams,
         (status, code, message, callId) => {
           console.log(
@@ -202,21 +202,30 @@ export default class Call2Screen extends Component {
   callDidAddVideoTrack = videoTrack => {
     console.log('callDidAddVideoTrack - ' + JSON.stringify(videoTrack));
 
-    const newTrackList = [...this.state.listVideoTrack, videoTrack];
-    this.setState({
-      listVideoTrack: newTrackList,
-    });
+    if (videoTrack.isLocal) {
+      this.setState({
+        localTrackId: videoTrack.trackId,
+      });
+    } else {
+      this.setState({
+        remoteTrackId: videoTrack.trackId,
+      });
+    }
   };
 
   // Invoked when the remove video track
   callDidRemoveVideoTrack = videoTrack => {
     console.log('handleRemoveVideoTrack - ' + JSON.stringify(videoTrack));
-    const newTrackList = this.state.listVideoTrack.filter(
-      value => value.trackId !== videoTrack.trackId,
-    );
-    this.setState({
-      listVideoTrack: newTrackList,
-    });
+
+    if (videoTrack.isLocal) {
+      this.setState({
+        localTrackId: '',
+      });
+    } else {
+      this.setState({
+        remoteTrackId: '',
+      });
+    }
   };
 
   // Invoked when receives info from other clients
@@ -253,7 +262,7 @@ export default class Call2Screen extends Component {
   startCall = () => {
     this.setState({status: 'started'});
 
-    this.call.current.setSpeakerphoneOn(
+    this.call2.current.setSpeakerphoneOn(
       this.state.callId,
       this.state.isSpeaker,
       (status, code, message) => {},
@@ -261,7 +270,7 @@ export default class Call2Screen extends Component {
   };
 
   switchPress = () => {
-    this.call.current.switchCamera(
+    this.call2.current.switchCamera(
       this.state.callId,
       (status, code, message) => {
         console.log('switch - ' + message);
@@ -270,7 +279,7 @@ export default class Call2Screen extends Component {
   };
 
   mutePress = () => {
-    this.call.current.mute(
+    this.call2.current.mute(
       this.state.callId,
       !this.state.isMute,
       (status, code, message) => {
@@ -284,7 +293,7 @@ export default class Call2Screen extends Component {
   };
 
   speakerPress = () => {
-    this.call.current.setSpeakerphoneOn(
+    this.call2.current.setSpeakerphoneOn(
       this.state.callId,
       !this.state.isSpeaker,
       (status, code, message) => {
@@ -297,7 +306,7 @@ export default class Call2Screen extends Component {
   };
 
   videoPress = () => {
-    this.call.current.enableVideo(
+    this.call2.current.enableVideo(
       this.state.callId,
       !this.state.isVideoEnable,
       (status, code, message) => {
@@ -312,20 +321,7 @@ export default class Call2Screen extends Component {
 
   sharePress = () => {
     if (this.state.isSharing) {
-      this.call.current.stopCapture(
-        this.state.callId,
-        (status, code, message) => {
-          if (status) {
-            this.setState({
-              isVideoEnable: !this.state.isVideoEnable,
-            });
-            notifee.stopForegroundService();
-          }
-        },
-      );
-    } else {
-      this.displayForegroundService();
-      this.call.current.startCapture(
+      this.call2.current.stopCapture(
         this.state.callId,
         (status, code, message) => {
           if (status) {
@@ -333,6 +329,18 @@ export default class Call2Screen extends Component {
               isSharing: !this.state.isSharing,
             });
             notifee.stopForegroundService();
+          }
+        },
+      );
+    } else {
+      this.displayForegroundService();
+      this.call2.current.startCapture(
+        this.state.callId,
+        (status, code, message) => {
+          if (status) {
+            this.setState({
+              isSharing: !this.state.isSharing,
+            });
           }
         },
       );
@@ -359,7 +367,7 @@ export default class Call2Screen extends Component {
   }
 
   answerCall = () => {
-    this.call.current.answer(this.state.callId, (status, code, message) => {
+    this.call2.current.answer(this.state.callId, (status, code, message) => {
       console.log('answer: ' + message);
       if (status) {
         this.setState({
@@ -373,12 +381,12 @@ export default class Call2Screen extends Component {
 
   endPress = (isHangup: boolean) => {
     if (isHangup) {
-      this.call.current.hangup(this.state.callId, (status, code, message) => {
+      this.call2.current.hangup(this.state.callId, (status, code, message) => {
         console.log('hangup: ' + message);
         this.props.navigation.popToTop();
       });
     } else {
-      this.call.current.reject(this.state.callId, (status, code, message) => {
+      this.call2.current.reject(this.state.callId, (status, code, message) => {
         console.log('reject: ' + message);
         this.props.navigation.popToTop();
       });
@@ -400,16 +408,6 @@ export default class Call2Screen extends Component {
         <Icon name={iconName} type="material" color={iconColor} size={30} />
       </TouchableOpacity>
     );
-
-    const renderItem = item => {
-      return (
-        <StringeeVideoView
-          style={this.styles.trackView}
-          trackId={item.item.trackId}
-          overlay={true}
-        />
-      );
-    };
 
     return (
       <View style={this.styles.container}>
@@ -434,16 +432,20 @@ export default class Call2Screen extends Component {
             />
           )}
 
-        {this.state.isVideoCall && (
-          <View style={this.styles.listTrackView}>
-            {this.state.listVideoTrack.length > 0 ? (
-              <FlatList
-                horizontal
-                data={this.state.listVideoTrack}
-                renderItem={renderItem}
-              />
-            ) : null}
-          </View>
+        {this.state.localTrackId !== '' && this.state.isVideoCall && (
+          <StringeeVideoView
+            style={this.styles.localShareView}
+            trackId={this.state.localTrackId}
+            overlay={true}
+          />
+        )}
+
+        {this.state.remoteTrackId !== '' && this.state.isVideoCall && (
+          <StringeeVideoView
+            style={this.styles.remoteShareView}
+            trackId={this.state.remoteTrackId}
+            overlay={true}
+          />
         )}
 
         {this.state.isVideoCall && (
@@ -595,6 +597,7 @@ export default class Call2Screen extends Component {
       height: 150,
       zIndex: 1,
     },
+
     remoteView: {
       backgroundColor: 'black',
       position: 'absolute',
@@ -605,17 +608,24 @@ export default class Call2Screen extends Component {
       zIndex: 0,
     },
 
-    listTrackView: {
-      flexDirection: 'row',
+    localShareView: {
+      backgroundColor: 'black',
       position: 'absolute',
-      bottom: 150,
+      top: 190,
+      right: 20,
+      width: 100,
+      height: 150,
       zIndex: 1,
     },
 
-    trackView: {
-      zIndex: 2,
-      height: 150,
+    remoteShareView: {
+      backgroundColor: 'black',
+      position: 'absolute',
+      top: 360,
+      right: 20,
       width: 100,
+      height: 150,
+      zIndex: 1,
     },
   });
 }
