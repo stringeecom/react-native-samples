@@ -8,13 +8,12 @@ import {
   Dimensions,
   Platform,
 } from 'react-native';
-import StringeeVideo from 'stringee-react-native/src/conference/StringeeVideo';
-import StringeeRoom from 'stringee-react-native/src/conference/StringeeRoom';
 import {Icon} from 'react-native-elements';
 import StringeeVideoTrackOption from 'stringee-react-native/src/helpers/StringeeVideoTrackOption';
 import {stringeeVideoDimensions} from 'stringee-react-native/src/helpers/StringeeHelper';
 import StringeeVideoView from 'stringee-react-native/src/StringeeVideoView';
 import notifee, {AndroidColor} from '@notifee/react-native';
+import {StringeeRoom, StringeeVideo} from 'stringee-react-native';
 
 export default class RoomScreen extends Component {
   stringeeVideo: StringeeVideo;
@@ -84,6 +83,10 @@ export default class RoomScreen extends Component {
         }
       },
     );
+  }
+
+  componentWillUnmount(): void {
+    this.stringeeRoom.close();
   }
 
   publishLocalTrack() {
