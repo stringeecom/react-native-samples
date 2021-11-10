@@ -17,7 +17,7 @@
     "react-native": "0.65.1",
     "react-native-safe-area-context": "^3.3.2",
     "react-native-screens": "^3.7.0",
-    "stringee-react-native": "^1.4.5"
+    "stringee-react-native": "^1.4.10"
   },
   "devDependencies": {
     "@babel/core": "^7.15.5",

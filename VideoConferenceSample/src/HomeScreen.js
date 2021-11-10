@@ -3,6 +3,7 @@ import {
   PermissionsAndroid,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -19,6 +20,7 @@ export default class HomeScreen extends Component {
       connected: false,
       clientId: '',
       permissionGranted: false,
+      userName: '',
     };
     this.client = React.createRef();
     this.clientEventHandlers = {
@@ -31,20 +33,6 @@ export default class HomeScreen extends Component {
   }
 
   componentDidMount() {
-    fetch(
-      'https://v2.stringee.com/web-sdk-conference-samples/php/token_pro.php?userId=AndroidTest&roomId=room-vn-1-TC0F51H8BP-1589370038788',
-    )
-      .then(response => response.json())
-      .then(json => {
-        this.setState({});
-        this.token = json.access_token;
-        this.roomToken = json.room_token;
-        this.client.current.connect(this.token);
-      })
-      .catch(error => {
-        console.error(error);
-      });
-
     if (!this.state.permissionGranted) {
       PermissionsAndroid.requestMultiple([
         PermissionsAndroid.PERMISSIONS.CAMERA,
@@ -60,6 +48,24 @@ export default class HomeScreen extends Component {
         }
       });
     }
+  }
+
+  getTokenAndConnect() {
+    fetch(
+      'https://v2.stringee.com/web-sdk-conference-samples/php/token_pro.php?userId=' +
+        this.state.userName +
+        '&roomId=room-vn-1-TC0F51H8BP-1589370038788',
+    )
+      .then(response => response.json())
+      .then(json => {
+        this.setState({});
+        this.token = json.access_token;
+        this.roomToken = json.room_token;
+        this.client.current.connect(this.token);
+      })
+      .catch(error => {
+        console.error(error);
+      });
   }
 
   //Event
@@ -78,7 +84,7 @@ export default class HomeScreen extends Component {
     this.client.current.disconnect();
     this.setState({
       userId: 'Disconnected',
-      hasConnected: false,
+      connected: false,
     });
   };
 
@@ -105,22 +111,42 @@ export default class HomeScreen extends Component {
       <View style={this.styles.container}>
         <Text style={this.styles.info}>Logged in as: {this.state.userId}</Text>
 
-        <View style={this.styles.center}>
-          <TouchableOpacity
-            style={this.styles.button}
-            onPress={() => {
-              if (this.state.permissionGranted) {
-                this.props.navigation.navigate('Room', {
-                  clientId: this.client.current.getId(),
-                  roomToken: this.roomToken,
-                });
-              } else {
-                console.log('Need require permission');
-              }
-            }}>
-            <Text style={this.styles.text}>Join room</Text>
-          </TouchableOpacity>
-        </View>
+        {this.state.connected ? (
+          <View style={this.styles.center}>
+            <TouchableOpacity
+              style={this.styles.button}
+              onPress={() => {
+                if (this.state.permissionGranted) {
+                  this.props.navigation.navigate('Room', {
+                    clientId: this.client.current.getId(),
+                    roomToken: this.roomToken,
+                  });
+                } else {
+                  console.log('Need require permission');
+                }
+              }}>
+              <Text style={this.styles.text}>Join room</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <View style={this.styles.center}>
+            <TextInput
+              style={this.styles.input}
+              onChangeText={text => {
+                this.setState({userName: text});
+              }}
+            />
+            <TouchableOpacity
+              style={this.styles.button}
+              onPress={() => {
+                if (this.state.userName.trim() !== '') {
+                  this.getTokenAndConnect();
+                }
+              }}>
+              <Text style={this.styles.text}>Connect</Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
         <StringeeClient
           ref={this.client}
@@ -151,6 +177,17 @@ export default class HomeScreen extends Component {
       color: '#F5FCFF',
       fontWeight: 'bold',
       fontSize: 15,
+    },
+    input: {
+      width: '80%',
+      marginBottom: 20,
+      backgroundColor: '#fff',
+      paddingVertical: 10,
+      paddingHorizontal: 15,
+      borderColor: '#ccc',
+      borderWidth: 1,
+      borderRadius: 15,
+      fontSize: 16,
     },
     button: {
       width: 120,

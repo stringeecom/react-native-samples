@@ -208,6 +208,9 @@ export default class RoomScreen extends Component {
             this.state.localShareTrack.close((status, code, message) => {
               if (status) {
                 notifee.stopForegroundService();
+                this.setState({
+                  isSharing: !this.state.isSharing,
+                });
               }
             });
           }

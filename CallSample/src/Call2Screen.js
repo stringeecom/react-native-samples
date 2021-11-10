@@ -53,9 +53,9 @@ export default class Call2Screen extends Component {
       onReceiveRemoteStream: this.callDidReceiveRemoteStream,
       onAddVideoTrack: this.callDidAddVideoTrack,
       onRemoveVideoTrack: this.callDidRemoveVideoTrack,
-      onReceiveCallInfo: this.didReceiveCallInfo,
-      onHandleOnAnotherDevice: this.didHandleOnAnotherDevice,
-      onAudioDeviceChange: this.didAudioDeviceChange, ///only available on android
+      onReceiveCallInfo: this.callDidReceiveCallInfo,
+      onHandleOnAnotherDevice: this.callDidHandleOnAnotherDevice,
+      onAudioDeviceChange: this.callDidAudioDeviceChange, ///only available on android
     };
   }
 
@@ -195,7 +195,12 @@ export default class Call2Screen extends Component {
   // Invoked when the remote stream is available
   callDidReceiveRemoteStream = ({callId}) => {
     console.log('callDidReceiveRemoteStream');
-    this.setState({receivedRemoteStream: true});
+    if (this.state.receivedRemoteStream) {
+      this.setState({receivedRemoteStream: false});
+      this.setState({receivedRemoteStream: true});
+    } else {
+      this.setState({receivedRemoteStream: true});
+    }
   };
 
   // Invoked when the add video track
@@ -229,12 +234,12 @@ export default class Call2Screen extends Component {
   };
 
   // Invoked when receives info from other clients
-  didReceiveCallInfo = ({callId, data}) => {
+  callDidReceiveCallInfo = ({callId, data}) => {
     console.log('didReceiveCallInfo - ' + JSON.stringify(data));
   };
 
   // Invoked when the call is handled on another device
-  didHandleOnAnotherDevice = ({callId, code, description}) => {
+  callDidHandleOnAnotherDevice = ({callId, code, description}) => {
     console.log(
       'didHandleOnAnotherDevice ' + callId + '***' + code + '***' + description,
     );
@@ -250,7 +255,7 @@ export default class Call2Screen extends Component {
   };
 
   // Invoked when audio device has change
-  didAudioDeviceChange = ({selectedAudioDevice, availableAudioDevices}) => {
+  callDidAudioDeviceChange = ({selectedAudioDevice, availableAudioDevices}) => {
     console.log(
       'didHandleOnAnotherDevice selectedAudioDevice' +
         selectedAudioDevice +
