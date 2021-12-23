@@ -1,15 +1,23 @@
 import React, {Component, createRef} from 'react';
 import {
-  View,
-  Text,
-  TouchableOpacity,
   FlatList,
+  Modal,
+  SafeAreaView,
   ScrollView,
   StyleSheet,
-  Modal,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import {StringeeClient} from 'stringee-react-native';
-import ActionSheet from 'react-native-actions-sheet';
+import {Icon} from 'react-native-elements';
+import ActShtCreateConversation from './src/ActShtCreateConversation';
+import ActShtGetConversation from './src/ActShtGetConversation';
+import ActShtParticipant from './src/ActShtParticipant';
+import ActShtUpdateConversation from './src/ActShtUpdateConversation';
+import ActShtSendMsg from './src/ActShtSendMsg';
+import ActShtGetMessage from './src/ActShtGetMessage';
+import ActShtMsgAction from './src/ActShtMsgAction';
 
 const token = 'PUT_YOUR_TOKEN_HERE';
 
@@ -26,10 +34,26 @@ export default class App extends Component {
       modalVisible: false,
       selectedConv: undefined,
       selectedMsg: undefined,
+      title: '',
     };
 
     this.client = createRef();
-    this.actionSheetRef = createRef();
+
+    this.createConvRef = createRef();
+    this.getConvByIdRef = createRef();
+    this.getConvAfterRef = createRef();
+    this.getConvBeforeRef = createRef();
+    this.getConvWithUserRef = createRef();
+
+    this.msgActionRef = createRef();
+    this.addPartRef = createRef();
+    this.removePartRef = createRef();
+    this.updateConvRef = createRef();
+    this.sendMsgRef = createRef();
+    this.getMsgAfterRef = createRef();
+    this.getMsgBeforeRef = createRef();
+    this.getMsgById = createRef();
+
     this.clientEventHandlers = {
       onConnect: this.onConnect,
       onDisConnect: this.onDisConnect,
@@ -116,6 +140,22 @@ export default class App extends Component {
           '\n objectChanges - ' +
           JSON.stringify(objectChanges),
       );
+
+      if (this.state.selectedMsg !== undefined) {
+        if (this.state.selectedMsg.id === objectChanges[0].id) {
+          this.setState({
+            selectedMsg: objectChanges[0],
+          });
+        }
+      }
+    } else {
+      if (this.state.selectedConv !== undefined) {
+        if (this.state.selectedConv.id === objectChanges[0].id) {
+          this.setState({
+            selectedConv: objectChanges[0],
+          });
+        }
+      }
     }
   };
 
@@ -184,16 +224,9 @@ export default class App extends Component {
   };
 
   // Actions
-  createConversation = () => {
-    const options = {
-      name: 'React-Native chat',
-      isDistinct: true,
-      isGroup: false,
-    };
-
-    const userIds = ['user100', 'user105'];
+  createConversation = (options, participant) => {
     this.client.current.createConversation(
-      userIds,
+      participant,
       options,
       (status, code, message, conversation) => {
         console.log(
@@ -203,14 +236,15 @@ export default class App extends Component {
             JSON.stringify(conversation),
         );
         this.addLog('Create conversation: ' + message);
-        this.clearConversations();
-        this.addConversation(conversation);
+        if (status) {
+          this.clearConversations();
+          this.addConversation(conversation);
+        }
       },
     );
   };
 
-  getConversationById = () => {
-    const convId = '';
+  getConversationById = convId => {
     this.client.current.getConversationById(
       convId,
       (status, code, message, conversation) => {
@@ -280,13 +314,12 @@ export default class App extends Component {
     );
   };
 
-  getConversationsBefore = () => {
-    const datetime = 1639032621596;
+  getConversationsBefore = dateTime => {
     const count = 10;
     const isAscending = true;
 
     this.client.current.getConversationsBefore(
-      datetime,
+      dateTime,
       count,
       isAscending,
       (status, code, message, conversations) => {
@@ -307,13 +340,12 @@ export default class App extends Component {
     );
   };
 
-  getConversationsAfter = () => {
-    const datetime = 1639032621596;
+  getConversationsAfter = dateTime => {
     const count = 10;
     const isAscending = true;
 
     this.client.current.getConversationsAfter(
-      datetime,
+      dateTime,
       count,
       isAscending,
       (status, code, message, conversations) => {
@@ -334,8 +366,7 @@ export default class App extends Component {
     );
   };
 
-  getConversationWithUser = () => {
-    const userId = '';
+  getConversationWithUser = userId => {
     this.client.current.getConversationWithUser(
       userId,
       (status, code, message, conversation) => {
@@ -382,9 +413,8 @@ export default class App extends Component {
     );
   };
 
-  addParticipants = () => {
+  addParticipants = participants => {
     if (this.state.selectedConv.isGroup) {
-      const participants = ['participant1', 'participant2'];
       this.client.current.addParticipants(
         this.state.selectedConv.id,
         participants,
@@ -406,9 +436,8 @@ export default class App extends Component {
     }
   };
 
-  removeParticipants = () => {
+  removeParticipants = participants => {
     if (this.state.selectedConv.isGroup) {
-      const participants = ['participant1', 'participant2'];
       this.client.current.removeParticipants(
         this.state.selectedConv.id,
         participants,
@@ -430,10 +459,10 @@ export default class App extends Component {
     }
   };
 
-  updateConversation = () => {
+  updateConversation = (convName, avatar) => {
     const params = {
-      name: 'new conversation name',
-      avatar: 'new link conversation avatar',
+      name: convName,
+      avatar: avatar,
     };
     this.client.current.updateConversation(
       this.state.selectedConv.id,
@@ -465,11 +494,11 @@ export default class App extends Component {
     );
   };
 
-  sendMessage = () => {
+  sendMessage = content => {
     const msg = {
       message: {
         // for message text + message link
-        content: 'content',
+        content: content,
 
         // for message photo
         photo: {
@@ -591,8 +620,7 @@ export default class App extends Component {
     );
   };
 
-  getMessagesAfter = () => {
-    const sequence = 1;
+  getMessagesAfter = sequence => {
     const count = 10;
     const isAscending = true;
     const loadDeletedMessage = false;
@@ -623,14 +651,13 @@ export default class App extends Component {
     );
   };
 
-  getMessagesBefore = () => {
-    const sequence = 1;
+  getMessagesBefore = sequence => {
     const count = 10;
     const isAscending = true;
     const loadDeletedMessage = false;
     const loadDeletedMessageContent = false;
 
-    this.client.current.getMessagesAfter(
+    this.client.current.getMessagesBefore(
       this.state.selectedConv.id,
       sequence,
       count,
@@ -655,8 +682,7 @@ export default class App extends Component {
     );
   };
 
-  getMessageById = () => {
-    const msgId = '';
+  getMessageById = msgId => {
     this.client.current.getMessageById(
       this.state.selectedConv.id,
       msgId,
@@ -686,9 +712,7 @@ export default class App extends Component {
     );
   };
 
-  editMessage = () => {
-    this.actionSheetRef.current.hide();
-    const newContent = 'new content';
+  editMessage = newContent => {
     this.client.current.editMessage(
       this.state.selectedConv.id,
       this.state.selectedMsg.id,
@@ -701,21 +725,24 @@ export default class App extends Component {
   };
 
   pinMessage = () => {
-    this.actionSheetRef.current.hide();
-    const pin = this.state.selectedMsg.id === this.state.selectedConv.pinMsgId;
+    const pin = this.state.selectedMsg.id !== this.state.selectedConv.pinMsgId;
     this.client.current.pinMessage(
       this.state.selectedConv.id,
       this.state.selectedMsg.id,
       pin,
       (status, code, message) => {
-        console.log('Pin message: ' + message);
-        this.addConversationLog('Pin message: ' + message);
+        if (pin) {
+          console.log('Pin message: ' + message);
+          this.addConversationLog('Pin message: ' + message);
+        } else {
+          console.log('Unpin message: ' + message);
+          this.addConversationLog('Unpin message: ' + message);
+        }
       },
     );
   };
 
   deleteMessage = () => {
-    this.actionSheetRef.current.hide();
     this.client.current.deleteMessage(
       this.state.selectedConv.id,
       this.state.selectedMsg.id,
@@ -727,7 +754,6 @@ export default class App extends Component {
   };
 
   revokeMessage = () => {
-    this.actionSheetRef.current.hide();
     this.client.current.revokeMessage(
       this.state.selectedConv.id,
       this.state.selectedMsg.id,
@@ -756,8 +782,17 @@ export default class App extends Component {
 
   render(): React.ReactNode {
     return (
-      <View style={this.styles.container}>
-        <Text style={this.styles.title}>Log:</Text>
+      <SafeAreaView style={this.styles.container}>
+        <View style={this.styles.row}>
+          <Text style={this.styles.title}>Log:</Text>
+          <TouchableOpacity
+            style={this.styles.cleanButton}
+            onPress={() => {
+              this.clearLog();
+            }}>
+            <Icon name="cleaning-services" s color="#000000" />
+          </TouchableOpacity>
+        </View>
 
         <View style={this.styles.box}>
           <FlatList
@@ -771,13 +806,15 @@ export default class App extends Component {
           />
         </View>
 
-        <Text style={this.styles.title}>Conversations:</Text>
+        <View style={this.styles.row}>
+          <Text style={this.styles.title}>Conversations:</Text>
+        </View>
 
         <View style={this.styles.box}>
           <FlatList
             style={this.styles.list}
             data={this.state.conversations}
-            renderItem={({item, index}) => (
+            renderItem={({item}) => (
               <View style={this.styles.itemBox}>
                 <TouchableOpacity
                   style={this.styles.dataItem}
@@ -791,9 +828,7 @@ export default class App extends Component {
                   }}>
                   <Text>{item.id}</Text>
                 </TouchableOpacity>
-                {index !== this.state.conversations.length - 1 && (
-                  <View style={this.styles.divider} />
-                )}
+                <View style={this.styles.divider} />
               </View>
             )}
           />
@@ -806,14 +841,14 @@ export default class App extends Component {
                 <TouchableOpacity
                   style={this.styles.button}
                   onPress={() => {
-                    this.createConversation();
+                    this.createConvRef.current.show();
                   }}>
                   <Text style={this.styles.text}>Create conversation</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={this.styles.button}
                   onPress={() => {
-                    this.getConversationById();
+                    this.getConvByIdRef.current.show();
                   }}>
                   <Text style={this.styles.text}>Get conversation by id</Text>
                 </TouchableOpacity>
@@ -838,14 +873,14 @@ export default class App extends Component {
                 <TouchableOpacity
                   style={this.styles.button}
                   onPress={() => {
-                    this.getConversationsAfter();
+                    this.getConvAfterRef.current.show();
                   }}>
                   <Text style={this.styles.text}>Get conversations after</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={this.styles.button}
                   onPress={() => {
-                    this.getConversationsBefore();
+                    this.getConvBeforeRef.current.show();
                   }}>
                   <Text style={this.styles.text}>Get conversation before</Text>
                 </TouchableOpacity>
@@ -854,7 +889,7 @@ export default class App extends Component {
                 <TouchableOpacity
                   style={this.styles.button}
                   onPress={() => {
-                    this.getConversationWithUser();
+                    this.getConvWithUserRef.current.show();
                   }}>
                   <Text style={this.styles.text}>
                     Get conversation with user
@@ -878,13 +913,6 @@ export default class App extends Component {
                   }}>
                   <Text style={this.styles.text}>Clear db</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-                  style={this.styles.button}
-                  onPress={() => {
-                    this.clearLog();
-                  }}>
-                  <Text style={this.styles.text}>Clear log</Text>
-                </TouchableOpacity>
               </View>
             </View>
           </ScrollView>
@@ -897,10 +925,37 @@ export default class App extends Component {
           onRequestClose={() => {
             this.setState({
               modalVisible: !this.state.modalVisible,
+              selectedConv: undefined,
             });
           }}>
-          <View style={this.styles.container}>
-            <Text style={this.styles.title}>Log:</Text>
+          <SafeAreaView style={this.styles.container}>
+            <View style={this.styles.header}>
+              <TouchableOpacity
+                style={this.styles.backButton}
+                onPress={() => {
+                  this.setState({
+                    modalVisible: !this.state.modalVisible,
+                  });
+                }}>
+                <Icon name="arrow-back-ios" s color="#ffffff" />
+              </TouchableOpacity>
+              <Text style={this.styles.headerTitle}>
+                {this.state.selectedConv === undefined
+                  ? ''
+                  : this.state.selectedConv.id}
+              </Text>
+            </View>
+
+            <View style={this.styles.row}>
+              <Text style={this.styles.title}>Log:</Text>
+              <TouchableOpacity
+                style={this.styles.cleanButton}
+                onPress={() => {
+                  this.clearMsgLog();
+                }}>
+                <Icon name="cleaning-services" s color="#000000" />
+              </TouchableOpacity>
+            </View>
 
             <View style={this.styles.box}>
               <FlatList
@@ -914,25 +969,25 @@ export default class App extends Component {
               />
             </View>
 
-            <Text style={this.styles.title}>Message:</Text>
+            <View style={this.styles.row}>
+              <Text style={this.styles.title}>Message:</Text>
+            </View>
 
             <View style={this.styles.box}>
               <FlatList
                 style={this.styles.list}
                 data={this.state.messages}
-                renderItem={({item, index}) => (
+                renderItem={({item}) => (
                   <View style={this.styles.itemBox}>
                     <TouchableOpacity
                       style={this.styles.dataItem}
                       onPress={() => {
                         this.setState({selectedMsg: item});
-                        this.actionSheetRef.current.show();
+                        this.msgActionRef.current.show();
                       }}>
                       <Text>{item.id}</Text>
                     </TouchableOpacity>
-                    {index !== this.state.conversations.length - 1 && (
-                      <View style={this.styles.divider} />
-                    )}
+                    <View style={this.styles.divider} />
                   </View>
                 )}
               />
@@ -952,7 +1007,7 @@ export default class App extends Component {
                     <TouchableOpacity
                       style={this.styles.button}
                       onPress={() => {
-                        this.addParticipants();
+                        this.addPartRef.current.show();
                       }}>
                       <Text style={this.styles.text}>Add participant</Text>
                     </TouchableOpacity>
@@ -961,14 +1016,14 @@ export default class App extends Component {
                     <TouchableOpacity
                       style={this.styles.button}
                       onPress={() => {
-                        this.removeParticipants();
+                        this.removePartRef.current.show();
                       }}>
                       <Text style={this.styles.text}>Remove participant</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={this.styles.button}
                       onPress={() => {
-                        this.updateConversation();
+                        this.updateConvRef.current.show();
                       }}>
                       <Text style={this.styles.text}>Update conversation</Text>
                     </TouchableOpacity>
@@ -993,7 +1048,7 @@ export default class App extends Component {
                     <TouchableOpacity
                       style={this.styles.button}
                       onPress={() => {
-                        this.sendMessage();
+                        this.sendMsgRef.current.show();
                       }}>
                       <Text style={this.styles.text}>Send message</Text>
                     </TouchableOpacity>
@@ -1016,7 +1071,7 @@ export default class App extends Component {
                     <TouchableOpacity
                       style={this.styles.button}
                       onPress={() => {
-                        this.getMessagesAfter();
+                        this.getMsgAfterRef.current.show();
                       }}>
                       <Text style={this.styles.text}>Get messages after</Text>
                     </TouchableOpacity>
@@ -1025,14 +1080,14 @@ export default class App extends Component {
                     <TouchableOpacity
                       style={this.styles.button}
                       onPress={() => {
-                        this.getMessagesBefore();
+                        this.getMsgBeforeRef.current.show();
                       }}>
                       <Text style={this.styles.text}>Get messages before</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={this.styles.button}
                       onPress={() => {
-                        this.getMessageById();
+                        this.getMsgById.current.show();
                       }}>
                       <Text style={this.styles.text}>Get message by id</Text>
                     </TouchableOpacity>
@@ -1047,64 +1102,133 @@ export default class App extends Component {
                         Mark conversation as read
                       </Text>
                     </TouchableOpacity>
-                    <TouchableOpacity
-                      style={this.styles.button}
-                      onPress={() => {
-                        this.clearMsgLog();
-                      }}>
-                      <Text style={this.styles.text}>Clear log</Text>
-                    </TouchableOpacity>
                   </View>
                 </View>
               </ScrollView>
             </View>
 
-            <ActionSheet
-              ref={this.actionSheetRef}
-              bounceOnOpen={true}
-              defaultOverlayOpacity={0.3}>
-              <View>
-                <TouchableOpacity
-                  style={this.styles.actionButton}
-                  onPress={() => {
-                    this.editMessage();
-                  }}>
-                  <Text style={this.styles.textAction}>Edit message</Text>
-                </TouchableOpacity>
-                <View style={this.styles.divider} />
-                <TouchableOpacity
-                  style={this.styles.actionButton}
-                  onPress={() => {
-                    this.pinMessage();
-                  }}>
-                  <Text style={this.styles.textAction}>Pin message</Text>
-                </TouchableOpacity>
-                <View style={this.styles.divider} />
-                <TouchableOpacity
-                  style={this.styles.actionButton}
-                  onPress={() => {
-                    this.deleteMessage();
-                  }}>
-                  <Text style={this.styles.textAction}>Delete message</Text>
-                </TouchableOpacity>
-                <View style={this.styles.divider} />
-                <TouchableOpacity
-                  style={this.styles.actionButton}
-                  onPress={() => {
-                    this.revokeMessage();
-                  }}>
-                  <Text style={this.styles.textAction}>Revoke message</Text>
-                </TouchableOpacity>
-              </View>
-            </ActionSheet>
-          </View>
+            <ActShtParticipant
+              ref={this.addPartRef}
+              title={'Add'}
+              data={participants => {
+                this.addParticipants(participants);
+              }}
+            />
+
+            <ActShtParticipant
+              ref={this.removePartRef}
+              title={'Remove'}
+              data={participants => {
+                this.removeParticipants(participants);
+              }}
+            />
+
+            <ActShtUpdateConversation
+              ref={this.updateConvRef}
+              data={(convName, avatar) => {
+                this.updateConversation(convName, avatar);
+              }}
+            />
+
+            <ActShtSendMsg
+              ref={this.sendMsgRef}
+              data={content => {
+                this.sendMessage(content);
+              }}
+            />
+
+            <ActShtGetMessage
+              ref={this.getMsgAfterRef}
+              isNumber={true}
+              title={'Sequence'}
+              data={sequence => {
+                this.getMessagesAfter(sequence);
+              }}
+            />
+
+            <ActShtGetMessage
+              ref={this.getMsgBeforeRef}
+              isNumber={true}
+              title={'Sequence'}
+              data={sequence => {
+                this.getMessagesBefore(sequence);
+              }}
+            />
+
+            <ActShtGetMessage
+              ref={this.getMsgById}
+              title={'Message id'}
+              data={msgId => {
+                this.getMessageById(msgId);
+              }}
+            />
+
+            <ActShtMsgAction
+              ref={this.msgActionRef}
+              onClose={() => {
+                this.setState({selectedMsg: undefined});
+              }}
+              data={(type, data) => {
+                if (type === 'editMessage') {
+                  this.editMessage(data);
+                } else if (type === 'pinMessage') {
+                  this.pinMessage();
+                } else if (type === 'deleteMessage') {
+                  this.deleteMessage();
+                } else if (type === 'revokeMessage') {
+                  this.revokeMessage();
+                }
+              }}
+            />
+          </SafeAreaView>
         </Modal>
+
+        <ActShtCreateConversation
+          ref={this.createConvRef}
+          data={(options, participant) => {
+            this.createConversation(options, participant);
+          }}
+        />
+
+        <ActShtGetConversation
+          ref={this.getConvByIdRef}
+          title={'Conversation id'}
+          data={convId => {
+            this.getConversationById(convId);
+          }}
+        />
+
+        <ActShtGetConversation
+          ref={this.getConvAfterRef}
+          isNumber={true}
+          title={'Time in milli second'}
+          data={dateTime => {
+            this.getConversationsAfter(dateTime);
+          }}
+        />
+
+        <ActShtGetConversation
+          ref={this.getConvBeforeRef}
+          isNumber={true}
+          title={'Time in milli second'}
+          data={dateTime => {
+            this.getConversationsBefore(dateTime);
+          }}
+        />
+
+        <ActShtGetConversation
+          ref={this.getConvWithUserRef}
+          title={'User id'}
+          data={userId => {
+            this.getConversationWithUser(userId);
+          }}
+        />
 
         <StringeeClient
           ref={this.client}
           eventHandlers={this.clientEventHandlers}
         />
-      </View>
+      </SafeAreaView>
     );
   }
 
@@ -1132,11 +1256,34 @@ export default class App extends Component {
       justifyContent: 'center',
       alignItems: 'center',
     },
-    title: {
+    header: {
       width: '100%',
+      height: 50,
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#1E6738',
+    },
+    headerTitle: {
+      flex: 1,
+      fontSize: 16,
+      fontWeight: 'bold',
+      textAlign: 'left',
+      color: '#F5FCFF',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    row: {
+      width: '100%',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    title: {
       fontSize: 16,
       textAlign: 'left',
-      paddingLeft: 20,
+      paddingLeft: 10,
       margin: 10,
       fontWeight: 'bold',
     },
@@ -1181,18 +1328,15 @@ export default class App extends Component {
       borderWidth: 1,
       borderColor: '#fff',
     },
-    actionButton: {
+    backButton: {
       height: 50,
-      width: '100%',
+      width: 50,
       justifyContent: 'center',
-      alignItems: 'center',
     },
-    textAction: {
-      textAlign: 'center',
-      color: '#000000',
-      fontSize: 21,
+    cleanButton: {
+      marginRight: 20,
+      justifyContent: 'center',
     },
-
     divider: {
       width: '100%',
       height: 1,

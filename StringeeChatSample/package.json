@@ -13,6 +13,9 @@
     "react": "17.0.2",
     "react-native": "0.66.3",
     "react-native-actions-sheet": "^0.5.8",
+    "react-native-elements": "^3.4.2",
+    "react-native-safe-area-context": "^3.3.2",
+    "react-native-vector-icons": "^9.0.0",
     "stringee-react-native": "^1.4.22"
   },
   "devDependencies": {
