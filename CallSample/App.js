@@ -11,17 +11,17 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigationContainer} from '@react-navigation/native';
 import HomeScreen from './src/HomeScreen';
 import CallScreen from './src/CallScreen';
-import notifee from '@notifee/react-native';
+// import notifee from '@notifee/react-native';
 import Call2Screen from './src/Call2Screen';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-  notifee.registerForegroundService(notification => {
-    return new Promise(() => {
-      // Long running task...
-    });
-  });
+  // notifee.registerForegroundService(notification => {
+  //   return new Promise(() => {
+  //     // Long running task...
+  //   });
+  // });
 
   return (
     <NavigationContainer>

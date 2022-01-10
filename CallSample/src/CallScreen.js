@@ -3,10 +3,8 @@ import {
   StyleSheet,
   View,
   TouchableOpacity,
-  FlatList,
   Text,
   Alert,
-  Platform,
   Dimensions,
 } from 'react-native';
 

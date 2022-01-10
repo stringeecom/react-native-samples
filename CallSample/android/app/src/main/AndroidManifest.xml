@@ -31,8 +31,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service
-            android:name="app.notifee.core.ForegroundService"
-            android:foregroundServiceType="mediaProjection" />
+<!--        <service-->
+<!--            android:name="app.notifee.core.ForegroundService"-->
+<!--            android:foregroundServiceType="mediaProjection" />-->
     </application>
 </manifest>

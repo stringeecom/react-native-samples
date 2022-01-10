@@ -3,7 +3,6 @@ import {
   StyleSheet,
   View,
   TouchableOpacity,
-  FlatList,
   Text,
   Alert,
   Platform,
@@ -12,7 +11,7 @@ import {
 
 import {Icon} from 'react-native-elements';
 import StringeeVideoView from 'stringee-react-native/src/StringeeVideoView';
-import notifee from '@notifee/react-native';
+// import notifee from '@notifee/react-native';
 import {StringeeCall2} from 'stringee-react-native';
 
 const height = Dimensions.get('window').height;
@@ -51,8 +50,8 @@ export default class Call2Screen extends Component {
       onChangeMediaState: this.callDidChangeMediaState,
       onReceiveLocalStream: this.callDidReceiveLocalStream,
       onReceiveRemoteStream: this.callDidReceiveRemoteStream,
-      onAddVideoTrack: this.callDidAddVideoTrack,
-      onRemoveVideoTrack: this.callDidRemoveVideoTrack,
+      // onAddVideoTrack: this.callDidAddVideoTrack,
+      // onRemoveVideoTrack: this.callDidRemoveVideoTrack,
       onReceiveCallInfo: this.callDidReceiveCallInfo,
       onHandleOnAnotherDevice: this.callDidHandleOnAnotherDevice,
       onAudioDeviceChange: this.callDidAudioDeviceChange, ///only available on android
@@ -324,52 +323,52 @@ export default class Call2Screen extends Component {
     );
   };
 
-  sharePress = () => {
-    if (this.state.isSharing) {
-      this.call2.current.stopCapture(
-        this.state.callId,
-        (status, code, message) => {
-          if (status) {
-            this.setState({
-              isSharing: !this.state.isSharing,
-            });
-            notifee.stopForegroundService();
-          }
-        },
-      );
-    } else {
-      this.displayForegroundService();
-      this.call2.current.startCapture(
-        this.state.callId,
-        (status, code, message) => {
-          if (status) {
-            this.setState({
-              isSharing: !this.state.isSharing,
-            });
-          }
-        },
-      );
-    }
-  };
+  // sharePress = () => {
+  // if (this.state.isSharing) {
+  //   this.call2.current.stopCapture(
+  //     this.state.callId,
+  //     (status, code, message) => {
+  //       if (status) {
+  //         this.setState({
+  //           isSharing: !this.state.isSharing,
+  //         });
+  //         notifee.stopForegroundService();
+  //       }
+  //     },
+  //   );
+  // } else {
+  //   this.displayForegroundService();
+  //   this.call2.current.startCapture(
+  //     this.state.callId,
+  //     (status, code, message) => {
+  //       if (status) {
+  //         this.setState({
+  //           isSharing: !this.state.isSharing,
+  //         });
+  //       }
+  //     },
+  //   );
+  // }
+  // };
 
-  async displayForegroundService() {
-    const notificationId = '11111'; // YOUR_NOTIFICATION_ID
-    const channelId = await notifee.createChannel({
-      id: 'YOUR_CHANNEL_ID',
-      name: 'ChannelName',
-      vibration: true,
-    });
-
-    await notifee.displayNotification({
-      id: notificationId,
-      title: 'Screen capture service',
-      body: 'Screen capture service',
-      android: {
-        channelId,
-        asForegroundService: true,
-      },
-    });
-  }
+  // async displayForegroundService() {
+  // const notificationId = '11111'; // YOUR_NOTIFICATION_ID
+  // const channelId = await notifee.createChannel({
+  //   id: 'YOUR_CHANNEL_ID',
+  //   name: 'ChannelName',
+  //   vibration: true,
+  // });
+  //
+  // await notifee.displayNotification({
+  //   id: notificationId,
+  //   title: 'Screen capture service',
+  //   body: 'Screen capture service',
+  //   android: {
+  //     channelId,
+  //     asForegroundService: true,
+  //   },
+  // });
+  // }
 
   answerCall = () => {
     this.call2.current.answer(this.state.callId, (status, code, message) => {
@@ -499,16 +498,16 @@ export default class Call2Screen extends Component {
               />
             )}
 
-            {Platform.OS === 'android' && this.state.isVideoCall && (
-              <CircleBtn
-                color={!this.state.isSharing ? '#FFFFFF8A' : 'white'}
-                iconName={
-                  !this.state.isSharing ? 'stop-screen-share' : 'screen-share'
-                }
-                iconColor={!this.state.isSharing ? 'white' : 'black'}
-                onPress={this.sharePress}
-              />
-            )}
+            {/*{Platform.OS === 'android' && this.state.isVideoCall && (*/}
+            {/*  <CircleBtn*/}
+            {/*    color={!this.state.isSharing ? '#FFFFFF8A' : 'white'}*/}
+            {/*    iconName={*/}
+            {/*      !this.state.isSharing ? 'stop-screen-share' : 'screen-share'*/}
+            {/*    }*/}
+            {/*    iconColor={!this.state.isSharing ? 'white' : 'black'}*/}
+            {/*    onPress={this.sharePress}*/}
+            {/*  />*/}
+            {/*)}*/}
           </View>
         )}
 
