@@ -1,17 +1,18 @@
 import React, {Component} from 'react';
 import {
   PermissionsAndroid,
+  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
-import {StringeeClient, StringeeServerAddress} from 'stringee-react-native';
+import {StringeeClient} from 'stringee-react-native';
 
 export default class HomeScreen extends Component {
-  token: string = 'PUT YOUR TOKEN HERE';
-  roomToken: string = 'PUT YOUR ROOM TOKEN HERE';
+  token: string = 'PUT_YOUR_TOKEN_HERE';
+  roomToken: string = 'PUT_YOUR_ROOM_TOKEN_HERE';
 
   constructor(props) {
     super(props);
@@ -48,24 +49,8 @@ export default class HomeScreen extends Component {
         }
       });
     }
-  }
 
-  getTokenAndConnect() {
-    fetch(
-      'https://v2.stringee.com/web-sdk-conference-samples/php/token_pro.php?userId=' +
-        this.state.userName +
-        '&roomId=room-vn-1-TC0F51H8BP-1589370038788',
-    )
-      .then(response => response.json())
-      .then(json => {
-        this.setState({});
-        this.token = json.access_token;
-        this.roomToken = json.room_token;
-        this.client.current.connect(this.token);
-      })
-      .catch(error => {
-        console.error(error);
-      });
+    this.client.current.connect(this.token);
   }
 
   //Event
@@ -81,7 +66,6 @@ export default class HomeScreen extends Component {
   // The client disconnects from Stringee server
   clientDidDisConnect = () => {
     console.log('clientDidDisConnect');
-    this.client.current.disconnect();
     this.setState({
       userId: 'Disconnected',
       connected: false,
@@ -108,14 +92,14 @@ export default class HomeScreen extends Component {
 
   render(): React.ReactNode {
     return (
-      <View style={this.styles.container}>
+      <SafeAreaView style={this.styles.container}>
         <Text style={this.styles.info}>Logged in as: {this.state.userId}</Text>
 
-        {this.state.connected ? (
-          <View style={this.styles.center}>
-            <TouchableOpacity
-              style={this.styles.button}
-              onPress={() => {
+        <View style={this.styles.center}>
+          <TouchableOpacity
+            style={this.styles.button}
+            onPress={() => {
+              if (this.state.connected) {
                 if (this.state.permissionGranted) {
                   this.props.navigation.navigate('Room', {
                     clientId: this.client.current.getId(),
@@ -124,35 +108,19 @@ export default class HomeScreen extends Component {
                 } else {
                   console.log('Need require permission');
                 }
-              }}>
-              <Text style={this.styles.text}>Join room</Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <View style={this.styles.center}>
-            <TextInput
-              style={this.styles.input}
-              onChangeText={text => {
-                this.setState({userName: text});
-              }}
-            />
-            <TouchableOpacity
-              style={this.styles.button}
-              onPress={() => {
-                if (this.state.userName.trim() !== '') {
-                  this.getTokenAndConnect();
-                }
-              }}>
-              <Text style={this.styles.text}>Connect</Text>
-            </TouchableOpacity>
-          </View>
-        )}
+              } else {
+                console.log('StringeeClient is disconnected');
+              }
+            }}>
+            <Text style={this.styles.text}>Join room</Text>
+          </TouchableOpacity>
+        </View>
 
         <StringeeClient
           ref={this.client}
           eventHandlers={this.clientEventHandlers}
         />
-      </View>
+      </SafeAreaView>
     );
   }
 

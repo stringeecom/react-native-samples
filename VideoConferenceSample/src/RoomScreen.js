@@ -4,20 +4,25 @@ import {
   View,
   TouchableOpacity,
   FlatList,
-  Text,
   Dimensions,
   Platform,
+  SafeAreaView,
 } from 'react-native';
 import {Icon} from 'react-native-elements';
-import StringeeVideoTrackOption from 'stringee-react-native/src/helpers/StringeeVideoTrackOption';
-import {stringeeVideoDimensions} from 'stringee-react-native/src/helpers/StringeeHelper';
-import StringeeVideoView from 'stringee-react-native/src/StringeeVideoView';
-import notifee, {AndroidColor} from '@notifee/react-native';
-import {StringeeRoom, StringeeVideo} from 'stringee-react-native';
+import notifee from '@notifee/react-native';
+import {
+  ScalingType,
+  StringeeVideo,
+  StringeeVideoDimensions,
+  StringeeVideoRoom,
+  StringeeVideoTrackInfo,
+  StringeeVideoTrackOption,
+  StringeeVideoView,
+} from 'stringee-react-native';
 
 export default class RoomScreen extends Component {
   stringeeVideo: StringeeVideo;
-  stringeeRoom: StringeeRoom;
+  stringeeVideoRoom: StringeeVideoRoom;
 
   constructor(props) {
     super(props);
@@ -26,12 +31,12 @@ export default class RoomScreen extends Component {
       roomToken: props.route.params.roomToken,
       isMute: false,
       isVideoEnable: true,
-      isSharing: false,
-      hasLocalTrack: false,
       localTrack: null,
+      hasLocalTrackView: false,
+      isSharing: false,
       localShareTrack: null,
-      listUser: [],
-      listVideoTrack: [],
+      listRemoteTrack: [],
+      listRemoteTrackReady: [],
     };
 
     this.stringeeVideo = new StringeeVideo(this.state.clientId);
@@ -41,52 +46,58 @@ export default class RoomScreen extends Component {
       didAddVideoTrack: this.handleAddVideoTrack,
       didRemoveVideoTrack: this.handleRemoveVideoTrack,
       didReceiveRoomMessage: this.handleReceiveRoomMessage,
+      trackReadyToPlay: this.handleTrackReadyToPlay,
     };
   }
 
   componentDidMount(): void {
-    this.stringeeVideo.connect(
+    this.stringeeVideo.joinRoom(
       this.state.roomToken,
       (status, code, message, data) => {
         if (status) {
           this.setState({
             listUser: data.users,
           });
-          this.stringeeRoom = data.room;
-          this.stringeeRoom.registerRoomEven(this.roomEvents);
+          this.stringeeVideoRoom = data.room;
+
+          this.stringeeVideoRoom.registerRoomEvent(this.roomEvents);
           this.publishLocalTrack();
 
-          if (data.videoTracks.length > 0) {
-            data.videoTracks.forEach(videoTrack => {
-              this.stringeeRoom.subscribe(
-                videoTrack,
-                new StringeeVideoTrackOption(
-                  videoTrack.audioEnable,
-                  videoTrack.videoEnable,
-                  videoTrack.isScreenCapture,
-                  stringeeVideoDimensions.dimensions_1080,
-                ),
-                (status, code, message) => {
-                  if (status) {
-                    var newTrackList = [
-                      ...this.state.listVideoTrack,
-                      videoTrack,
-                    ];
-                    this.setState({
-                      listVideoTrack: newTrackList,
-                    });
-                  }
-                },
-              );
+          if (data.videoTrackInfos.length > 0) {
+            data.videoTrackInfos.forEach(videoTrackInfo => {
+              this.subscribeTrack(videoTrackInfo);
             });
           }
+        } else {
+          this.props.navigation.goBack();
+        }
+      },
+    );
+  }
+
+  subscribeTrack(videoTrackInfo: StringeeVideoTrackInfo) {
+    this.stringeeVideoRoom.subscribe(
+      videoTrackInfo,
+      new StringeeVideoTrackOption(
+        videoTrackInfo.audioEnable,
+        videoTrackInfo.videoEnable,
+        videoTrackInfo.isScreenCapture,
+        StringeeVideoDimensions.dimensions_1080,
+      ),
+      (status, code, message, videoTrack) => {
+        if (status) {
+          // this.state.listVideoTrack.
+          let newTrackList = [...this.state.listRemoteTrack, videoTrack];
+          this.setState({
+            listRemoteTrack: newTrackList,
+          });
         }
       },
     );
   }
 
   componentWillUnmount(): void {
-    this.stringeeRoom.close();
+    this.stringeeVideoRoom.close();
   }
 
   publishLocalTrack() {
@@ -94,20 +105,24 @@ export default class RoomScreen extends Component {
       true,
       true,
       false,
-      stringeeVideoDimensions.dimensions_1080,
+      StringeeVideoDimensions.dimensions_1080,
     );
     this.stringeeVideo.createLocalVideoTrack(
       trackOptions,
       (status, code, message, data) => {
+        console.log('createLocalVideoTrack - ' + message);
         if (status) {
-          this.stringeeRoom.publish(data, (status, code, message, data) => {
-            if (status) {
-              this.setState({
-                localTrack: data,
-                hasLocalTrack: true,
-              });
-            }
-          });
+          this.stringeeVideoRoom.publish(
+            data,
+            (status1, code1, message1, localTrack) => {
+              console.log('publish - ' + message);
+              if (status1) {
+                this.setState({
+                  localTrack: localTrack,
+                });
+              }
+            },
+          );
         }
       },
     );
@@ -115,49 +130,29 @@ export default class RoomScreen extends Component {
 
   handleJoinRoom = user => {
     console.log('handleJoinRoom - ' + JSON.stringify(user));
-    this.setState({
-      listUser: [...this.state.listUser, user],
-    });
   };
 
   handleLeaveRoom = user => {
     console.log('handleLeaveRoom - ' + JSON.stringify(user));
-    const newUserList = this.state.listUser.filter(
-      value => value.userId !== user.userId,
-    );
-    this.setState({
-      listUser: newUserList,
-    });
   };
 
-  handleAddVideoTrack = videoTrack => {
-    console.log('handleAddVideoTrack - ' + JSON.stringify(videoTrack));
-    this.stringeeRoom.subscribe(
-      videoTrack,
-      new StringeeVideoTrackOption(
-        videoTrack.audioEnable,
-        videoTrack.videoEnable,
-        videoTrack.isScreenCapture,
-        stringeeVideoDimensions.dimensions_1080,
-      ),
-      (status, code, message) => {
-        if (status) {
-          const newTrackList = [...this.state.listVideoTrack, videoTrack];
-          this.setState({
-            listVideoTrack: newTrackList,
-          });
-        }
-      },
-    );
+  handleAddVideoTrack = videoTrackInfo => {
+    console.log('handleAddVideoTrack - ' + JSON.stringify(videoTrackInfo));
+    this.subscribeTrack(videoTrackInfo);
   };
 
-  handleRemoveVideoTrack = videoTrack => {
-    console.log('handleRemoveVideoTrack - ' + JSON.stringify(videoTrack));
-    const newTrackList = this.state.listVideoTrack.filter(
-      value => value.trackId !== videoTrack.trackId,
+  handleRemoveVideoTrack = videoTrackInfo => {
+    console.log('handleRemoveVideoTrack - ' + JSON.stringify(videoTrackInfo));
+    const newTrackList = this.state.listRemoteTrack.filter(
+      value => value.getTrackId() !== videoTrackInfo.trackId,
+    );
+
+    const newTrackReadyList = this.state.listRemoteTrackReady.filter(
+      value => value.getTrackId() !== videoTrackInfo.trackId,
     );
     this.setState({
-      listVideoTrack: newTrackList,
+      listRemoteTrack: newTrackList,
+      listRemoteTrackReady: newTrackReadyList,
     });
   };
 
@@ -168,6 +163,30 @@ export default class RoomScreen extends Component {
         ' - from - ' +
         JSON.stringify(from),
     );
+  };
+
+  handleTrackReadyToPlay = videoTrack => {
+    console.log('handleTrackReadyToPlay - ' + JSON.stringify(videoTrack));
+    if (videoTrack.isLocal) {
+      if (videoTrack.isScreenCapture) {
+        let newTrackReadyList = [
+          ...this.state.listRemoteTrackReady,
+          videoTrack,
+        ];
+        this.setState({
+          listRemoteTrackReady: newTrackReadyList,
+        });
+      } else {
+        this.setState({
+          hasLocalTrackView: true,
+        });
+      }
+    } else {
+      let newTrackReadyList = [...this.state.listRemoteTrackReady, videoTrack];
+      this.setState({
+        listRemoteTrackReady: newTrackReadyList,
+      });
+    }
   };
 
   switchPress = () => {
@@ -201,17 +220,26 @@ export default class RoomScreen extends Component {
 
   sharePress = () => {
     if (this.state.isSharing) {
-      this.stringeeRoom.unpublish(
+      this.stringeeVideoRoom.unpublish(
         this.state.localShareTrack,
         (status, code, message) => {
           if (status) {
-            this.state.localShareTrack.close((status, code, message) => {
-              if (status) {
-                notifee.stopForegroundService();
-                this.setState({
-                  isSharing: !this.state.isSharing,
-                });
-              }
+            notifee.stopForegroundService();
+            this.setState({
+              isSharing: !this.state.isSharing,
+            });
+            const newTrackList = this.state.listRemoteTrack.filter(
+              value =>
+                value.getTrackId() !== this.state.localShareTrack.localId,
+            );
+
+            const newTrackReadyList = this.state.listRemoteTrackReady.filter(
+              value =>
+                value.getTrackId() !== this.state.localShareTrack.localId,
+            );
+            this.setState({
+              listRemoteTrack: newTrackList,
+              listRemoteTrackReady: newTrackReadyList,
             });
           }
         },
@@ -222,14 +250,17 @@ export default class RoomScreen extends Component {
         (status, code, message, data) => {
           console.log('createCaptureScreenTrack - ' + message);
           if (status) {
-            this.stringeeRoom.publish(
+            this.stringeeVideoRoom.publish(
               data,
               (status, code, message, videoTrack) => {
                 if (status) {
-                  var newTrackList = [...this.state.listVideoTrack, videoTrack];
+                  const newTrackList = [
+                    ...this.state.listRemoteTrack,
+                    videoTrack,
+                  ];
                   this.setState({
                     localShareTrack: videoTrack,
-                    listVideoTrack: newTrackList,
+                    listRemoteTrack: newTrackList,
                     isSharing: !this.state.isSharing,
                   });
                 }
@@ -261,46 +292,15 @@ export default class RoomScreen extends Component {
   }
 
   endPress = () => {
-    // unsubcrise other video track
-    if (this.state.listVideoTrack.length > 0) {
-      this.state.listVideoTrack.forEach((track, index) => {
-        if (!track.isLocal) {
-          this.stringeeRoom.unsubscribe(track, (status, code, message) => {});
+    this.stringeeVideoRoom.leave(false, (status, code, message) => {
+      console.log('leave ' + message);
+      if (status) {
+        if (this.state.isSharing) {
+          notifee.stopForegroundService();
         }
-      });
-    }
-
-    if (this.state.isSharing) {
-      this.stringeeRoom.unpublish(
-        this.state.localShareTrack,
-        (status, code, message) => {
-          if (status) {
-            this.state.localShareTrack.close((status, code, message) => {
-              if (status) {
-                notifee.stopForegroundService();
-              }
-            });
-          }
-        },
-      );
-    }
-
-    this.stringeeRoom.unpublish(
-      this.state.localTrack,
-      (status, code, message) => {
-        if (status) {
-          this.state.localTrack.close((status, code, message) => {
-            if (status) {
-              this.stringeeRoom.leave(false, (status, code, message) => {
-                if (status) {
-                  this.props.navigation.goBack();
-                }
-              });
-            }
-          });
-        }
-      },
-    );
+        this.props.navigation.goBack();
+      }
+    });
   };
 
   render(): React.ReactNode {
@@ -338,27 +338,29 @@ export default class RoomScreen extends Component {
       return (
         <StringeeVideoView
           style={this.styles.trackView}
-          trackId={item.item.trackId}
+          trackId={item.item.getTrackId()}
+          scalingType={ScalingType.FIT}
           overlay={true}
         />
       );
     };
 
     return (
-      <View style={this.styles.container}>
-        {this.state.hasLocalTrack && (
+      <SafeAreaView style={this.styles.container}>
+        {this.state.hasLocalTrackView ? (
           <StringeeVideoView
             style={this.styles.localView}
             overlay={false}
-            trackId={this.state.localTrack.trackId}
+            scalingType={ScalingType.FIT}
+            trackId={this.state.localTrack.getTrackId()}
           />
-        )}
+        ) : null}
 
         <View style={this.styles.listTrackView}>
-          {this.state.listVideoTrack.length > 0 ? (
+          {this.state.listRemoteTrackReady.length > 0 ? (
             <FlatList
               horizontal
-              data={this.state.listVideoTrack}
+              data={this.state.listRemoteTrackReady}
               renderItem={renderItem}
             />
           ) : null}
@@ -406,7 +408,7 @@ export default class RoomScreen extends Component {
             onPress={this.endPress}
           />
         </View>
-      </View>
+      </SafeAreaView>
     );
   }
 
