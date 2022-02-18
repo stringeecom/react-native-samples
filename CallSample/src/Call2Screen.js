@@ -5,17 +5,11 @@ import {
   TouchableOpacity,
   Text,
   Alert,
-  Platform,
   Dimensions,
 } from 'react-native';
 
 import {Icon} from 'react-native-elements';
-import StringeeVideoView from 'stringee-react-native/src/StringeeVideoView';
-// import notifee from '@notifee/react-native';
-import {StringeeCall2} from 'stringee-react-native';
-
-const height = Dimensions.get('window').height;
-const width = Dimensions.get('window').width;
+import {StringeeCall2, StringeeVideoView} from 'stringee-react-native';
 
 export default class Call2Screen extends Component {
   constructor(props) {
@@ -34,13 +28,9 @@ export default class Call2Screen extends Component {
       isMute: false,
       isVideoEnable: props.route.params.isVideoCall,
       isSpeaker: props.route.params.isVideoCall,
-      isSharing: false,
       showAnswerBtn: props.route.params.isIncoming,
       receivedLocalStream: false,
       receivedRemoteStream: false,
-      localTrackId: '',
-      remoteTrackId: '',
-
       signalingState: -1,
       mediaState: -1,
     };
@@ -50,8 +40,6 @@ export default class Call2Screen extends Component {
       onChangeMediaState: this.callDidChangeMediaState,
       onReceiveLocalStream: this.callDidReceiveLocalStream,
       onReceiveRemoteStream: this.callDidReceiveRemoteStream,
-      // onAddVideoTrack: this.callDidAddVideoTrack,
-      // onRemoveVideoTrack: this.callDidRemoveVideoTrack,
       onReceiveCallInfo: this.callDidReceiveCallInfo,
       onHandleOnAnotherDevice: this.callDidHandleOnAnotherDevice,
       onAudioDeviceChange: this.callDidAudioDeviceChange, ///only available on android
@@ -323,53 +311,6 @@ export default class Call2Screen extends Component {
     );
   };
 
-  // sharePress = () => {
-  // if (this.state.isSharing) {
-  //   this.call2.current.stopCapture(
-  //     this.state.callId,
-  //     (status, code, message) => {
-  //       if (status) {
-  //         this.setState({
-  //           isSharing: !this.state.isSharing,
-  //         });
-  //         notifee.stopForegroundService();
-  //       }
-  //     },
-  //   );
-  // } else {
-  //   this.displayForegroundService();
-  //   this.call2.current.startCapture(
-  //     this.state.callId,
-  //     (status, code, message) => {
-  //       if (status) {
-  //         this.setState({
-  //           isSharing: !this.state.isSharing,
-  //         });
-  //       }
-  //     },
-  //   );
-  // }
-  // };
-
-  // async displayForegroundService() {
-  // const notificationId = '11111'; // YOUR_NOTIFICATION_ID
-  // const channelId = await notifee.createChannel({
-  //   id: 'YOUR_CHANNEL_ID',
-  //   name: 'ChannelName',
-  //   vibration: true,
-  // });
-  //
-  // await notifee.displayNotification({
-  //   id: notificationId,
-  //   title: 'Screen capture service',
-  //   body: 'Screen capture service',
-  //   android: {
-  //     channelId,
-  //     asForegroundService: true,
-  //   },
-  // });
-  // }
-
   answerCall = () => {
     this.call2.current.answer(this.state.callId, (status, code, message) => {
       console.log('answer: ' + message);
@@ -422,6 +363,7 @@ export default class Call2Screen extends Component {
               style={this.styles.remoteView}
               callId={this.state.callId}
               local={false}
+              overlay={false}
             />
           )}
 
@@ -435,22 +377,6 @@ export default class Call2Screen extends Component {
               overlay={true}
             />
           )}
-
-        {this.state.localTrackId !== '' && this.state.isVideoCall && (
-          <StringeeVideoView
-            style={this.styles.localShareView}
-            trackId={this.state.localTrackId}
-            overlay={true}
-          />
-        )}
-
-        {this.state.remoteTrackId !== '' && this.state.isVideoCall && (
-          <StringeeVideoView
-            style={this.styles.remoteShareView}
-            trackId={this.state.remoteTrackId}
-            overlay={true}
-          />
-        )}
 
         {this.state.isVideoCall && (
           <View style={this.styles.btnSwitch}>
@@ -497,17 +423,6 @@ export default class Call2Screen extends Component {
                 onPress={this.videoPress}
               />
             )}
-
-            {/*{Platform.OS === 'android' && this.state.isVideoCall && (*/}
-            {/*  <CircleBtn*/}
-            {/*    color={!this.state.isSharing ? '#FFFFFF8A' : 'white'}*/}
-            {/*    iconName={*/}
-            {/*      !this.state.isSharing ? 'stop-screen-share' : 'screen-share'*/}
-            {/*    }*/}
-            {/*    iconColor={!this.state.isSharing ? 'white' : 'black'}*/}
-            {/*    onPress={this.sharePress}*/}
-            {/*  />*/}
-            {/*)}*/}
           </View>
         )}
 
@@ -607,29 +522,9 @@ export default class Call2Screen extends Component {
       position: 'absolute',
       top: 0,
       left: 0,
-      width: width,
-      height: height,
+      width: Dimensions.get('window').width,
+      height: Dimensions.get('window').height,
       zIndex: 0,
-    },
-
-    localShareView: {
-      backgroundColor: 'black',
-      position: 'absolute',
-      top: 190,
-      right: 20,
-      width: 100,
-      height: 150,
-      zIndex: 1,
-    },
-
-    remoteShareView: {
-      backgroundColor: 'black',
-      position: 'absolute',
-      top: 360,
-      right: 20,
-      width: 100,
-      height: 150,
-      zIndex: 1,
     },
   });
 }

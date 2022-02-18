@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 
 import {Icon} from 'react-native-elements';
-import StringeeVideoView from 'stringee-react-native/src/StringeeVideoView';
+import {StringeeVideoView} from 'stringee-react-native/src/StringeeVideoView';
 import {StringeeCall} from 'stringee-react-native';
 
 const height = Dimensions.get('window').height;
@@ -333,6 +333,7 @@ export default class CallScreen extends Component {
               style={this.styles.remoteView}
               callId={this.state.callId}
               local={false}
+              overlay={false}
             />
           )}
 

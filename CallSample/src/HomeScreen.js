@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {StringeeClient, StringeeServerAddress} from 'stringee-react-native';
+import {StringeeClient} from 'stringee-react-native';
 
 export default class HomeScreen extends Component {
   token: string = 'PUT YOUR TOKEN HERE';
