@@ -18,7 +18,7 @@
     "react-native-safe-area-context": "^3.3.2",
     "react-native-screens": "^3.8.0",
     "react-native-vector-icons": "^8.1.0",
-    "stringee-react-native": "^1.4.25"
+    "stringee-react-native": "^1.4.27"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",

@@ -6,11 +6,15 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  Platform
 } from 'react-native';
 import {StringeeClient} from 'stringee-react-native';
 
 export default class HomeScreen extends Component {
-  token: string = 'PUT YOUR TOKEN HERE';
+  token1: string = 'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0xiT0Rpa3o4ZHBITGRvVU92c0lJYWdCTFZqUXNJOXdKLTE2NDc0MTM5NDQiLCJpc3MiOiJTS0xiT0Rpa3o4ZHBITGRvVU92c0lJYWdCTFZqUXNJOXdKIiwiZXhwIjoxNjUwMDA1OTQ0LCJ1c2VySWQiOiJ1c2VyMSJ9._C164Z0_9y4LwrA0fJIgyGpoWpTjn4Df-COsuPBs4c8';
+  token2: string = 'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0xiT0Rpa3o4ZHBITGRvVU92c0lJYWdCTFZqUXNJOXdKLTE2NDc0MTM5NTIiLCJpc3MiOiJTS0xiT0Rpa3o4ZHBITGRvVU92c0lJYWdCTFZqUXNJOXdKIiwiZXhwIjoxNjUwMDA1OTUyLCJ1c2VySWQiOiJ1c2VyMiJ9.JVsrsFd9n_KqzzJGEQYyjfDt7mTV5ei0-o4YB_w2ojs';
+
+  // token: string = user1;
 
   constructor(props) {
     super(props);
@@ -35,10 +39,12 @@ export default class HomeScreen extends Component {
 
   componentDidMount() {
     if (!this.state.permissionGranted) {
-      this.requestPermission();
+      if (Platform.OS === 'android') {
+        this.requestPermission();
+      }
     }
 
-    this.client.current.connect(this.token);
+    this.client.current.connect(this.token2);
   }
 
   requestPermission() {
@@ -58,7 +64,7 @@ export default class HomeScreen extends Component {
   }
 
   makeCall(isCall: boolean, isVideoCall: boolean) {
-    if (this.state.permissionGranted) {
+    if (this.state.permissionGranted || Platform.OS === 'ios') {
       if (this.state.to.trim() !== '') {
         if (isCall) {
           this.props.navigation.navigate('Call', {

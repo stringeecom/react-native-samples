@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
   Text,
   Alert,
-  Dimensions,
+  Dimensions, Platform,
 } from 'react-native';
 
 import {Icon} from 'react-native-elements';
@@ -134,11 +134,11 @@ export default class Call2Screen extends Component {
         break;
       case 3:
         // Busy
-        this.endPress(true);
+        this.dismissCallingView();
         break;
       case 4:
         // Ended
-        this.endPress(true);
+        this.dismissCallingView();
         break;
     }
   };
@@ -231,13 +231,10 @@ export default class Call2Screen extends Component {
       'didHandleOnAnotherDevice ' + callId + '***' + code + '***' + description,
     );
     this.setState({status: description});
-    switch (code) {
-      case 2:
-        this.endPress(true);
-        break;
-      case 3:
-        this.endPress(true);
-        break;
+
+    // Cuoc goi da duoc answer, reject hoặc end thi can dismiss view
+    if (code != 1) {
+      this.dismissCallingView();
     }
   };
 
@@ -317,6 +314,7 @@ export default class Call2Screen extends Component {
       if (status) {
         this.setState({
           showAnswerBtn: false,
+          signalingState: 2
         });
       } else {
         this.endPress(false);
@@ -328,14 +326,22 @@ export default class Call2Screen extends Component {
     if (isHangup) {
       this.call2.current.hangup(this.state.callId, (status, code, message) => {
         console.log('hangup: ' + message);
-        this.props.navigation.popToTop();
+        if (Platform.OS === 'android') {
+          this.dismissCallingView();
+        }
       });
     } else {
       this.call2.current.reject(this.state.callId, (status, code, message) => {
         console.log('reject: ' + message);
-        this.props.navigation.popToTop();
+        if (Platform.OS === 'android') {
+          this.dismissCallingView();
+        }
       });
     }
+  };
+
+  dismissCallingView = () => {
+    this.props.navigation.goBack();
   };
 
   render(): React.ReactNode {
@@ -427,6 +433,15 @@ export default class Call2Screen extends Component {
         )}
 
         <View style={this.styles.callActions}>
+          <CircleBtn
+              color={'red'}
+              iconName={'call-end'}
+              iconColor={'white'}
+              onPress={() => {
+                this.endPress(!this.state.showAnswerBtn);
+              }}
+          />
+
           {this.state.showAnswerBtn && (
             <CircleBtn
               color={'green'}
@@ -436,14 +451,6 @@ export default class Call2Screen extends Component {
             />
           )}
 
-          <CircleBtn
-            color={'red'}
-            iconName={'call-end'}
-            iconColor={'white'}
-            onPress={() => {
-              this.endPress(!this.state.showAnswerBtn);
-            }}
-          />
         </View>
 
         <StringeeCall2
@@ -477,7 +484,7 @@ export default class Call2Screen extends Component {
       justifyContent: 'space-evenly',
       alignItems: 'center',
       position: 'absolute',
-      bottom: 110,
+      bottom: 140,
       zIndex: 1,
     },
 
@@ -488,7 +495,7 @@ export default class Call2Screen extends Component {
       justifyContent: 'space-evenly',
       alignItems: 'center',
       position: 'absolute',
-      bottom: 20,
+      bottom: 50,
       zIndex: 1,
     },
 
@@ -510,7 +517,7 @@ export default class Call2Screen extends Component {
     localView: {
       backgroundColor: 'black',
       position: 'absolute',
-      top: 20,
+      top: 40,
       right: 20,
       width: 100,
       height: 150,
