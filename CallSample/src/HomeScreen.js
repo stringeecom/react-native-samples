@@ -6,15 +6,12 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  Platform
+  Platform,
 } from 'react-native';
-import {StringeeClient} from 'stringee-react-native';
+import {StringeeClient, StringeeServerAddress} from 'stringee-react-native';
 
 export default class HomeScreen extends Component {
-  token1: string = 'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0xiT0Rpa3o4ZHBITGRvVU92c0lJYWdCTFZqUXNJOXdKLTE2NDc0MTM5NDQiLCJpc3MiOiJTS0xiT0Rpa3o4ZHBITGRvVU92c0lJYWdCTFZqUXNJOXdKIiwiZXhwIjoxNjUwMDA1OTQ0LCJ1c2VySWQiOiJ1c2VyMSJ9._C164Z0_9y4LwrA0fJIgyGpoWpTjn4Df-COsuPBs4c8';
-  token2: string = 'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0xiT0Rpa3o4ZHBITGRvVU92c0lJYWdCTFZqUXNJOXdKLTE2NDc0MTM5NTIiLCJpc3MiOiJTS0xiT0Rpa3o4ZHBITGRvVU92c0lJYWdCTFZqUXNJOXdKIiwiZXhwIjoxNjUwMDA1OTUyLCJ1c2VySWQiOiJ1c2VyMiJ9.JVsrsFd9n_KqzzJGEQYyjfDt7mTV5ei0-o4YB_w2ojs';
-
-  // token: string = user1;
+  token: string = 'PUT_YOUR_TOKEN_HERE';
 
   constructor(props) {
     super(props);
@@ -44,7 +41,7 @@ export default class HomeScreen extends Component {
       }
     }
 
-    this.client.current.connect(this.token2);
+    this.client.current.connect(this.token);
   }
 
   requestPermission() {
@@ -262,6 +259,8 @@ export default class HomeScreen extends Component {
         <StringeeClient
           ref={this.client}
           eventHandlers={this.clientEventHandlers}
+          // If you use a premise server, put your host and port here to connect
+          // serverAddresses={new StringeeServerAddress('host', port)}
         />
       </View>
     );

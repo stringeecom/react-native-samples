@@ -5,7 +5,8 @@ import {
   TouchableOpacity,
   Text,
   Alert,
-  Dimensions, Platform,
+  Dimensions,
+  Platform,
 } from 'react-native';
 
 import {Icon} from 'react-native-elements';
@@ -282,7 +283,7 @@ export default class CallScreen extends Component {
       if (status) {
         this.setState({
           showAnswerBtn: false,
-          signalingState: 2
+          signalingState: 2,
         });
       } else {
         this.endPress(false);
@@ -402,12 +403,12 @@ export default class CallScreen extends Component {
 
         <View style={this.styles.callActions}>
           <CircleBtn
-              color={'red'}
-              iconName={'call-end'}
-              iconColor={'white'}
-              onPress={() => {
-                this.endPress(!this.state.showAnswerBtn);
-              }}
+            color={'red'}
+            iconName={'call-end'}
+            iconColor={'white'}
+            onPress={() => {
+              this.endPress(!this.state.showAnswerBtn);
+            }}
           />
 
           {this.state.showAnswerBtn && (
@@ -418,7 +419,6 @@ export default class CallScreen extends Component {
               onPress={this.answerCall}
             />
           )}
-
         </View>
 
         <StringeeCall

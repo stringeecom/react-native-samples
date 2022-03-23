@@ -1,1 +1,0 @@
-../../../../Stringee/Stringee/Classes/Stringee.framework/Versions/A/Headers/StringeeRoomStream.h
