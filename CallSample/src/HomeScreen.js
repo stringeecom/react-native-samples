@@ -11,6 +11,7 @@ import {
 import {StringeeClient, StringeeServerAddress} from 'stringee-react-native';
 
 export default class HomeScreen extends Component {
+
   token: string = 'PUT_YOUR_TOKEN_HERE';
 
   constructor(props) {

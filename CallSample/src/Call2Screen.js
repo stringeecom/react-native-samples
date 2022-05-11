@@ -13,6 +13,7 @@ import {Icon} from 'react-native-elements';
 import {StringeeCall2, StringeeVideoView} from 'stringee-react-native';
 
 export default class Call2Screen extends Component {
+
   constructor(props) {
     super(props);
     this.state = {

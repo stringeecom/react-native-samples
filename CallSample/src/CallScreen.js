@@ -16,6 +16,7 @@ const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
 
 export default class CallScreen extends Component {
+
   constructor(props) {
     super(props);
     this.state = {
