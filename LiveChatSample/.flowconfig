@@ -20,6 +20,7 @@ node_modules/react-native/Libraries/polyfills/.*
 node_modules/react-native/interface.js
 node_modules/react-native/flow/
 
+
 [options]
 emoji=true
 

@@ -23,6 +23,7 @@ import com.android.build.OutputFile
  *   // https://reactnative.dev/docs/performance#enable-the-ram-format
  *   bundleCommand: "ram-bundle",
  *
+ *
  *   // whether to bundle JS and assets in debug mode
  *   bundleInDebug: false,
  *

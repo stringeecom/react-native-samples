@@ -13,3 +13,4 @@ public class MainActivity extends ReactActivity {
     return "CallNotificationSample";
   }
 }
+

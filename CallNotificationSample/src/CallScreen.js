@@ -37,6 +37,7 @@ class CallScreen extends Component {
                     )}
                 </View>
 
+
                 <View style={styles.remoteView}>
                     {this.props.hasRemoteStream && this.props.stringeeCallId != '' && (
                         <StringeeVideoView

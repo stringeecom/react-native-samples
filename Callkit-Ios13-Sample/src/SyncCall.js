@@ -9,6 +9,7 @@ class SyncCall {
   serial;
   callId;
   callkitId;
+
   callCode;
 
   rejected; // nguoi dung da click reject cuoc goi

@@ -11,6 +11,7 @@ node_modules/react-native/Libraries/polyfills/.*
 ; Flow doesn't support platforms
 .*/Libraries/Utilities/LoadingView.js
 
+
 [untyped]
 .*/node_modules/@react-native-community/cli/.*/.*
 

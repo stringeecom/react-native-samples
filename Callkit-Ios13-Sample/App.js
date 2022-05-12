@@ -16,6 +16,7 @@ import uuid from 'react-native-uuid';
 import CallScreen from './src/CallScreen';
 import SyncCall from './src/SyncCall';
 
+
 const options = {
     ios: {
         appName: 'Stringee',

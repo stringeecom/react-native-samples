@@ -30,6 +30,7 @@ class App extends Component {
     state = {
         appState: AppState.currentState,
 
+
         toUserId: '',
         currentUserId: '',
         userId: '',

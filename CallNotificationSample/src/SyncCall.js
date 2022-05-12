@@ -21,6 +21,7 @@ class SyncCall {
   receivedStringeeCall;
 
   constructor() {
+
     this.serial = 1;
     this.callId = '';
     this.callkitId = '';

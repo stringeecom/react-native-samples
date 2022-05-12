@@ -22,6 +22,7 @@ export default function App() {
         screenOptions={{
           tabBarActiveTintColor: '#e91e63',
         }}>
+
         <Tab.Screen
           name="Customer"
           component={Customer}

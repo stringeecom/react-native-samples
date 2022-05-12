@@ -16,6 +16,7 @@ create_aar_targets(glob(["libs/*.aar"]))
 
 create_jar_targets(glob(["libs/*.jar"]))
 
+
 android_library(
     name = "all-libs",
     exported_deps = lib_deps,
