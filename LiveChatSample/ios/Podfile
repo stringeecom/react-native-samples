@@ -27,3 +27,4 @@ target 'LiveChatSample' do
     react_native_post_install(installer)
   end
 end
+

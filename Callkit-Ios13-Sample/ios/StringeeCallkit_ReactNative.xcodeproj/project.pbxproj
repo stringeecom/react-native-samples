@@ -709,7 +709,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.stringee.CallkitSample;
 				PRODUCT_NAME = StringeeCallkit_ReactNative;
-				PROVISIONING_PROFILE_SPECIFIER = CallkitProDev;
+				PROVISIONING_PROFILE_SPECIFIER = CallkitSampleDev;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";

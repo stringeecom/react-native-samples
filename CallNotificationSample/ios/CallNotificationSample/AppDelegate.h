@@ -7,3 +7,4 @@
 @property (nonatomic, assign) UIBackgroundTaskIdentifier backgroundUpdateTask;
 
 @end
+

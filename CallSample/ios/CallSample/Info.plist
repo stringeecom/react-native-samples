@@ -51,16 +51,17 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-  
+
   <key>UIAppFonts</key>
   <array>
     <string>MaterialIcons.ttf</string>
   </array>
-  
+
   <key>NSCameraUsageDescription</key>
   <string>$(PRODUCT_NAME) muốn sử dụng camera để cho phép bạn chụp ảnh, gọi video trong ứng dụng</string>
   <key>NSMicrophoneUsageDescription</key>
   <string>$(PRODUCT_NAME) sử dụng microphone để cho phép bạn thực hiện các cuộc gọi thoại trong ứng dụng</string>
-  
+
 </dict>
 </plist>
+
