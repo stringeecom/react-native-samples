@@ -89,7 +89,6 @@ export default class ActShtCreateConversation extends Component {
             <TouchableOpacity
               style={this.styles.button}
               onPress={() => {
-                this.hide();
                 const options = {
                   name: this.state.convName,
                   isDistinct: this.state.isDistinct,
@@ -106,7 +105,7 @@ export default class ActShtCreateConversation extends Component {
                   );
                   return;
                 }
-
+                this.hide();
                 this.props.data(options, participant);
               }}>
               <Text style={this.styles.text}>Create</Text>

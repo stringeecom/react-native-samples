@@ -7,9 +7,7 @@ import {
   TouchableOpacity,
   View,
   SafeAreaView,
-  Alert,
 } from 'react-native';
-import {CheckBox} from 'react-native-elements';
 
 export default class ActShtGetMessage extends Component {
   constructor(props) {

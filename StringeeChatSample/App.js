@@ -18,8 +18,11 @@ import ActShtUpdateConversation from './src/ActShtUpdateConversation';
 import ActShtSendMsg from './src/ActShtSendMsg';
 import ActShtGetMessage from './src/ActShtGetMessage';
 import ActShtMsgAction from './src/ActShtMsgAction';
+import ActShtGetUserInfo from './src/ActShtGetUserInfo';
+import ActShtUpdateUserInfo from './src/ActShtUpdateUserInfo';
 
-const token = 'PUT_YOUR_TOKEN_HERE';
+const token =
+  'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZULTE2NjMwNDMyMjQiLCJpc3MiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZUIiwiZXhwIjoxNjY1NjM1MjI0LCJ1c2VySWQiOiJ1c2VyMSJ9.O6E7_IHRejlgPv8A9ag722FuDp0bKMeDK8y_9lMs_iY';
 
 export default class App extends Component {
   constructor(props) {
@@ -44,6 +47,8 @@ export default class App extends Component {
     this.getConvAfterRef = createRef();
     this.getConvBeforeRef = createRef();
     this.getConvWithUserRef = createRef();
+    this.getGetUserInfoRef = createRef();
+    this.updateUserInfoRef = createRef();
 
     this.msgActionRef = createRef();
     this.addPartRef = createRef();
@@ -392,6 +397,27 @@ export default class App extends Component {
           'Get unread conversation count: ' + message + ' \ncount -' + count,
         );
         this.addLog('Get unread conversation count: ' + message);
+      },
+    );
+  };
+
+  getUserInfo = userIds => {
+    this.client.current.getUserInfo(userIds, (status, code, message, users) => {
+      console.log(
+        'Get user info: ' + message + ' \nusers -' + JSON.stringify(users),
+      );
+      this.addLog(
+        'Get user info: ' + message + ' \nusers -' + JSON.stringify(users),
+      );
+    });
+  };
+
+  updateUserInfo = userInfo => {
+    this.client.current.updateUserInfoWithParam(
+      userInfo,
+      (status, code, message) => {
+        console.log('Update user info: ' + message);
+        this.addLog('Update user info: ' + message);
       },
     );
   };
@@ -909,6 +935,30 @@ export default class App extends Component {
                 <TouchableOpacity
                   style={this.styles.button}
                   onPress={() => {
+                    this.getGetUserInfoRef.current.show();
+                  }}>
+                  <Text style={this.styles.text}>Get user's info</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={this.styles.button}
+                  onPress={() => {
+                    this.client.current.getUserInfo(
+                      [this.state.userId],
+                      (status, code, message, users) => {
+                        if (status) {
+                          this.updateUserInfoRef.current.setUserInfo(users[0]);
+                          this.updateUserInfoRef.current.show();
+                        }
+                      },
+                    );
+                  }}>
+                  <Text style={this.styles.text}>Update user's info</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={this.styles.rowButton}>
+                <TouchableOpacity
+                  style={this.styles.button}
+                  onPress={() => {
                     this.clearDb();
                   }}>
                   <Text style={this.styles.text}>Clear db</Text>
@@ -1221,6 +1271,21 @@ export default class App extends Component {
           title={'User id'}
           data={userId => {
             this.getConversationWithUser(userId);
+          }}
+        />
+
+        <ActShtGetUserInfo
+          ref={this.getGetUserInfoRef}
+          data={userIds => {
+            this.getUserInfo(userIds);
+          }}
+        />
+
+        <ActShtUpdateUserInfo
+          ref={this.updateUserInfoRef}
+          data={userInfo => {
+            console.log(userInfo);
+            this.updateUserInfo(userInfo);
           }}
         />
 

@@ -7,16 +7,16 @@ import {
   TouchableOpacity,
   View,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 
-export default class ActShtParticipant extends Component {
+export default class ActShtGetUserInfo extends Component {
   constructor(props) {
     super(props);
 
     this.ref = createRef();
     this.state = {
-      participantString: '',
-      title: props.title,
+      userIds: '',
     };
   }
 
@@ -36,13 +36,13 @@ export default class ActShtParticipant extends Component {
         bounceOnOpen={true}
         defaultOverlayOpacity={0.3}>
         <SafeAreaView>
-          <Text style={this.styles.title}>Participant: </Text>
+          <Text style={this.styles.title}>User ids: </Text>
           <TextInput
             style={this.styles.input}
             placeholder="user's id, user's id 2"
             onChangeText={text => {
               this.setState({
-                participantString: text,
+                userIds: text,
               });
             }}
           />
@@ -51,14 +51,16 @@ export default class ActShtParticipant extends Component {
             <TouchableOpacity
               style={this.styles.button}
               onPress={() => {
-                this.hide();
-                const participant = this.state.participantString
-                  .replace(/ /g, '')
-                  .split(',');
+                const userIds = this.state.userIds.replace(/ /g, '').split(',');
 
-                this.props.data(participant);
+                if (userIds.length === 0) {
+                  Alert.alert('user id is empty');
+                  return;
+                }
+                this.hide();
+                this.props.data(userIds);
               }}>
-              <Text style={this.styles.text}>{this.state.title}</Text>
+              <Text style={this.styles.text}>Get</Text>
             </TouchableOpacity>
           </View>
         </SafeAreaView>
