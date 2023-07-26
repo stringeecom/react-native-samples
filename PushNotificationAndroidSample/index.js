@@ -6,36 +6,64 @@ import {AppRegistry} from 'react-native';
 import App from './App';
 import {name as appName} from './app.json';
 import messaging from '@react-native-firebase/messaging';
-import notifee from '@notifee/react-native';
+import notifee, {
+  AndroidCategory,
+  AndroidImportance,
+} from '@notifee/react-native';
+import NotificationCommon from './src/NotificationCommon';
 
 async function onMessageReceived(message) {
   const data = JSON.parse(message.data.data);
   const callStatus = data.callStatus;
   const from = data.from.number;
-  const notificationId = '11111'; // YOUR_NOTIFICATION_ID
-  console.log('data: ' + callStatus);
+  console.log('data: ' + JSON.stringify(data));
   const channelId = await notifee.createChannel({
-    id: 'YOUR_CHANNEL_ID',
-    name: 'ChannelName',
+    id: NotificationCommon.channelId,
+    name: NotificationCommon.channelName,
+    description: NotificationCommon.channelDescription,
     vibration: true,
   });
   switch (callStatus) {
     case 'started':
       await notifee.displayNotification({
-        id: notificationId,
+        id: NotificationCommon.notificationId,
         title: 'Incoming Call',
         body: 'Call from ' + from,
         android: {
           channelId,
+          importance: AndroidImportance.HIGH,
+          category: AndroidCategory.CALL,
+          autoCancel: false,
+          ongoing: true,
           pressAction: {
             id: 'default',
-            mainComponent: appName,
+            launchActivity: 'default',
+          },
+          actions: [
+            {
+              title: 'Answer',
+              pressAction: {
+                id: 'answer',
+                launchActivity: 'default',
+              },
+            },
+            {
+              title: 'Reject',
+              pressAction: {
+                id: 'reject',
+                launchActivity: 'default',
+              },
+            },
+          ],
+          fullScreenAction: {
+            id: 'default',
+            launchActivity: 'default',
           },
         },
       });
       break;
     case 'ended':
-      await notifee.cancelNotification(notificationId);
+      await notifee.cancelNotification(NotificationCommon.notificationId);
       break;
   }
 }

@@ -9,8 +9,8 @@ import {
 } from 'react-native';
 import {StringeeVideoView} from 'stringee-react-native';
 
-var height = Dimensions.get('window').height;
-var width = Dimensions.get('window').width;
+const height = Dimensions.get('window').height;
+const width = Dimensions.get('window').width;
 
 const muteImg = require('../resource/mute.png');
 const muteImg_selected = require('../resource/mute_selected.png');
@@ -27,11 +27,10 @@ class CallScreen extends Component {
       <View style={styles.container}>
         {this.props.isVideoCall &&
           this.props.hasLocalStream &&
-          this.props.stringeeCallId != '' && (
+          this.props.stringeeCallId !== '' && (
             <StringeeVideoView
               style={styles.localView}
               callId={this.props.stringeeCallId}
-              streamId=""
               local={true}
               overlay={true}
             />
@@ -40,12 +39,12 @@ class CallScreen extends Component {
         <View style={styles.remoteView}>
           {this.props.isVideoCall &&
             this.props.hasRemoteStream &&
-            this.props.stringeeCallId != '' && (
+            this.props.stringeeCallId !== '' && (
               <StringeeVideoView
-                style={{flex: 1}}
+                style={{width: width, height: height, zIndex: 0}}
                 callId={this.props.stringeeCallId}
-                streamId=""
                 local={false}
+                overlay={false}
               />
             )}
         </View>
@@ -75,7 +74,7 @@ class CallScreen extends Component {
             </TouchableOpacity>
           )}
 
-          <TouchableOpacity onPress={this.props.peakerButtonHandler}>
+          <TouchableOpacity onPress={this.props.speakerButtonHandler}>
             {this.renderSpeakerImage()}
           </TouchableOpacity>
         </View>
@@ -119,17 +118,17 @@ class CallScreen extends Component {
   }
 
   renderMuteImage = () => {
-    var imgSource = this.props.isMute ? muteImg_selected : muteImg;
+    const imgSource = this.props.isMute ? muteImg_selected : muteImg;
     return <Image style={styles.button} source={imgSource} />;
   };
 
   renderSpeakerImage = () => {
-    var imgSource = this.props.isSpeaker ? speakerImg_selected : speakerImg;
+    const imgSource = this.props.isSpeaker ? speakerImg_selected : speakerImg;
     return <Image style={styles.button} source={imgSource} />;
   };
 
   renderVideoImage = () => {
-    var imgSource = this.props.enableVideo ? videoEnableImg : videoDisableImg;
+    const imgSource = this.props.enableVideo ? videoEnableImg : videoDisableImg;
     return <Image style={styles.button} source={imgSource} />;
   };
 }
@@ -195,7 +194,7 @@ const styles = StyleSheet.create({
     right: 30,
     width: 100,
     height: 150,
-    zIndex: 1,
+    zIndex: 5,
   },
   remoteView: {
     backgroundColor: 'black',

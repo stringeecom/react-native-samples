@@ -17,7 +17,7 @@ import {
   TextInput,
   PermissionsAndroid,
 } from 'react-native';
-import {AsyncStorage, AppState} from 'react-native';
+import {AppState} from 'react-native';
 import {
   StringeeClient,
   StringeeCall,
@@ -26,12 +26,16 @@ import {
 import CallScreen from './src/CallScreen';
 import messaging from '@react-native-firebase/messaging';
 import {each} from 'underscore';
+import notifee, {EventType} from '@notifee/react-native';
+import NotificationCommon from './src/NotificationCommon';
 
 const requestPermission = async () =>
   new Promise((resolve, reject) => {
     PermissionsAndroid.requestMultiple([
       PermissionsAndroid.PERMISSIONS.CAMERA,
       PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+      PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
+      PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
     ])
       .then(result => {
         const permissionsError = {};
@@ -54,6 +58,13 @@ const requestPermission = async () =>
   });
 
 class App extends Component {
+  stringeeClient = React.createRef();
+  stringeeCall = React.createRef();
+  stringeeCall2 = React.createRef();
+  static actionPressed: string;
+  static callViewIsShow: boolean = false;
+  isInCall: boolean = false;
+
   state = {
     appState: AppState.currentState,
 
@@ -86,6 +97,25 @@ class App extends Component {
     super(props);
     console.disableYellowBox = true;
 
+    notifee.onBackgroundEvent(async event => {
+      if (event.type === EventType.ACTION_PRESS) {
+        console.log('onBackgroundEvent - ' + event.detail.pressAction.id);
+        App.actionPressed = event.detail.pressAction.id;
+        if (App.callViewIsShow) {
+          switch (event.detail.pressAction.id) {
+            case NotificationCommon.answerActionId:
+              this._answerCallAction();
+              // App.event.onAction(event.detail.pressAction.id);
+              break;
+            case NotificationCommon.rejectActionId:
+              this._endCallAction(false);
+              break;
+          }
+        }
+        await notifee.cancelNotification(NotificationCommon.notificationId);
+      }
+    });
+
     this.clientEventHandlers = {
       onConnect: this._clientDidConnect,
       onDisConnect: this._clientDidDisConnect,
@@ -109,62 +139,16 @@ class App extends Component {
   }
 
   async componentDidMount() {
+    await this.registerEventOpenApp();
     const token =
-      'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZULTE2MjIxMDY5NjQiLCJpc3MiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZUIiwiZXhwIjoxNjI0Njk4OTY0LCJ1c2VySWQiOiJ1c2VyMiJ9.qr5FPylsTZLYThB0HerHGIHt7CguRZTxqkXl4jSX5zM';
+      'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZULTE2OTAzNDEzNzQiLCJpc3MiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZUIiwiZXhwIjoxNjkyOTMzMzc0LCJ1c2VySWQiOiJ1c2VyMSJ9.zVGg9RqtXtdFSfa86NWW5zm9_EHezRbG2-mhV0Vs9Gg';
 
-    await this.refs.stringeeClient.connect(token);
-    this.setState({clientId: this.refs.stringeeClient.getId()});
-    requestPermission();
-
-    AppState.addEventListener('change', this._handleAppStateChange);
-  }
-
-  async componentWillUnmount() {
-    AppState.removeEventListener('change', this._handleAppStateChange);
-  }
-
-  _handleAppStateChange = nextAppState => {
-    this.setState({appState: nextAppState});
-    console.log('App state ' + this.state.appState);
-  };
-
-  /// MARK: - CONNECT EVENT HANDLER
-  // The client connects to Stringee server
-  _clientDidConnect = ({userId}) => {
-    console.log('_clientDidConnect - ' + userId);
-    this.setState({currentUserId: userId});
-    AsyncStorage.getItem('isPushTokenRegistered').then(value => {
-      if (value !== 'true') {
-        messaging()
-          .getToken()
-          .then(token => {
-            this.refs.stringeeClient.registerPush(
-              token,
-              true,
-              true,
-              (result, code, desc) => {
-                console.log(
-                  'registerPush: \nresult-' +
-                    result +
-                    ' code-' +
-                    code +
-                    ' desc-' +
-                    desc,
-                );
-                if (result) {
-                  AsyncStorage.multiSet([
-                    ['isPushTokenRegistered', 'true'],
-                    ['token', token],
-                  ]);
-                }
-              },
-            );
-          });
-      }
-    });
+    await this.stringeeClient.current.connect(token);
+    this.setState({clientId: this.stringeeClient.current.getId()});
+    await requestPermission();
 
     messaging().onTokenRefresh(token => {
-      this.refs.stringeeClient.registerPush(
+      this.stringeeClient.current.registerPush(
         token,
         true,
         true,
@@ -177,15 +161,54 @@ class App extends Component {
               ' desc-' +
               desc,
           );
-          if (result) {
-            AsyncStorage.multiSet([
-              ['isPushTokenRegistered', 'true'],
-              ['token', token],
-            ]);
-          }
         },
       );
     });
+    AppState.addEventListener('change', this._handleAppStateChange);
+  }
+
+  async registerEventOpenApp() {
+    const initialNotification = await notifee.getInitialNotification();
+
+    if (initialNotification && initialNotification.pressAction) {
+      App.actionPressed = initialNotification.pressAction.id;
+    }
+    await notifee.cancelNotification(NotificationCommon.notificationId);
+  }
+
+  async componentWillUnmount() {
+    AppState.removeEventListener('change', this._handleAppStateChange);
+  }
+
+  _handleAppStateChange = async nextAppState => {
+    this.setState({appState: nextAppState});
+    console.log('App state ' + this.state.appState);
+  };
+
+  /// MARK: - CONNECT EVENT HANDLER
+  // The client connects to Stringee server
+  _clientDidConnect = ({userId}) => {
+    console.log('_clientDidConnect - ' + userId);
+    this.setState({currentUserId: userId});
+    messaging()
+      .getToken()
+      .then(token => {
+        this.stringeeClient.current.registerPush(
+          token,
+          true,
+          true,
+          (result, code, desc) => {
+            console.log(
+              'registerPush: \nresult-' +
+                result +
+                ' code-' +
+                code +
+                ' desc-' +
+                desc,
+            );
+          },
+        );
+      });
   };
 
   // The client disconnects from Stringee server
@@ -240,21 +263,43 @@ class App extends Component {
         ' serial-' +
         serial,
     );
+    if (this.isInCall) {
+      const newCall: StringeeCall = new StringeeCall({
+        clientId: this.state.clientId,
+      });
+      newCall.reject(callId, (status, code, message) => {
+        console.log('reject new call when in call');
+      });
+    } else {
+      this.isInCall = true;
+      this.setState({
+        userId: from,
+        callState: 'Incoming Call',
+        showCallingView: true,
+        callId: callId,
+        isStringeeCall: true,
+        isVideoCall: isVideoCall,
+        enableVideo: isVideoCall,
+        isSpeaker: isVideoCall,
+      });
 
-    this.setState({
-      userId: from,
-      callState: 'Incoming Call',
-      showCallingView: true,
-      callId: callId,
-      isStringeeCall: true,
-      isVideoCall: isVideoCall,
-      enableVideo: isVideoCall,
-      isSpeaker: isVideoCall,
-    });
+      this.stringeeCall.current.initAnswer(callId, (status, code, message) => {
+        console.log('initAnswer ' + message);
+      });
 
-    this.refs.stringeeCall.initAnswer(callId, (status, code, message) => {
-      console.log('initAnswer ' + message);
-    });
+      if (App.actionPressed && !App.callViewIsShow) {
+        switch (App.actionPressed === NotificationCommon.answerActionId) {
+          case NotificationCommon.answerActionId:
+            this._answerCallAction();
+            break;
+          case NotificationCommon.rejectActionId:
+            this._endCallAction(false);
+            break;
+        }
+        App.actionPressed = undefined;
+      }
+      App.callViewIsShow = true;
+    }
   };
 
   // IncomingCall event
@@ -288,20 +333,43 @@ class App extends Component {
         serial,
     );
 
-    this.setState({
-      userId: from,
-      callState: 'Incoming Call',
-      showCallingView: true,
-      callId: callId,
-      isStringeeCall: false,
-      isVideoCall: isVideoCall,
-      enableVideo: isVideoCall,
-      isSpeaker: isVideoCall,
-    });
+    if (this.isInCall) {
+      const newCall: StringeeCall2 = new StringeeCall2({
+        clientId: this.state.clientId,
+      });
+      newCall.reject(callId, (status, code, message) => {
+        console.log('reject new call when in call');
+      });
+    } else {
+      this.isInCall = true;
+      this.setState({
+        userId: from,
+        callState: 'Incoming Call',
+        showCallingView: true,
+        callId: callId,
+        isStringeeCall: false,
+        isVideoCall: isVideoCall,
+        enableVideo: isVideoCall,
+        isSpeaker: isVideoCall,
+      });
 
-    this.refs.stringeeCall2.initAnswer(callId, (status, code, message) => {
-      console.log('initAnswer ' + message);
-    });
+      this.stringeeCall2.current.initAnswer(callId, (status, code, message) => {
+        console.log('initAnswer ' + message);
+      });
+
+      if (App.actionPressed && !App.callViewIsShow) {
+        switch (App.actionPressed) {
+          case NotificationCommon.answerActionId:
+            this._answerCallAction();
+            break;
+          case NotificationCommon.rejectActionId:
+            this._endCallAction(false);
+            break;
+        }
+        App.actionPressed = undefined;
+      }
+      App.callViewIsShow = true;
+    }
   };
 
   /// MARK: - CALL EVENT HANDLER
@@ -363,7 +431,7 @@ class App extends Component {
         break;
     }
     if (this.state.isStringeeCall) {
-      this.refs.stringeeCall.setSpeakerphoneOn(
+      this.stringeeCall.current.setSpeakerphoneOn(
         callId,
         this.state.isSpeaker,
         (status, code, message) => {
@@ -371,7 +439,7 @@ class App extends Component {
         },
       );
     } else {
-      this.refs.stringeeCall2.setSpeakerphoneOn(
+      this.stringeeCall2.current.setSpeakerphoneOn(
         callId,
         this.state.isSpeaker,
         (status, code, message) => {
@@ -424,10 +492,10 @@ class App extends Component {
 
   onChangeText = text => {
     this.setState({toUserId: text});
-    console.log(text);
   };
 
-  callButtonClick = (isStringeeCall: boolean, isVideoCall: boolean) => {
+  callButtonClick = async (isStringeeCall: boolean, isVideoCall: boolean) => {
+    this.isInCall = true;
     this.setState({
       isStringeeCall: isStringeeCall,
       isVideoCall: isVideoCall,
@@ -445,7 +513,7 @@ class App extends Component {
     setTimeout(() => {
       console.log('isStringeeCall-' + isStringeeCall);
       if (isStringeeCall) {
-        this.refs.stringeeCall.makeCall(
+        this.stringeeCall.current.makeCall(
           parameters,
           (status, code, message, callId) => {
             console.log(
@@ -475,7 +543,7 @@ class App extends Component {
           },
         );
       } else {
-        this.refs.stringeeCall2.makeCall(
+        this.stringeeCall2.current.makeCall(
           parameters,
           (status, code, message, callId) => {
             console.log(
@@ -509,6 +577,8 @@ class App extends Component {
   };
 
   _endCallAndUpdateView = () => {
+    App.callViewIsShow = false;
+    this.isInCall = false;
     // reset trang thai va view
     this.setState({
       callState: 'Ended',
@@ -531,32 +601,30 @@ class App extends Component {
   _endCallAction = (isHangUp: boolean) => {
     if (this.state.isStringeeCall) {
       if (isHangUp) {
-        this.refs.stringeeCall.hangup(
+        this.stringeeCall.current.hangup(
           this.state.callId,
           (status, code, message) => {
-            console.log('3');
             this._endCallAndUpdateView();
           },
         );
       } else {
-        this.refs.stringeeCall.reject(
+        this.stringeeCall.current.reject(
           this.state.callId,
           (status, code, message) => {
-            console.log('4');
             this._endCallAndUpdateView();
           },
         );
       }
     } else {
       if (isHangUp) {
-        this.refs.stringeeCall2.hangup(
+        this.stringeeCall2.current.hangup(
           this.state.callId,
           (status, code, message) => {
             this._endCallAndUpdateView();
           },
         );
       } else {
-        this.refs.stringeeCall2.reject(
+        this.stringeeCall2.current.reject(
           this.state.callId,
           (status, code, message) => {
             this._endCallAndUpdateView();
@@ -568,7 +636,7 @@ class App extends Component {
 
   _answerCallAction = () => {
     if (this.state.isStringeeCall) {
-      this.refs.stringeeCall.answer(
+      this.stringeeCall.current.answer(
         this.state.callId,
         (status, code, message) => {
           this.setState({answeredCall: true});
@@ -581,7 +649,7 @@ class App extends Component {
         },
       );
     } else {
-      this.refs.stringeeCall2.answer(
+      this.stringeeCall2.current.answer(
         this.state.callId,
         (status, code, message) => {
           this.setState({answeredCall: true});
@@ -598,7 +666,7 @@ class App extends Component {
 
   _muteAction = () => {
     if (this.state.isStringeeCall) {
-      this.refs.stringeeCall.mute(
+      this.stringeeCall.current.mute(
         this.state.callId,
         !this.state.isMute,
         (status, code, message) => {
@@ -606,7 +674,7 @@ class App extends Component {
         },
       );
     } else {
-      this.refs.stringeeCall2.mute(
+      this.stringeeCall2.current.mute(
         this.state.callId,
         !this.state.isMute,
         (status, code, message) => {
@@ -618,7 +686,7 @@ class App extends Component {
 
   _speakerAction = () => {
     if (this.state.isStringeeCall) {
-      this.refs.stringeeCall.setSpeakerphoneOn(
+      this.stringeeCall.current.setSpeakerphoneOn(
         this.state.callId,
         !this.state.isSpeaker,
         (status, code, message) => {
@@ -626,7 +694,7 @@ class App extends Component {
         },
       );
     } else {
-      this.refs.stringeeCall2.setSpeakerphoneOn(
+      this.stringeeCall2.current.setSpeakerphoneOn(
         this.state.callId,
         !this.state.isSpeaker,
         (status, code, message) => {
@@ -638,7 +706,7 @@ class App extends Component {
 
   _enableVideoAction = () => {
     if (this.state.isStringeeCall) {
-      this.refs.stringeeCall.enableVideo(
+      this.stringeeCall.current.enableVideo(
         this.state.callId,
         !this.state.enableVideo,
         (status, code, message) => {
@@ -646,7 +714,7 @@ class App extends Component {
         },
       );
     } else {
-      this.refs.stringeeCall2.enableVideo(
+      this.stringeeCall2.current.enableVideo(
         this.state.callId,
         !this.state.enableVideo,
         (status, code, message) => {
@@ -658,14 +726,14 @@ class App extends Component {
 
   _switchCameraAction = () => {
     if (this.state.isStringeeCall) {
-      this.refs.stringeeCall.switchCamera(
+      this.stringeeCall.current.switchCamera(
         this.state.callId,
         (status, code, message) => {
           console.log(message);
         },
       );
     } else {
-      this.refs.stringeeCall2.switchCamera(
+      this.stringeeCall2.current.switchCamera(
         this.state.callId,
         (status, code, message) => {
           console.log(message);
@@ -704,7 +772,7 @@ class App extends Component {
                 acceptButtonHandler={this._answerCallAction}
                 switchCameraHandler={this._switchCameraAction}
                 isSpeaker={this.state.isSpeaker}
-                peakerButtonHandler={this._speakerAction}
+                speakerButtonHandler={this._speakerAction}
                 isMute={this.state.isMute}
                 muteButtonHandler={this._muteAction}
                 enableVideo={this.state.enableVideo}
@@ -736,7 +804,7 @@ class App extends Component {
           <TouchableHighlight
             style={styles.callButton}
             onPress={() => {
-              this.callButtonClick(true, false);
+              this.callButtonClick(true, false).then(r => {});
             }}>
             <Text style={styles.textStyle}>Voice call</Text>
           </TouchableHighlight>
@@ -767,19 +835,19 @@ class App extends Component {
 
         <View>
           <StringeeClient
-            ref="stringeeClient"
+            ref={this.stringeeClient}
             eventHandlers={this.clientEventHandlers}
           />
           {this.state.clientId !== null && this.state.isStringeeCall && (
             <StringeeCall
-              ref="stringeeCall"
+              ref={this.stringeeCall}
               clientId={this.state.clientId}
               eventHandlers={this.callEventHandlers}
             />
           )}
           {this.state.clientId !== null && !this.state.isStringeeCall && (
             <StringeeCall2
-              ref="stringeeCall2"
+              ref={this.stringeeCall2}
               clientId={this.state.clientId}
               eventHandlers={this.callEventHandlers}
             />
