@@ -50,9 +50,7 @@
   NSString *fromNumber = payloadDataDic[@"from"][@"map"][@"number"];
   NSString *callName = fromAlias != NULL ? fromAlias : fromNumber != NULL ? fromNumber : @"Connecting...";
   NSString *uuid = [[[NSUUID UUID] UUIDString] lowercaseString];
-  
-  NSString *ste = @"STE";
-    
+      
   NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
   
   
@@ -83,9 +81,7 @@
     
     [RNVoipPushNotificationManager didReceiveIncomingPushWithPayload:customPayload forType:type];
     
-    if (callObserver.calls.count == 0) {
-      [RNCallKeep reportNewIncomingCall:uuid handle:@"stringee" handleType:@"generic" hasVideo:true localizedCallerName:callName supportsHolding:false supportsDTMF:false supportsGrouping:false supportsUngrouping:false fromPushKit:true payload:dict withCompletionHandler:completion];
-    }
+    [RNCallKeep reportNewIncomingCall:uuid handle:@"stringee" handleType:@"generic" hasVideo:true localizedCallerName:callName supportsHolding:false supportsDTMF:false supportsGrouping:false supportsUngrouping:false fromPushKit:true payload:dict withCompletionHandler:completion];
     
   
     
