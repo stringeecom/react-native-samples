@@ -4,7 +4,7 @@ import {configureStore} from '@reduxjs/toolkit';
 import reducers from './reducers';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigationContainer} from '@react-navigation/native';
-import {HomeScreen} from './components/Home';
+import HomeScreen from './components/Home';
 import {
   ANSWER_ACTION_ID,
   CALL_SCREEN_NAME,

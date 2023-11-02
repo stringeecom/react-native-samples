@@ -19,7 +19,7 @@
     @"appName": @"CallSampleHook",
     @"supportsVideo": @YES
   }];
-  
+    
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }
 
@@ -49,9 +49,12 @@
   NSString *fromAlias = payloadDataDic[@"from"][@"map"][@"alias"];
   NSString *fromNumber = payloadDataDic[@"from"][@"map"][@"number"];
   NSString *callName = fromAlias != NULL ? fromAlias : fromNumber != NULL ? fromNumber : @"Connecting...";
-
   NSString *uuid = [[[NSUUID UUID] UUIDString] lowercaseString];
+  
+  NSString *ste = @"STE";
+    
   NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+  
   
   
   if (serial == NULL) {
@@ -67,6 +70,7 @@
   [dict setObject:uuid forKey:@"uuid"];
   [dict setObject:serial forKey:@"serial"];
   [dict setObject:callId forKey:@"callId"];
+  [dict setObject:callName forKey:@"callName"];
   
   NSLog(@"voip push from stringee ---------------------");
 
@@ -75,9 +79,15 @@
      CustomPushPayload* customPayload = [[CustomPushPayload alloc] init];
     customPayload.customDictionaryPayload = dict;
     
+    CXCallObserver *callObserver = [[CXCallObserver alloc] init];
+    
     [RNVoipPushNotificationManager didReceiveIncomingPushWithPayload:customPayload forType:type];
-    NSLog(@"show incoming call");
-    [RNCallKeep reportNewIncomingCall:uuid handle:@"stringee" handleType:@"generic" hasVideo:true localizedCallerName:callName supportsHolding:false supportsDTMF:false supportsGrouping:false supportsUngrouping:false fromPushKit:true payload:dict withCompletionHandler:completion];
+    
+    if (callObserver.calls.count == 0) {
+      [RNCallKeep reportNewIncomingCall:uuid handle:@"stringee" handleType:@"generic" hasVideo:true localizedCallerName:callName supportsHolding:false supportsDTMF:false supportsGrouping:false supportsUngrouping:false fromPushKit:true payload:dict withCompletionHandler:completion];
+    }
+    
+  
     
   } else {
     // Show fake call
@@ -112,7 +122,7 @@
   }];
 
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-    [NSThread sleepForTimeInterval:5.0f];
+    [NSThread sleepForTimeInterval:10];
     [[UIApplication sharedApplication] endBackgroundTask:self.backgroundUpdateTask];
     self.backgroundUpdateTask = UIBackgroundTaskInvalid;
   });

@@ -5,7 +5,7 @@ import {
   UPDATE_SIGNAL_STATE,
   USER_ONLINE_STAUS,
 } from '../const';
-import {SignalingState} from 'stringee';
+import {SignalingState} from 'stringee-react-native-v2';
 
 const INIT_STATE = {
   client: {

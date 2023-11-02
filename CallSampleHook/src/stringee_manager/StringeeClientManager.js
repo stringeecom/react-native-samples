@@ -3,27 +3,11 @@ import {
   StringeeClientListener,
   StringeeCall,
   StringeeCall2,
-} from 'stringee';
+} from 'stringee-react-native-v2';
 import messaging from '@react-native-firebase/messaging';
 import StringeeCallManager from './StringeeCallManager';
-import {
-  ANSWER_ACTION_ID,
-  CHANNEL_DESCRIPTION,
-  CHANNEL_ID,
-  CHANNEL_NAME,
-  isIos,
-  NOTIFICATION_ID,
-  OPEN_APP_ACTION_ID,
-  OPEN_APP_IN_FULL_SCREEN_MODE_ACTION_ID,
-  REJECT_ACTION_ID,
-} from '../const';
+import {isIos} from '../const';
 import InCallManager from 'react-native-incall-manager';
-import notifee, {
-  AndroidCategory,
-  AndroidImportance,
-} from '@notifee/react-native';
-import {AppState} from 'react-native';
-import {AppStateStatus} from 'react-native/Libraries/AppState/AppState';
 
 class StringeeClientManager {
   static instance = new StringeeClientManager();
@@ -31,7 +15,7 @@ class StringeeClientManager {
 
   pushToken: string;
 
-  listener: StringeeClientListener;
+  listenner: StringeeClientListener;
 
   isConnected: boolean = false;
 
@@ -93,15 +77,15 @@ class StringeeClientManager {
             );
           });
       }
-      if (this.listener.onConnect) {
-        this.listener.onConnect(this.client, userId);
+      if (this.listenner.onConnect) {
+        this.listenner.onConnect(this.client, userId);
       }
     };
     clientListener.onDisConnect = client => {
       console.log('onDisConnect: ');
       this.isConnected = false;
-      if (this.listener.onDisConnect) {
-        this.listener.onDisConnect(client);
+      if (this.listenner.onDisConnect) {
+        this.listenner.onDisConnect(client);
       }
     };
 
@@ -111,11 +95,15 @@ class StringeeClientManager {
     ) => {
       console.log('onIncomingCall: callId - ', call.callId);
       if (StringeeCallManager.instance.call != null) {
+        console.log('busy call');
         call.reject();
       } else {
+        if (!isIos) {
+          InCallManager.startRingtone('_BUNDLE_');
+        }
         StringeeCallManager.instance.handleIncomingCall(call);
-        if (this.listener.onIncomingCall) {
-          this.listener.onIncomingCall(client, call);
+        if (this.listenner.onIncomingCall) {
+          this.listenner.onIncomingCall(client, call);
         }
       }
     };
@@ -131,11 +119,15 @@ class StringeeClientManager {
 
       console.log('onIncomingCall2: callId - ', call.callId);
       if (StringeeCallManager.instance.call != null) {
+        console.log('busy call');
         call.reject();
       } else {
+        if (!isIos) {
+          InCallManager.startRingtone('_BUNDLE_');
+        }
         StringeeCallManager.instance.handleIncomingCall(call);
-        if (this.listener.onIncomingCall2) {
-          this.listener.onIncomingCall2(client, call);
+        if (this.listenner.onIncomingCall2) {
+          this.listenner.onIncomingCall2(client, call);
         }
       }
     };
@@ -147,15 +139,15 @@ class StringeeClientManager {
     ) => {
       console.log('onFailWithError: code-' + code + ' message: ' + message);
       this.isConnected = false;
-      if (this.listener.onFailWithError) {
-        this.listener.onFailWithError(client, code, message);
+      if (this.listenner.onFailWithError) {
+        this.listenner.onFailWithError(client, code, message);
       }
     };
 
     clientListener.onRequestAccessToken = () => {
       console.log('onRequestAccessToken');
-      if (this.listener.onRequestAccessToken) {
-        this.listener.onRequestAccessToken();
+      if (this.listenner.onRequestAccessToken) {
+        this.listenner.onRequestAccessToken();
       }
     };
     this.client.registerEvents(clientListener);

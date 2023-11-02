@@ -6,7 +6,6 @@ import {
   TextInput,
   StyleSheet,
   PermissionsAndroid,
-  AppState,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {setCallInfo, setClientInfo} from '../../redux/actions';
@@ -21,19 +20,18 @@ import {
 } from '../../const';
 import {each} from 'underscore';
 import notifee from '@notifee/react-native';
-import {StringeeClientListener} from 'stringee';
+import {StringeeClientListener} from 'stringee-react-native-v2';
 
+//const stringee_token =
+//  'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZULTE2OTgxMjE1NzYiLCJpc3MiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZUIiwiZXhwIjoxNzAwNzEzNTc2LCJ1c2VySWQiOiJpb3MxIn0.0zF25tvsW_A9SPuK_dxU5r_MbLxPU-gJ6UBmd-rACg8';
 const stringee_token =
-  'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZULTE2OTcxMDc4MzkiLCJpc3MiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZUIiwiZXhwIjoxNjk5Njk5ODM5LCJ1c2VySWQiOiJhbmRyb2lkMiJ9.y0r89hmIkZjoBbjX0fZXV8PDqQGH3fW_nWIQ7jaOUfU';
-
+  'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZULTE2OTgxMjE1ODUiLCJpc3MiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZUIiwiZXhwIjoxNzAwNzEzNTg1LCJ1c2VySWQiOiJpb3MyIn0.vbcvhaRLynS7DdLeZqfocxh_qaAQpZ-L7D7THROdnjw';
 const HomeScreen = () => {
   const [callWith, setCallWith] = useState('');
   const isOnline = useSelector(state => state.stringee.client.isOnline);
   const clientId = useSelector(state => state.stringee.client.client_id);
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  // const appState = useRef(AppState.currentState);
-  // const [appStateVisible, setAppStateVisible] = useState(appState.current);
 
   /**
    * handle press action from notification when app is killed
@@ -80,18 +78,6 @@ const HomeScreen = () => {
       bootstrap().then(r => {
         console.log(r);
       });
-      // const subscription = AppState.addEventListener('change', nextAppState => {
-      //   if (
-      //     appState.current.match(/inactive|background/) &&
-      //     nextAppState === 'active'
-      //   ) {
-      //     console.log('App has come to the foreground!');
-      //   }
-      //
-      //   appState.current = nextAppState;
-      //   setAppStateVisible(appState.current);
-      //   console.log('AppState', appState.current);
-      // });
     }
     if (clientManager.instance.client.userId !== undefined) {
       dispatch(
@@ -104,18 +90,18 @@ const HomeScreen = () => {
 
     clientManager.instance.connect(stringee_token);
 
-    clientManager.instance.listener = new StringeeClientListener();
+    clientManager.instance.listenner = new StringeeClientListener();
 
-    clientManager.instance.listener.onConnect = (_, id) => {
+    clientManager.instance.listenner.onConnect = (_, id) => {
       console.log(id);
       dispatch(setClientInfo({isOnline: true, client_id: id}));
     };
 
-    clientManager.instance.listener.onDisConnect = _ => {
+    clientManager.instance.listenner.onDisConnect = _ => {
       dispatch(setClientInfo({isOnline: false, clientId: clientId}));
     };
 
-    clientManager.instance.listener.onIncomingCall = (_, call) => {
+    clientManager.instance.listenner.onIncomingCall = (_, call) => {
       dispatch(
         setCallInfo({
           call_with: call.from,
@@ -123,7 +109,7 @@ const HomeScreen = () => {
       );
       navigation.navigate(CALL_SCREEN_NAME);
     };
-    clientManager.instance.listener.onIncomingCall2 = (_, call) => {
+    clientManager.instance.listenner.onIncomingCall2 = (_, call) => {
       dispatch(
         setCallInfo({
           call_with: call.from,
@@ -252,7 +238,7 @@ const HomeScreen = () => {
   );
 };
 
-export {HomeScreen, stringee_token};
+export default HomeScreen;
 
 const style = StyleSheet.create({
   callButton: {

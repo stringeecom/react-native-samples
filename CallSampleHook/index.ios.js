@@ -14,7 +14,7 @@ AppRegistry.registerHeadlessTask('CallBackgroundActions', () => {
   RNCallKeep.setup({
     ios: {
       appName: appName,
-      includesCallsInRecents: false,
+      includesCallsInRecents: true,
     },
   });
   RNCallKeep.setAvailable(true);
@@ -23,7 +23,7 @@ AppRegistry.registerHeadlessTask('CallBackgroundActions', () => {
 RNCallKeep.setup({
   ios: {
     appName: appName,
-    includesCallsInRecents: false,
+    includesCallsInRecents: true,
   },
 });
 

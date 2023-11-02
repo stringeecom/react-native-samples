@@ -12,7 +12,7 @@ import icon from '../../../assets/icon';
 import StringeeCallManager from '../../stringee_manager/StringeeCallManager';
 import {useNavigation} from '@react-navigation/native';
 import {setSignalState} from '../../redux/actions';
-import {SignalingState, StringeeVideoView} from 'stringee';
+import {SignalingState, StringeeVideoView} from 'stringee-react-native-v2';
 import {HOME_SCREEN_NAME} from '../../const';
 import RNCallKeep from 'react-native-callkeep';
 
@@ -66,14 +66,11 @@ const CallScreen = () => {
     setIsSpeakerOn(StringeeCallManager.instance.call.isVideoCall);
 
     StringeeCallManager.instance.didAns = () => {
-      console.log('setSignalState(answered);');
       dispatch(setSignalState('answered'));
-      setMediaConnected(true);
     };
 
     StringeeCallManager.instance.registerEvent({
       onChangeSignalingState: signalingState => {
-        console.log('home screen: ', signalingState);
         if (signalingState === 'busy' || signalingState === 'ended') {
           clearDataAndGoBack();
         }
@@ -85,9 +82,7 @@ const CallScreen = () => {
       onReceiveLocalStream: () => {
         setActiveLocal(true);
       },
-      onChangeMediaState: mediaState => {
-        console.log('event media');
-        console.log(mediaState);
+      onChangeMediaState: (_, mediaState, __) => {
         if (mediaState === 'connected') {
           setMediaConnected(true);
         }
@@ -282,7 +277,11 @@ const CallScreen = () => {
         <View style>
           <Text style={{color: 'gray', marginLeft: 5}}>{signalState}</Text>
           <View style={sheet.border_view} />
-          <Text style={sheet.call_info_name}>{callInfo.call_with}</Text>
+          <Text style={sheet.call_info_name}>
+            {StringeeCallManager.instance.callType === 'CALL_IN'
+              ? StringeeCallManager.instance.call.from
+              : StringeeCallManager.instance.call.to}
+          </Text>
         </View>
         <View style={{flex: 1}} />
         <View>
@@ -300,8 +299,6 @@ const CallScreen = () => {
   };
 
   const footerNormalCall = () => {
-    console.log(StringeeCallManager.instance.callType, signalState);
-
     if (
       StringeeCallManager.instance.callType === 'CALL_IN' &&
       signalState === 'ringing'
@@ -334,14 +331,7 @@ const CallScreen = () => {
                 </Text>
               </View>
               <View style={{flex: 1}} />
-              {((StringeeCallManager.instance.callType === 'CALL_IN' &&
-                signalState !== SignalingState.ringing &&
-                signalState !== SignalingState.ended &&
-                signalState !== SignalingState.busy) ||
-                (StringeeCallManager.instance.callType === 'CALL_OUT' &&
-                  signalState !== SignalingState.ended &&
-                  signalState !== SignalingState.busy)) &&
-                callActionButton()}
+              {callActionButton()}
             </View>
           </View>
         </View>
@@ -398,10 +388,10 @@ const CallScreen = () => {
   };
 
   const mainRender = () => {
-    if (!activeLocal) {
-      return normalCallScreen();
+    if (StringeeCallManager.instance.call.isVideoCall && mediaConnected) {
+      return videoCallScreen();
     }
-    return videoCallScreen();
+    return normalCallScreen();
   };
   return mainRender();
 };
