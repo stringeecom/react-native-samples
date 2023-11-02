@@ -16,6 +16,22 @@ const stringeePushConfig = () => {
     call.callKeeps.push(payload);
   });
 
+  RNCallKeep.addEventListener(
+    'didDisplayIncomingCall',
+    ({payload, callUUID}) => {
+      if (!payload.callId) {
+        console.log('end fake call');
+        RNCallKeep.endCall(callUUID);
+      } else {
+        setTimeout(() => {
+          if (!call.call || call.call.callId !== payload.callId) {
+            RNCallKeep.endCall(callUUID);
+          }
+        }, 5000);
+      }
+    },
+  );
+
   RNCallKeep.addEventListener('endCall', ({callUUID}) => {
     call.endCallKeep(callUUID);
   });

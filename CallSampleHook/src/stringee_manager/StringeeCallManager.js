@@ -325,6 +325,7 @@ class StringeeCallManager {
           data.callName,
           'generic',
           false,
+          data,
         );
         this.callKeeps.push(data);
       }

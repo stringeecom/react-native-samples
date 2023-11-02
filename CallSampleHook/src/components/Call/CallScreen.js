@@ -247,6 +247,13 @@ const CallScreen = () => {
   };
 
   const callActionButton = () => {
+    if (
+      signalState === SignalingState.ringing &&
+      StringeeCallManager.instance.callType === 'CALL_IN'
+    ) {
+      return <View />;
+    }
+
     return (
       <View style={{marginBottom: 30, flexDirection: 'row'}}>
         <TouchableOpacity style={{marginLeft: 80}} onPress={didTapMute}>
