@@ -6,8 +6,10 @@
 #import <RNVoipPushNotificationManager.h>
 #import "RNCallKeep.h"
 #import "CustomPushPayload.h"
-
-@implementation AppDelegate
+#import "ManagerUUID.h"
+@implementation AppDelegate {
+  CXCallObserver * callObs;
+}
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -19,7 +21,12 @@
     @"appName": @"CallSampleHook",
     @"supportsVideo": @YES
   }];
-    
+  
+  [RNVoipPushNotificationManager voipRegistration];
+  
+  self->callObs = [[CXCallObserver alloc] init];
+  [self->callObs setDelegate:self queue:nil];
+  
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }
 
@@ -41,7 +48,7 @@
 
 - (void)pushRegistry:(PKPushRegistry *)registry didReceiveIncomingPushWithPayload:(PKPushPayload *)payload forType:(PKPushType)type withCompletionHandler:(void (^)(void))completion {
   NSDictionary *payloadDataDic = payload.dictionaryPayload[@"data"][@"map"][@"data"][@"map"];
-  NSLog(@"didReceiveIncomingPushWithPayload: %@", payloadDataDic);
+  NSLog(@"didReceiveIncomingPushWithPayload: %@", payload.dictionaryPayload);
   NSString *callId = payloadDataDic[@"callId"];
   NSNumber *serial = payloadDataDic[@"serial"];
   NSString *callStatus = payloadDataDic[@"callStatus"];
@@ -49,12 +56,13 @@
   NSString *fromAlias = payloadDataDic[@"from"][@"map"][@"alias"];
   NSString *fromNumber = payloadDataDic[@"from"][@"map"][@"number"];
   NSString *callName = fromAlias != NULL ? fromAlias : fromNumber != NULL ? fromNumber : @"Connecting...";
-  NSString *uuid = [[[NSUUID UUID] UUIDString] lowercaseString];
+  NSString *uuid = [ManagerUUID.instance getUUID];
+  
+  if (uuid.length == 0) {
+    uuid = [[[NSUUID UUID] UUIDString] lowercaseString];
+  }
       
   NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
-  
-  
-  
   if (serial == NULL) {
     serial = @(1);
   }
@@ -74,17 +82,21 @@
 
   if (callId != NULL && [callStatus isEqual: @"started"]) {
     // --- Process the received push
-     CustomPushPayload* customPayload = [[CustomPushPayload alloc] init];
+    CustomPushPayload* customPayload = [[CustomPushPayload alloc] init];
     customPayload.customDictionaryPayload = dict;
-    
-    CXCallObserver *callObserver = [[CXCallObserver alloc] init];
     
     [RNVoipPushNotificationManager didReceiveIncomingPushWithPayload:customPayload forType:type];
     
-    [RNCallKeep reportNewIncomingCall:uuid handle:@"stringee" handleType:@"generic" hasVideo:true localizedCallerName:callName supportsHolding:false supportsDTMF:false supportsGrouping:false supportsUngrouping:false fromPushKit:true payload:dict withCompletionHandler:completion];
+    BOOL didShow = false;
     
-  
-    
+    for (CXCall * call in callObs.calls) {
+      if ([call.UUID.UUIDString.lowercaseString isEqualToString:uuid]) {
+        didShow = true;
+      }
+    }
+    if (!didShow) {
+      [RNCallKeep reportNewIncomingCall:uuid handle:@"Stringee" handleType:@"generic" hasVideo:true localizedCallerName:callName supportsHolding:false supportsDTMF:true supportsGrouping:false supportsUngrouping:false fromPushKit:true payload:nil withCompletionHandler:completion];
+    }
   } else {
     // Show fake call
     NSLog(@"show fake call");
@@ -125,6 +137,14 @@
 }
 
 // end copy
+
+
+- (void)callObserver:(nonnull CXCallObserver *)callObserver callChanged:(nonnull CXCall *)call {
+  if (call.hasEnded && [call.UUID.UUIDString.lowercaseString isEqualToString: [ManagerUUID.instance getUUID]]) {
+    [ManagerUUID.instance reset];
+    NSLog(@"RESET UUID");
+  }
+}
 
 
 @end

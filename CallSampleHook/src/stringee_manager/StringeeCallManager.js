@@ -7,8 +7,9 @@ import RNCallKeep from 'react-native-callkeep';
 import StringeeClientManager from './StringeeClientManager';
 import {isIos} from '../const';
 import InCallManager from 'react-native-incall-manager';
-import UUID from 'react-native-uuid';
 import {name} from '../../app.json';
+import {NativeModules} from 'react-native';
+
 /**
  * call manager object.
  * @class StringeeCallManager
@@ -142,14 +143,17 @@ class StringeeCallManager {
         this.answerCallKeep();
       }
       if (this.callDidRejectFromPush) {
+        console.log('reject from push');
         this.endCallKeep(this.callDidRejectFromPush);
       }
     }
-    let uuid = UUID.v4();
-    this.handleCallkeep({
-      uuid: uuid,
-      callId: call.callId,
-      callName: call.fromAlias,
+    NativeModules.RNManagerUUID.UUID(uuid => {
+      console.log('native uuid: ', uuid);
+      this.handleCallkeep({
+        uuid: uuid,
+        callId: call.callId,
+        callName: call.fromAlias,
+      });
     });
   }
   /**
@@ -304,32 +308,29 @@ class StringeeCallManager {
    * @param {object} data data from call keep
    */
   handleCallkeep(data) {
-    RNCallKeep.getCalls().then(items => {
-      let flag = false;
-      items.forEach(item => {
-        if (this.searchCallIdWithUUID(item.uuid) === data.callId) {
-          flag = true;
+    if (
+      this.callKeeps.find(item => {
+        return item.callId === data.callId;
+      }) == null
+    ) {
+      RNCallKeep.getCalls().then(items => {
+        if (
+          items.find(item => {
+            return item.callUUID === data.uuid;
+          }) == null
+        ) {
+          RNCallKeep.displayIncomingCall(
+            data.uuid,
+            name,
+            data.callName,
+            'generic',
+            false,
+            data,
+          );
         }
       });
-      if (
-        !flag &&
-        !this.callKeeps.find(item => {
-          item.callId === data.callId;
-        }) &&
-        items.length > this.callKeeps.length
-      ) {
-        console.log('show callkeep from js', this.callKeeps);
-        RNCallKeep.displayIncomingCall(
-          data.uuid,
-          name,
-          data.callName,
-          'generic',
-          false,
-          data,
-        );
-        this.callKeeps.push(data);
-      }
-    });
+      this.callKeeps.push(data);
+    }
   }
   /**
    * If the manager class is handling the call check if the call is anwered from callkeep or not

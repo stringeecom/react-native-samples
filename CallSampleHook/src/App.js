@@ -17,6 +17,8 @@ import CallScreen from './components/Call/CallScreen';
 import 'react-native-reanimated';
 import notifee, {EventType} from '@notifee/react-native';
 import StringeeCallManager from './stringee_manager/StringeeCallManager';
+import {useEffect} from 'react';
+import stringeePushConfig from './stringee_manager/VoipPushManager';
 
 const store = configureStore({
   reducer: reducers,

@@ -14,6 +14,8 @@
 		6D2C5870D72CF4F76467C071 /* libPods-CallSampleHook-CallSampleHookTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 28979DB72F30E58E468ECDB2 /* libPods-CallSampleHook-CallSampleHookTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		934FCCF62A8093C700117874 /* CustomPushPayload.m in Sources */ = {isa = PBXBuildFile; fileRef = 934FCCF52A8093C700117874 /* CustomPushPayload.m */; };
+		93C3FD0F2AF643B4000BA091 /* RNManagerUUID.m in Sources */ = {isa = PBXBuildFile; fileRef = 93C3FD0E2AF643B4000BA091 /* RNManagerUUID.m */; };
+		93C3FD122AF656C3000BA091 /* ManagerUUID.m in Sources */ = {isa = PBXBuildFile; fileRef = 93C3FD112AF656C3000BA091 /* ManagerUUID.m */; };
 		B9F98B17268A6DF38E327B65 /* libPods-CallSampleHook.a in Frameworks */ = {isa = PBXBuildFile; fileRef = EFAA94EA8BAA9DDC023CA206 /* libPods-CallSampleHook.a */; };
 /* End PBXBuildFile section */
 
@@ -45,6 +47,10 @@
 		934FCCF42A8093C700117874 /* CustomPushPayload.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomPushPayload.h; sourceTree = "<group>"; };
 		934FCCF52A8093C700117874 /* CustomPushPayload.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomPushPayload.m; sourceTree = "<group>"; };
 		93B0C28C2A80D6C100170157 /* CallSampleHook.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = CallSampleHook.entitlements; path = CallSampleHook/CallSampleHook.entitlements; sourceTree = "<group>"; };
+		93C3FD0B2AF64344000BA091 /* RNManagerUUID.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNManagerUUID.h; sourceTree = "<group>"; };
+		93C3FD0E2AF643B4000BA091 /* RNManagerUUID.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNManagerUUID.m; sourceTree = "<group>"; };
+		93C3FD102AF65697000BA091 /* ManagerUUID.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ManagerUUID.h; sourceTree = "<group>"; };
+		93C3FD112AF656C3000BA091 /* ManagerUUID.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ManagerUUID.m; sourceTree = "<group>"; };
 		DD3D8E5C4114A9CBC43A11C5 /* Pods-CallSampleHook-CallSampleHookTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CallSampleHook-CallSampleHookTests.debug.xcconfig"; path = "Target Support Files/Pods-CallSampleHook-CallSampleHookTests/Pods-CallSampleHook-CallSampleHookTests.debug.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		EFAA94EA8BAA9DDC023CA206 /* libPods-CallSampleHook.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CallSampleHook.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -99,6 +105,10 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				93C3FD0B2AF64344000BA091 /* RNManagerUUID.h */,
+				93C3FD0E2AF643B4000BA091 /* RNManagerUUID.m */,
+				93C3FD102AF65697000BA091 /* ManagerUUID.h */,
+				93C3FD112AF656C3000BA091 /* ManagerUUID.m */,
 			);
 			name = CallSampleHook;
 			sourceTree = "<group>";
@@ -433,9 +443,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				93C3FD0F2AF643B4000BA091 /* RNManagerUUID.m in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				934FCCF62A8093C700117874 /* CustomPushPayload.m in Sources */,
+				93C3FD122AF656C3000BA091 /* ManagerUUID.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -512,7 +524,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = A55Q6CBZXS;
+				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9L439MV268;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = CallSampleHook/Info.plist;
@@ -552,7 +564,7 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = A55Q6CBZXS;
+				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 9L439MV268;
 				INFOPLIST_FILE = CallSampleHook/Info.plist;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "";

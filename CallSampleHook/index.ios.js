@@ -10,21 +10,15 @@ import stringeePushConfig from './src/stringee_manager/VoipPushManager';
 
 AppRegistry.registerComponent(appName, () => App);
 
-AppRegistry.registerHeadlessTask('CallBackgroundActions', () => {
-  RNCallKeep.setup({
-    ios: {
-      appName: appName,
-      includesCallsInRecents: true,
-    },
-  });
-  RNCallKeep.setAvailable(true);
+AppRegistry.registerHeadlessTask('background', () => {
+  console.log('background task');
+  stringeePushConfig();
 });
 
+stringeePushConfig();
 RNCallKeep.setup({
   ios: {
     appName: appName,
     includesCallsInRecents: true,
   },
 });
-
-stringeePushConfig();

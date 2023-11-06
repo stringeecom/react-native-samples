@@ -8,6 +8,7 @@ import messaging from '@react-native-firebase/messaging';
 import StringeeCallManager from './StringeeCallManager';
 import {isIos} from '../const';
 import InCallManager from 'react-native-incall-manager';
+import RNVoipPushNotification from 'react-native-voip-push-notification';
 
 class StringeeClientManager {
   static instance = new StringeeClientManager();
@@ -44,6 +45,7 @@ class StringeeClientManager {
       this.isConnected = true;
       if (isIos) {
         console.log('Register push ios: ', this.pushToken);
+        RNVoipPushNotification.onVoipNotificationCompleted('JS_DID_ACTIVE');
         if (this.pushToken) {
           console.log('register push while client connected');
           this.client.registerPush(
@@ -62,7 +64,7 @@ class StringeeClientManager {
           .then(token => {
             this.client.registerPush(
               token,
-              true,
+              false,
               true,
               (result, code, desc) => {
                 console.log(
