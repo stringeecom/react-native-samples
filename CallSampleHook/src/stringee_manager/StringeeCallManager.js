@@ -8,7 +8,6 @@ import StringeeClientManager from './StringeeClientManager';
 import {isIos} from '../const';
 import InCallManager from 'react-native-incall-manager';
 import {name} from '../../app.json';
-import {NativeModules} from 'react-native';
 
 /**
  * call manager object.
@@ -147,13 +146,16 @@ class StringeeCallManager {
         this.endCallKeep(this.callDidRejectFromPush);
       }
     }
-    this.call.generateUUID(uuid => {
-      this.handleCallkeep({
-        uuid: uuid,
-        callId: call.callId,
-        callName: call.fromAlias,
-      });
-    });
+    this.call
+      .generateUUID()
+      .then(uuid => {
+        this.handleCallkeep({
+          uuid: uuid,
+          callId: call.callId,
+          callName: call.fromAlias,
+        });
+      })
+      .catch(console.log);
   }
   /**
    * init answer the call
