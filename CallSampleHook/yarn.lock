@@ -6449,9 +6449,9 @@ string_decoder@~1.1.1:
   dependencies:
     safe-buffer "~5.1.0"
 
-"stringee-react-native-v2@https://github.com/stringeecom/stringee-react-native-v2.git#hieph/features/SG7530-manage-uuid-by-callid":
+"stringee-react-native-v2@https://github.com/stringeecom/stringee-react-native-v2.git#anhnqk/features/SG-7530-init-new-architecture":
   version "0.0.1"
-  resolved "https://github.com/stringeecom/stringee-react-native-v2.git#265d4444fd7999903dbed662858a430c50192c25"
+  resolved "https://github.com/stringeecom/stringee-react-native-v2.git#988e045aa2ed983c8998739419594aa01ffb9c74"
   dependencies:
     underscore "^1.13.6"
 

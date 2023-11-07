@@ -4,7 +4,7 @@ import {configureStore} from '@reduxjs/toolkit';
 import reducers from './reducers';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigationContainer} from '@react-navigation/native';
-import HomeScreen from './components/Home';
+import {HomeScreen} from './components/Home';
 import {
   ANSWER_ACTION_ID,
   CALL_SCREEN_NAME,
@@ -17,8 +17,6 @@ import CallScreen from './components/Call/CallScreen';
 import 'react-native-reanimated';
 import notifee, {EventType} from '@notifee/react-native';
 import StringeeCallManager from './stringee_manager/StringeeCallManager';
-import {useEffect} from 'react';
-import stringeePushConfig from './stringee_manager/VoipPushManager';
 
 const store = configureStore({
   reducer: reducers,

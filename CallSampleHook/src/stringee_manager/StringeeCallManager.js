@@ -5,8 +5,23 @@ import {
 } from 'stringee-react-native-v2';
 import RNCallKeep from 'react-native-callkeep';
 import StringeeClientManager from './StringeeClientManager';
-import {isIos} from '../const';
+import {
+  ANSWER_ACTION_ID,
+  CHANNEL_DESCRIPTION,
+  CHANNEL_ID,
+  CHANNEL_NAME,
+  isIos,
+  NOTIFICATION_ID,
+  OPEN_APP_ACTION_ID,
+  OPEN_APP_IN_FULL_SCREEN_MODE_ACTION_ID,
+  REJECT_ACTION_ID,
+} from '../const';
 import InCallManager from 'react-native-incall-manager';
+import {AppState} from 'react-native';
+import notifee, {
+  AndroidCategory,
+  AndroidImportance,
+} from '@notifee/react-native';
 import {name} from '../../app.json';
 
 /**
@@ -32,6 +47,7 @@ class StringeeCallManager {
   didAnsItem;
   callEvents = {
     onChangeSignalingState: (_, signalingState, __, ___, ____) => {
+      console.log('onChangeSignalingState', signalingState);
       this.signalingState = signalingState;
       if (
         signalingState === SignalingState.ended ||
@@ -105,7 +121,6 @@ class StringeeCallManager {
    * @function endSectionCall
    */
   endSectionCall() {
-    console.log('remove section call');
     if (!isIos) {
       InCallManager.stopRingtone();
     }
@@ -126,8 +141,18 @@ class StringeeCallManager {
    * @param {StringeeCall | undefined} call The call from onIncomingCall
    */
   handleIncomingCall(call) {
+    console.log('handleIncomingCall', call);
+    if (!isIos) {
+      InCallManager.startRingtone('_BUNDLE_');
+      if (AppState.currentState === 'background') {
+        this.showIncomingCallNotification(call.fromAlias).then(r =>
+          console.log(r),
+        );
+      }
+    }
+
     call.initAnswer((status, code, message) => {
-      console.log('initAnswer', call.callId, status, code, message);
+      console.log('initAnswer', status, code, message);
     });
     this.call = call;
     if (this.events) {
@@ -142,20 +167,55 @@ class StringeeCallManager {
         this.answerCallKeep();
       }
       if (this.callDidRejectFromPush) {
-        console.log('reject from push');
         this.endCallKeep(this.callDidRejectFromPush);
       }
     }
-    this.call
-      .generateUUID()
-      .then(uuid => {
-        this.handleCallkeep({
-          uuid: uuid,
-          callId: call.callId,
-          callName: call.fromAlias,
-        });
-      })
-      .catch(console.log);
+  }
+
+  async showIncomingCallNotification(from: String) {
+    const channelId = await notifee.createChannel({
+      id: CHANNEL_ID,
+      name: CHANNEL_NAME,
+      description: CHANNEL_DESCRIPTION,
+      vibration: true,
+      importance: AndroidImportance.HIGH,
+    });
+    console.log('vao day ko');
+    await notifee.displayNotification({
+      id: NOTIFICATION_ID,
+      title: 'Incoming Call',
+      body: 'Call from ' + from,
+      android: {
+        channelId,
+        importance: AndroidImportance.HIGH,
+        category: AndroidCategory.CALL,
+        autoCancel: false,
+        ongoing: true,
+        pressAction: {
+          id: OPEN_APP_ACTION_ID,
+          launchActivity: 'default',
+        },
+        actions: [
+          {
+            title: 'Answer',
+            pressAction: {
+              id: ANSWER_ACTION_ID,
+              launchActivity: 'default',
+            },
+          },
+          {
+            title: 'Reject',
+            pressAction: {
+              id: REJECT_ACTION_ID,
+            },
+          },
+        ],
+        fullScreenAction: {
+          id: OPEN_APP_IN_FULL_SCREEN_MODE_ACTION_ID,
+          launchActivity: 'default',
+        },
+      },
+    });
   }
   /**
    * init answer the call
@@ -175,11 +235,13 @@ class StringeeCallManager {
   mute(isMute, callback) {
     if (this.call) {
       this.call.mute(isMute, callback);
-      this.callKeeps.forEach(item => {
-        if (item.callId === this.call.callId) {
-          RNCallKeep.toggleAudioRouteSpeaker(item.uuid, isMute);
-        }
-      });
+      if (isIos) {
+        this.callKeeps.forEach(item => {
+          if (item.callId === this.call.callId) {
+            RNCallKeep.toggleAudioRouteSpeaker(item.uuid, isMute);
+          }
+        });
+      }
     }
   }
   /**
@@ -220,11 +282,13 @@ class StringeeCallManager {
   enableSpeaker(isOn, callback) {
     if (this.call) {
       this.call.setSpeakerphoneOn(isOn, callback);
-      this.callKeeps.forEach(item => {
-        if (item.callId === this.call.callId) {
-          RNCallKeep.toggleAudioRouteSpeaker(item.uuid, isOn);
-        }
-      });
+      if (isIos) {
+        this.callKeeps.forEach(item => {
+          if (item.callId === this.call.callId) {
+            RNCallKeep.toggleAudioRouteSpeaker(item.uuid, isOn);
+          }
+        });
+      }
     }
   }
   /**
@@ -297,13 +361,6 @@ class StringeeCallManager {
       this.events.onChangeSignalingState(SignalingState.ended);
     }
   }
-
-  searchCallIdWithUUID(uuid: string) {
-    return this.callKeeps.find(item => {
-      item.uuid === uuid;
-    })?.callId;
-  }
-
   /**
    *
    * @param {object} data data from call keep
@@ -351,7 +408,7 @@ class StringeeCallManager {
       this.call.callId
     ) {
       this.call.answer((status, code, message) => {
-        console.log('ans call ', this.call.callId, status, code, message);
+        console.log('answer', status, code, message);
         if (!isIos) {
           InCallManager.stopRingtone();
         }

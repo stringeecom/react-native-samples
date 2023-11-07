@@ -338,7 +338,14 @@ const CallScreen = () => {
                 </Text>
               </View>
               <View style={{flex: 1}} />
-              {callActionButton()}
+              {((StringeeCallManager.instance.callType === 'CALL_IN' &&
+                signalState !== SignalingState.ringing &&
+                signalState !== SignalingState.ended &&
+                signalState !== SignalingState.busy) ||
+                (StringeeCallManager.instance.callType === 'CALL_OUT' &&
+                  signalState !== SignalingState.ended &&
+                  signalState !== SignalingState.busy)) &&
+                callActionButton()}
             </View>
           </View>
         </View>

@@ -22,10 +22,10 @@ import {each} from 'underscore';
 import notifee from '@notifee/react-native';
 import {StringeeClientListener} from 'stringee-react-native-v2';
 
-//const stringee_token =
-//  'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZULTE2OTgxMjE1NzYiLCJpc3MiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZUIiwiZXhwIjoxNzAwNzEzNTc2LCJ1c2VySWQiOiJpb3MxIn0.0zF25tvsW_A9SPuK_dxU5r_MbLxPU-gJ6UBmd-rACg8';
+// const stringee_token =
+//   'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZULTE2OTgxMjE1NzYiLCJpc3MiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZUIiwiZXhwIjoxNzAwNzEzNTc2LCJ1c2VySWQiOiJpb3MxIn0.0zF25tvsW_A9SPuK_dxU5r_MbLxPU-gJ6UBmd-rACg8';
 const stringee_token =
-  'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZULTE2OTgxMjE1ODUiLCJpc3MiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZUIiwiZXhwIjoxNzAwNzEzNTg1LCJ1c2VySWQiOiJpb3MyIn0.vbcvhaRLynS7DdLeZqfocxh_qaAQpZ-L7D7THROdnjw';
+  'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZULTE2OTkzNDA5MzUiLCJpc3MiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZUIiwiZXhwIjoxNzAxOTMyOTM1LCJ1c2VySWQiOiJhbmRyb2lkIn0.KA5vCIO7HVCRrU4wKLROnIWYYc_LGWEupNDA5pYH8LI';
 const HomeScreen = () => {
   const [callWith, setCallWith] = useState('');
   const isOnline = useSelector(state => state.stringee.client.isOnline);
@@ -90,18 +90,18 @@ const HomeScreen = () => {
 
     clientManager.instance.connect(stringee_token);
 
-    clientManager.instance.listenner = new StringeeClientListener();
+    clientManager.instance.listener = new StringeeClientListener();
 
-    clientManager.instance.listenner.onConnect = (_, id) => {
+    clientManager.instance.listener.onConnect = (_, id) => {
       console.log(id);
       dispatch(setClientInfo({isOnline: true, client_id: id}));
     };
 
-    clientManager.instance.listenner.onDisConnect = _ => {
+    clientManager.instance.listener.onDisConnect = _ => {
       dispatch(setClientInfo({isOnline: false, clientId: clientId}));
     };
 
-    clientManager.instance.listenner.onIncomingCall = (_, call) => {
+    clientManager.instance.listener.onIncomingCall = (_, call) => {
       dispatch(
         setCallInfo({
           call_with: call.from,
@@ -109,7 +109,7 @@ const HomeScreen = () => {
       );
       navigation.navigate(CALL_SCREEN_NAME);
     };
-    clientManager.instance.listenner.onIncomingCall2 = (_, call) => {
+    clientManager.instance.listener.onIncomingCall2 = (_, call) => {
       dispatch(
         setCallInfo({
           call_with: call.from,
@@ -238,7 +238,7 @@ const HomeScreen = () => {
   );
 };
 
-export default HomeScreen;
+export {HomeScreen, stringee_token};
 
 const style = StyleSheet.create({
   callButton: {
