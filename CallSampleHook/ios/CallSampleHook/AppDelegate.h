@@ -3,7 +3,6 @@
 #import "CustomPushPayload.h"
 #import <CallKit/CXCallObserver.h>
 
-@interface AppDelegate : RCTAppDelegate<CXCallObserverDelegate>
+@interface AppDelegate : RCTAppDelegate
 @property (nonatomic, assign) UIBackgroundTaskIdentifier backgroundUpdateTask;
-@property (nonatomic, assign) BOOL jsCodeDidActive;
 @end

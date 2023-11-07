@@ -6,10 +6,8 @@
 #import <RNVoipPushNotificationManager.h>
 #import "RNCallKeep.h"
 #import "CustomPushPayload.h"
-#import "ManagerUUID.h"
-@implementation AppDelegate {
-  CXCallObserver * callObs;
-}
+#import <RNStringeeInstanceManager.h>
+@implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
@@ -23,10 +21,6 @@
   }];
   
   [RNVoipPushNotificationManager voipRegistration];
-  
-  self->callObs = [[CXCallObserver alloc] init];
-  [self->callObs setDelegate:self queue:nil];
-  
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }
 
@@ -56,19 +50,21 @@
   NSString *fromAlias = payloadDataDic[@"from"][@"map"][@"alias"];
   NSString *fromNumber = payloadDataDic[@"from"][@"map"][@"number"];
   NSString *callName = fromAlias != NULL ? fromAlias : fromNumber != NULL ? fromNumber : @"Connecting...";
-  NSString *uuid = [ManagerUUID.instance getUUID];
-  
-  if (uuid.length == 0) {
-    uuid = [[[NSUUID UUID] UUIDString] lowercaseString];
-  }
+
       
   NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
   if (serial == NULL) {
-    serial = @(1);
+    serial = @(0);
   }
   
   if (callId == NULL) {
     callId = payloadDataDic[@"content"][@"map"][@"message"][@"map"][@"call_id"];
+  }
+  
+  NSString *uuid = [RNStringeeInstanceManager.instance generateUUID:callId serial:serial];
+
+  if (uuid.length == 0) {
+    uuid = [[[NSUUID UUID] UUIDString] lowercaseString];
   }
   
   NSLog(@"info %@ %@ %@", uuid, serial, callId);
@@ -86,7 +82,7 @@
     customPayload.customDictionaryPayload = dict;
     
     [RNVoipPushNotificationManager didReceiveIncomingPushWithPayload:customPayload forType:type];
-    
+    CXCallObserver *callObs = [[CXCallObserver alloc] init];
     BOOL didShow = false;
     
     for (CXCall * call in callObs.calls) {
@@ -138,13 +134,6 @@
 
 // end copy
 
-
-- (void)callObserver:(nonnull CXCallObserver *)callObserver callChanged:(nonnull CXCall *)call {
-  if (call.hasEnded && [call.UUID.UUIDString.lowercaseString isEqualToString: [ManagerUUID.instance getUUID]]) {
-    [ManagerUUID.instance reset];
-    NSLog(@"RESET UUID");
-  }
-}
 
 
 @end

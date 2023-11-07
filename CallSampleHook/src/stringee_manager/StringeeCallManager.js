@@ -147,8 +147,7 @@ class StringeeCallManager {
         this.endCallKeep(this.callDidRejectFromPush);
       }
     }
-    NativeModules.RNManagerUUID.UUID(uuid => {
-      console.log('native uuid: ', uuid);
+    this.call.generateUUID(uuid => {
       this.handleCallkeep({
         uuid: uuid,
         callId: call.callId,
@@ -313,6 +312,7 @@ class StringeeCallManager {
         return item.callId === data.callId;
       }) == null
     ) {
+      console.log('uuid js: ', data.uuid);
       RNCallKeep.getCalls().then(items => {
         if (
           items.find(item => {

@@ -29,7 +29,7 @@
     "react-native-voip-push-notification": "^3.3.0",
     "react-redux": "^8.1.2",
     "redux": "^4.2.1",
-    "stringee-react-native-v2": "0.0.1"
+    "stringee-react-native-v2": "https://github.com/stringeecom/stringee-react-native-v2.git#hieph/features/SG7530-manage-uuid-by-callid"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

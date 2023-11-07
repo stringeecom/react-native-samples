@@ -14,7 +14,7 @@ const stringeePushConfig = () => {
   });
 
   RNVoipPushNotification.addEventListener('notification', payload => {
-    call.handleCallkeep(payload);
+    call.callKeeps.push(payload);
   });
 
   RNVoipPushNotification.addEventListener('didLoadWithEvents', events => {
