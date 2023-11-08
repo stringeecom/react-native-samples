@@ -170,6 +170,16 @@ class StringeeCallManager {
         this.endCallKeep(this.callDidRejectFromPush);
       }
     }
+    this.call
+      .generateUUID()
+      .then(uuid => {
+        this.handleCallkeep({
+          uuid: uuid,
+          callId: call.callId,
+          callName: call.fromAlias,
+        });
+      })
+      .catch(console.log);
   }
 
   async showIncomingCallNotification(from: String) {
