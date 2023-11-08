@@ -87,6 +87,11 @@ const CallScreen = () => {
           setMediaConnected(true);
         }
       },
+      onHandleOnAnotherDevice: signalingState => {
+        if (signalingState !== 'ringing') {
+          clearDataAndGoBack();
+        }
+      },
     });
 
     if (StringeeCallManager.instance.callType === 'CALL_OUT') {
