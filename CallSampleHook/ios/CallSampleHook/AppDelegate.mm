@@ -54,7 +54,7 @@
       
   NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
   if (serial == NULL) {
-    serial = @(0);
+    serial = @(1);
   }
   
   if (callId == NULL) {
