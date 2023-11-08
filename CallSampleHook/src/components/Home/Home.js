@@ -22,8 +22,6 @@ import {each} from 'underscore';
 import notifee from '@notifee/react-native';
 import {StringeeClientListener} from 'stringee-react-native-v2';
 
-// const stringee_token =
-//   'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZULTE2OTgxMjE1NzYiLCJpc3MiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZUIiwiZXhwIjoxNzAwNzEzNTc2LCJ1c2VySWQiOiJpb3MxIn0.0zF25tvsW_A9SPuK_dxU5r_MbLxPU-gJ6UBmd-rACg8';
 const stringee_token =
   'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZULTE2OTkzNDA5MzUiLCJpc3MiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZUIiwiZXhwIjoxNzAxOTMyOTM1LCJ1c2VySWQiOiJhbmRyb2lkIn0.KA5vCIO7HVCRrU4wKLROnIWYYc_LGWEupNDA5pYH8LI';
 const HomeScreen = () => {

@@ -19,13 +19,6 @@ export const setCallInfo = callInfo => {
   };
 };
 
-export const setScreenState = state => {
-  return {
-    type: UPDATE_CALL_SCREEN,
-    payload: state,
-  };
-};
-
 export const setSignalState = state => {
   return {
     type: UPDATE_SIGNAL_STATE,
