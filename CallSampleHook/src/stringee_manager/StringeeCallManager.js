@@ -62,6 +62,16 @@ class StringeeCallManager {
         this.events.onChangeMediaState(_, mediaState, __);
       }
     },
+    handleOnHandleOnAnotherDevice: (
+      stringeeCall,
+      signalingState,
+      description,
+    ) => {
+      console.log('onHandleOnAnotherDevice', signalingState);
+      if (this.events) {
+        this.events.onHandleOnAnotherDevice(signalingState);
+      }
+    },
   };
 
   constructor() {
