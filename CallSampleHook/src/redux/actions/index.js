@@ -1,9 +1,4 @@
-import {
-  UPDATE_CALL_INFO,
-  UPDATE_CALL_SCREEN,
-  UPDATE_SIGNAL_STATE,
-  USER_ONLINE_STAUS,
-} from '../../const';
+import { UPDATE_CALL_INFO, UPDATE_SIGNAL_STATE, USER_ONLINE_STAUS } from "../../const";
 
 export const setClientInfo = data => {
   return {

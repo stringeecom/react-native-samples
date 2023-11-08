@@ -1,5 +1,5 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {KEY_PUSH_REGISTERED} from '../const';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { KEY_PUSH_REGISTERED } from "../const";
 
 export const getRegisterStatus = async () => {
   try {

@@ -1,3 +1,3 @@
-import {HomeScreen, stringee_token} from './Home';
+import { HomeScreen, stringee_token } from "./Home";
 
-export {HomeScreen, stringee_token};
+export { HomeScreen, stringee_token };
