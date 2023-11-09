@@ -1,16 +1,23 @@
-import React, { useEffect, useState } from "react";
-import { Dimensions, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import icon from "../../../assets/icon";
-import StringeeCallManager from "../../stringee_manager/StringeeCallManager";
-import { useNavigation } from "@react-navigation/native";
-import { setSignalState } from "../../redux/actions";
-import { MediaState, SignalingState, StringeeVideoView } from "stringee-react-native-v2";
-import { HOME_SCREEN_NAME } from "../../const";
-import RNCallKeep from "react-native-callkeep";
+import React, {useEffect, useState} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Dimensions,
+} from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
+import icon from '../../../assets/icon';
+import StringeeCallManager from '../../stringee_manager/StringeeCallManager';
+import {useNavigation} from '@react-navigation/native';
+import {setSignalState} from '../../redux/actions';
+import {SignalingState, StringeeVideoView} from 'stringee-react-native-v2';
+import {HOME_SCREEN_NAME} from '../../const';
+import RNCallKeep from 'react-native-callkeep';
 
-const height = Dimensions.get("window").height;
-const width = Dimensions.get("window").width;
+const height = Dimensions.get('window').height;
+const width = Dimensions.get('window').width;
 const CallScreen = () => {
   const callInfo = useSelector(state => state.stringee.call);
   const signalState: SignalingState = useSelector(
@@ -52,59 +59,50 @@ const CallScreen = () => {
   };
 
   const setupCall = () => {
-    if (!StringeeCallManager.instance.stringeeCall) {
+    if (!StringeeCallManager.instance.call) {
       clearDataAndGoBack();
     }
 
-    setIsSpeakerOn(StringeeCallManager.instance.stringeeCall.isVideoCall);
+    setIsSpeakerOn(StringeeCallManager.instance.call.isVideoCall);
 
     StringeeCallManager.instance.didAns = () => {
-      dispatch(setSignalState("answered"));
+      dispatch(setSignalState('answered'));
     };
 
     StringeeCallManager.instance.registerEvent({
-      onChangeSignalingState: handleOnChangeSignalingState,
-      onReceiveRemoteStream: handleOnReceiveRemoteStream,
-      onReceiveLocalStream: handleOnReceiveLocalStream,
-      onChangeMediaState: handleOnChangeMediaState,
-      onHandleOnAnotherDevice: handleOnHandleOnAnotherDevice,
+      onChangeSignalingState: signalingState => {
+        if (signalingState === 'busy' || signalingState === 'ended') {
+          clearDataAndGoBack();
+        }
+        dispatch(setSignalState(signalingState));
+      },
+      onReceiveRemoteStream: () => {
+        setActiveRemote(true);
+      },
+      onReceiveLocalStream: () => {
+        setActiveLocal(true);
+      },
+      onChangeMediaState: (_, mediaState, __) => {
+        if (mediaState === 'connected') {
+          setMediaConnected(true);
+        }
+      },
+      onHandleOnAnotherDevice: signalingState => {
+        if (signalingState !== 'ringing') {
+          clearDataAndGoBack();
+        }
+      },
     });
 
-    if (StringeeCallManager.instance.callType === "CALL_OUT") {
-      StringeeCallManager.instance.makeCall((status, code, message) => {
-        console.log("makeCall", status, code, message);
+    if (StringeeCallManager.instance.callType === 'CALL_OUT') {
+      StringeeCallManager.instance.makeCall((status, _, message) => {
+        console.log('makeCall - ', message);
         if (!status) {
           clearDataAndGoBack();
         }
       });
     } else {
-      dispatch(setSignalState("ringing"));
-    }
-  };
-
-  const handleOnChangeSignalingState = signalingState => {
-    if (
-      signalingState === SignalingState.busy ||
-      signalingState === SignalingState.ended
-    ) {
-      clearDataAndGoBack();
-    }
-    dispatch(setSignalState(signalingState));
-  };
-  const handleOnReceiveRemoteStream = () => {
-    setActiveRemote(true);
-  };
-  const handleOnReceiveLocalStream = () => {
-    setActiveLocal(true);
-  };
-  const handleOnChangeMediaState = mediaState => {
-    if (mediaState === MediaState.connected) {
-      setMediaConnected(true);
-    }
-  };
-  const handleOnHandleOnAnotherDevice = signalingState => {
-    if (signalingState !== SignalingState.ringing) {
-      clearDataAndGoBack();
+      dispatch(setSignalState('ringing'));
     }
   };
 
@@ -112,10 +110,10 @@ const CallScreen = () => {
     let h = (time / 60).toFixed(0).toString();
     let m = (time % 60).toString();
     if (h.length === 1) {
-      h = "0" + h;
+      h = '0' + h;
     }
     if (m.length === 1) {
-      m = "0" + m;
+      m = '0' + m;
     }
     return `${h}:${m}`;
   };
@@ -127,7 +125,7 @@ const CallScreen = () => {
         if (status) {
           setIsOnCamera(!isOnCamera);
         }
-        console.log("enableVideo", status, code, message);
+        console.log('enableVideo', status, code, message);
       },
     );
   };
@@ -135,10 +133,10 @@ const CallScreen = () => {
   const endCallButton = () => {
     return (
       <TouchableOpacity
-        style={{ alignSelf: "center", marginTop: "15%" }}
+        style={{alignSelf: 'center', marginTop: '15%'}}
         onPress={() => {
           StringeeCallManager.instance.hangup((status, code, message) => {
-            console.log("hangup", status, code, message);
+            console.log('hangup: ', status, code, message);
           });
         }}>
         <Image source={icon.endCall} style={sheet.button_size} />
@@ -151,7 +149,7 @@ const CallScreen = () => {
       if (status) {
         setIsMute(!isMute);
       }
-      console.log("mute", status, code, message);
+      console.log('mute', status, code, message);
     });
   };
 
@@ -162,7 +160,7 @@ const CallScreen = () => {
         if (status) {
           setIsSpeakerOn(!isSpeakerOn);
         }
-        console.log("enableSpeaker", status, code, message);
+        console.log('enableSpeaker', status, code, message);
       },
     );
   };
@@ -189,7 +187,7 @@ const CallScreen = () => {
           onPress={() => {
             StringeeCallManager.instance.switchCamera(
               (status, code, message) => {
-                console.log("switchCamera", status, code, message);
+                console.log('switchCamera', status, code, message);
               },
             );
           }}>
@@ -199,7 +197,7 @@ const CallScreen = () => {
           style={sheet.stack_item_button}
           onPress={() => {
             StringeeCallManager.instance.hangup((status, code, message) => {
-              console.log("hangup", status, code, message);
+              console.log('end video call: ', status, code, message);
             });
           }}>
           <Image source={icon.endCall} style={sheet.button_size} />
@@ -214,29 +212,27 @@ const CallScreen = () => {
         <TouchableOpacity
           onPress={() => {
             let item = StringeeCallManager.instance.callKeeps.find(
-              item =>
-                item.callId ===
-                StringeeCallManager.instance.stringeeCall.callId,
+              item => item.callId === StringeeCallManager.instance.call.callId,
             );
             if (item) {
               RNCallKeep.answerIncomingCall(item.uuid);
             } else {
               StringeeCallManager.instance.answer((status, code, message) => {
-                console.log("answer", status, code, message);
-                dispatch(setSignalState("answered"));
+                console.log('answer - ', status, code, message);
+                dispatch(setSignalState('answered'));
               });
             }
           }}>
-          <Image source={icon.answer} style={{ width: 70, height: 70 }} />
+          <Image source={icon.answer} style={{width: 70, height: 70}} />
         </TouchableOpacity>
-        <View style={{ flex: 1 }} />
+        <View style={{flex: 1}} />
         <TouchableOpacity
           onPress={() => {
             StringeeCallManager.instance.rejectCall((status, code, message) => {
-              console.log("reject", status, code, message);
+              console.log('reject call', status, code, message);
             });
           }}>
-          <Image source={icon.endCall} style={{ width: 70, height: 70 }} />
+          <Image source={icon.endCall} style={{width: 70, height: 70}} />
         </TouchableOpacity>
       </View>
     );
@@ -244,11 +240,11 @@ const CallScreen = () => {
 
   const incomingCallView = () => {
     return (
-      <View style={{ flex: 1, alignItems: "center" }}>
-        <View style={{ flex: 1 }} />
-        <Text style={{ color: "gray" }}>Cuộc gọi đến</Text>
-        <View style={{ ...sheet.border_view, marginLeft: null }} />
-        <Text style={{ ...sheet.call_info_name, marginBottom: 30 }}>
+      <View style={{flex: 1, alignItems: 'center'}}>
+        <View style={{flex: 1}} />
+        <Text style={{color: 'gray'}}>Cuộc gọi đến</Text>
+        <View style={{...sheet.border_view, marginLeft: null}} />
+        <Text style={{...sheet.call_info_name, marginBottom: 30}}>
           {callInfo.call_with}
         </Text>
       </View>
@@ -258,21 +254,21 @@ const CallScreen = () => {
   const callActionButton = () => {
     if (
       signalState === SignalingState.ringing &&
-      StringeeCallManager.instance.callType === "CALL_IN"
+      StringeeCallManager.instance.callType === 'CALL_IN'
     ) {
       return <View />;
     }
 
     return (
-      <View style={{ marginBottom: 30, flexDirection: "row" }}>
-        <TouchableOpacity style={{ marginLeft: 80 }} onPress={didTapMute}>
+      <View style={{marginBottom: 30, flexDirection: 'row'}}>
+        <TouchableOpacity style={{marginLeft: 80}} onPress={didTapMute}>
           <Image
             source={isMute ? icon.unMute : icon.mute}
             style={sheet.button_size}
           />
         </TouchableOpacity>
-        <View style={{ flex: 1 }} />
-        <TouchableOpacity style={{ marginRight: 80 }} onPress={didTapSpeaker}>
+        <View style={{flex: 1}} />
+        <TouchableOpacity style={{marginRight: 80}} onPress={didTapSpeaker}>
           <Image
             source={isSpeakerOn ? icon.speakerOff : icon.speakerOn}
             style={sheet.button_size}
@@ -287,24 +283,24 @@ const CallScreen = () => {
       <View
         style={{
           marginBottom: 0,
-          width: "100%",
-          flexDirection: "row",
+          width: '100%',
+          flexDirection: 'row',
         }}>
         <View style>
-          <Text style={{ color: "gray", marginLeft: 5 }}>{signalState}</Text>
+          <Text style={{color: 'gray', marginLeft: 5}}>{signalState}</Text>
           <View style={sheet.border_view} />
           <Text style={sheet.call_info_name}>
-            {StringeeCallManager.instance.callType === "CALL_IN"
-              ? StringeeCallManager.instance.stringeeCall.from
-              : StringeeCallManager.instance.stringeeCall.to}
+            {StringeeCallManager.instance.callType === 'CALL_IN'
+              ? StringeeCallManager.instance.call.from
+              : StringeeCallManager.instance.call.to}
           </Text>
         </View>
-        <View style={{ flex: 1 }} />
+        <View style={{flex: 1}} />
         <View>
-          <View style={{ flex: 1 }} />
+          <View style={{flex: 1}} />
           {mediaConnected && (
             <View style={sheet.time_duration}>
-              <Text style={{ color: "white", fontWeight: "600" }}>
+              <Text style={{color: 'white', fontWeight: '600'}}>
                 {duration2time(duration)}
               </Text>
             </View>
@@ -316,8 +312,8 @@ const CallScreen = () => {
 
   const footerNormalCall = () => {
     if (
-      StringeeCallManager.instance.callType === "CALL_IN" &&
-      signalState === SignalingState.ringing
+      StringeeCallManager.instance.callType === 'CALL_IN' &&
+      signalState === 'ringing'
     ) {
       return incomingCallButtonAction();
     }
@@ -326,32 +322,32 @@ const CallScreen = () => {
 
   const normalCallScreen = () => {
     return (
-      <View style={{ flex: 1 }}>
+      <View style={{flex: 1}}>
         <View style={sheet.call_info_view}>
-          <View style={{ flex: 1, flexDirection: "column-reverse" }}>
-            {(StringeeCallManager.instance.callType !== "CALL_IN" ||
-                signalState !== SignalingState.ringing) &&
+          <View style={{flex: 1, flexDirection: 'column-reverse'}}>
+            {(StringeeCallManager.instance.callType !== 'CALL_IN' ||
+              signalState !== SignalingState.ringing) &&
               callInfoView()}
           </View>
-          <View style={{ flex: 3 }}>
-            <View style={{ flex: 1 }}>
-              {StringeeCallManager.instance.callType === "CALL_IN" &&
+          <View style={{flex: 3}}>
+            <View style={{flex: 1}}>
+              {StringeeCallManager.instance.callType === 'CALL_IN' &&
                 signalState === SignalingState.ringing &&
                 incomingCallView()}
             </View>
-            <View style={{ flex: 2 }}>
+            <View style={{flex: 2}}>
               <View style={sheet.circle_avatar_view}>
                 <Text
-                  style={{ fontSize: 28, fontWeight: "bold", color: "white" }}>
+                  style={{fontSize: 28, fontWeight: 'bold', color: 'white'}}>
                   {callInfo.call_with.charAt(0)}
                 </Text>
               </View>
-              <View style={{ flex: 1 }} />
+              <View style={{flex: 1}} />
               {callActionButton()}
             </View>
           </View>
         </View>
-        <View style={{ flex: 2, backgroundColor: "white" }}>
+        <View style={{flex: 2, backgroundColor: 'white'}}>
           {footerNormalCall()}
         </View>
       </View>
@@ -360,17 +356,17 @@ const CallScreen = () => {
 
   const videoCallScreen = () => {
     return (
-      <View style={{ flex: 1 }}>
+      <View style={{flex: 1}}>
         {activeRemote && (
           <StringeeVideoView
-            callId={StringeeCallManager.instance.stringeeCall.callId}
+            callId={StringeeCallManager.instance.call.callId}
             local={false}
-            scalingType={"fit"}
+            scalingType={'fit'}
             style={{
               flex: 1,
               width: width,
               height: height,
-              backgroundColor: "black",
+              backgroundColor: 'black',
             }}
             overlay={false}
           />
@@ -379,19 +375,19 @@ const CallScreen = () => {
           <View
             style={{
               ...sheet.time_duration,
-              position: "absolute",
+              position: 'absolute',
               top: 150,
               right: 0,
             }}>
-            <Text style={{ color: "white", fontWeight: "600" }}>
+            <Text style={{color: 'white', fontWeight: '600'}}>
               {duration2time(duration)}
             </Text>
           </View>
         )}
         <StringeeVideoView
-          callId={StringeeCallManager.instance.stringeeCall.callId}
+          callId={StringeeCallManager.instance.call.callId}
           local={true}
-          scalingType={"fit"}
+          scalingType={'fit'}
           overlay={true}
           style={
             // activeRemote ? sheet.local_view_did_active_remote : sheet.local_view
@@ -404,10 +400,7 @@ const CallScreen = () => {
   };
 
   const mainRender = () => {
-    if (
-      StringeeCallManager.instance.stringeeCall.isVideoCall &&
-      mediaConnected
-    ) {
+    if (StringeeCallManager.instance.call.isVideoCall && mediaConnected) {
       return videoCallScreen();
     }
     return normalCallScreen();
@@ -422,26 +415,26 @@ const sheet = StyleSheet.create({
     marginLeft: 5,
     width: 30,
     height: 2,
-    backgroundColor: "#66D54B",
+    backgroundColor: '#66D54B',
     marginTop: 8,
   },
   call_info_name: {
-    color: "white",
+    color: 'white',
     fontSize: 20,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginTop: 16,
     marginLeft: 5,
   },
   time_duration: {
     padding: 8,
     paddingRight: 15,
-    backgroundColor: "#66D54B",
+    backgroundColor: '#66D54B',
     borderTopStartRadius: 5,
     borderBottomStartRadius: 5,
   },
   call_info_view: {
     flex: 5,
-    backgroundColor: "#082E53",
+    backgroundColor: '#082E53',
     borderBottomEndRadius: 16,
     borderBottomStartRadius: 16,
   },
@@ -449,12 +442,12 @@ const sheet = StyleSheet.create({
   circle_avatar_view: {
     width: 120,
     height: 120,
-    alignSelf: "center",
-    backgroundColor: "green",
+    alignSelf: 'center',
+    backgroundColor: 'green',
     borderWidth: 3,
-    borderColor: "white",
-    alignItems: "center",
-    justifyContent: "center",
+    borderColor: 'white',
+    alignItems: 'center',
+    justifyContent: 'center',
     borderRadius: 60,
   },
 
@@ -465,33 +458,33 @@ const sheet = StyleSheet.create({
 
   incoming_btn: {
     height: 60,
-    flexDirection: "row",
+    flexDirection: 'row',
     marginHorizontal: 60,
-    marginTop: "15%",
+    marginTop: '15%',
   },
 
   video_call_button_section: {
-    justifyContent: "center",
-    position: "absolute",
-    width: "100%",
+    justifyContent: 'center',
+    position: 'absolute',
+    width: '100%',
     height: 200,
     bottom: 0,
-    flexDirection: "row",
+    flexDirection: 'row',
   },
 
   stack_item_button: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   local_view: {
     flex: 1,
-    backgroundColor: "blue",
+    backgroundColor: 'blue',
   },
 
   local_view_did_active_remote: {
-    position: "absolute",
+    position: 'absolute',
     width: 150,
     height: 200,
     top: 50,

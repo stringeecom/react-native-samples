@@ -1,13 +1,19 @@
-import { CALL_STATE_SCREEN, UPDATE_CALL_INFO, UPDATE_CALL_SCREEN, UPDATE_SIGNAL_STATE, USER_ONLINE_STAUS } from "../const";
-import { SignalingState } from "stringee-react-native-v2";
+import {
+  CALL_STATE_SCREEN,
+  UPDATE_CALL_INFO,
+  UPDATE_CALL_SCREEN,
+  UPDATE_SIGNAL_STATE,
+  USER_ONLINE_STAUS,
+} from '../const';
+import {SignalingState} from 'stringee-react-native-v2';
 
 const INIT_STATE = {
   client: {
     isOnline: false,
-    client_id: "",
+    client_id: '',
   },
   call: {
-    call_with: "Callee",
+    call_with: 'Callee',
   },
   callScreen: CALL_STATE_SCREEN.normal,
   signalState: SignalingState.ended,

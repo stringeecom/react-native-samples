@@ -1,30 +1,38 @@
-import RNVoipPushNotification from "react-native-voip-push-notification";
-import StringeeClientManager from "./StringeeClientManager";
-import StringeeCallManager from "./StringeeCallManager";
-import RNCallKeep from "react-native-callkeep";
+import RNVoipPushNotification from 'react-native-voip-push-notification';
+import StringeeClientManager from './StringeeClientManager';
+import StringeeCallManager from './StringeeCallManager';
+import RNCallKeep from 'react-native-callkeep';
+import {NativeModules} from 'react-native';
 
 const stringeePushConfig = () => {
+  console.log('config push Stringee', NativeModules.RNManagerUUID);
   const client = StringeeClientManager.instance;
   const call = StringeeCallManager.instance;
 
-  RNVoipPushNotification.addEventListener("register", token => {
+  RNVoipPushNotification.addEventListener('register', token => {
     client.updatePushToken(token);
   });
 
-  RNVoipPushNotification.addEventListener("notification", payload => {
+  RNVoipPushNotification.addEventListener('notification', payload => {
     call.callKeeps.push(payload);
   });
 
-  RNVoipPushNotification.addEventListener("didLoadWithEvents", events => {
+  RNVoipPushNotification.addEventListener('didLoadWithEvents', events => {
     if (!events || !Array.isArray(events) || events.length < 1) {
       return;
     }
     for (let voipEvent of events) {
-      let { name, data } = voipEvent;
-      if (name === RNVoipPushNotification.RNVoipPushRemoteNotificationsRegisteredEvent) {
+      let {name, data} = voipEvent;
+      if (
+        name ===
+        RNVoipPushNotification.RNVoipPushRemoteNotificationsRegisteredEvent
+      ) {
         client.updatePushToken(data);
       }
-      if (name === RNVoipPushNotification.RNVoipPushRemoteNotificationReceivedEvent) {
+      if (
+        name ===
+        RNVoipPushNotification.RNVoipPushRemoteNotificationReceivedEvent
+      ) {
         call.handleCallkeep(data);
         RNVoipPushNotification.onVoipNotificationCompleted(data.uuid);
       }
@@ -33,25 +41,26 @@ const stringeePushConfig = () => {
 
   RNVoipPushNotification.registerVoipToken();
 
-  RNCallKeep.addEventListener("didDisplayIncomingCall", ({ callUUID }) => {
+  RNCallKeep.addEventListener('didDisplayIncomingCall', ({callUUID}) => {
     setTimeout(() => {
-      if (!call.stringeeCall) {
+      if (!call.call) {
+        console.log('end call time out');
         RNCallKeep.endCall(callUUID);
       }
     }, 5000);
   });
 
-  RNCallKeep.addEventListener("endCall", ({ callUUID }) => {
+  RNCallKeep.addEventListener('endCall', ({callUUID}) => {
     if (call.callKeeps.find(item => item.uuid === callUUID) != null) {
       call.endCallKeep(callUUID);
     }
   });
 
-  RNCallKeep.addEventListener("answerCall", ({ callUUID }) => {
+  RNCallKeep.addEventListener('answerCall', ({callUUID}) => {
     call.handleAnswerCallKeep(callUUID);
   });
 
-  RNCallKeep.addEventListener("didActivateAudioSession", () => {
+  RNCallKeep.addEventListener('didActivateAudioSession', () => {
     call.answerCallKeep();
   });
 };
