@@ -59,13 +59,24 @@ const CallScreen = () => {
   };
 
   const setupCall = () => {
-    if (!StringeeCallManager.instance.call) {
-      clearDataAndGoBack();
+    if (!callInfo.isIncoming) {
+      if (callInfo.useCall2) {
+        StringeeCallManager.instance.makeCall2(
+          callInfo.call_with,
+          callInfo.isVideo,
+        );
+      } else {
+        StringeeCallManager.instance.makeCall(
+          callInfo.call_with,
+          callInfo.isVideo,
+        );
+      }
     }
+    dispatch(setSignalState(SignalingState.calling));
 
-    setIsSpeakerOn(StringeeCallManager.instance.call.isVideoCall);
+    setIsSpeakerOn(callInfo.isVideo);
 
-    StringeeCallManager.instance.didAns = () => {
+    StringeeCallManager.instance.didAnswer = () => {
       dispatch(setSignalState('answered'));
     };
 
@@ -74,6 +85,7 @@ const CallScreen = () => {
         if (signalingState === 'busy' || signalingState === 'ended') {
           clearDataAndGoBack();
         }
+        console.log('dispatch(setSignalState(signalingState));', signalState);
         dispatch(setSignalState(signalingState));
       },
       onReceiveRemoteStream: () => {
@@ -93,17 +105,6 @@ const CallScreen = () => {
         }
       },
     });
-
-    if (StringeeCallManager.instance.callType === 'CALL_OUT') {
-      StringeeCallManager.instance.makeCall((status, _, message) => {
-        console.log('makeCall - ', message);
-        if (!status) {
-          clearDataAndGoBack();
-        }
-      });
-    } else {
-      dispatch(setSignalState('ringing'));
-    }
   };
 
   const duration2time = time => {
@@ -211,17 +212,7 @@ const CallScreen = () => {
       <View style={sheet.incoming_btn}>
         <TouchableOpacity
           onPress={() => {
-            let item = StringeeCallManager.instance.callKeeps.find(
-              item => item.callId === StringeeCallManager.instance.call.callId,
-            );
-            if (item) {
-              RNCallKeep.answerIncomingCall(item.uuid);
-            } else {
-              StringeeCallManager.instance.answer((status, code, message) => {
-                console.log('answer - ', status, code, message);
-                dispatch(setSignalState('answered'));
-              });
-            }
+            StringeeCallManager.instance.answer();
           }}>
           <Image source={icon.answer} style={{width: 70, height: 70}} />
         </TouchableOpacity>
@@ -252,10 +243,7 @@ const CallScreen = () => {
   };
 
   const callActionButton = () => {
-    if (
-      signalState === SignalingState.ringing &&
-      StringeeCallManager.instance.callType === 'CALL_IN'
-    ) {
+    if (signalState === SignalingState.ringing && callInfo.isIncoming) {
       return <View />;
     }
 
@@ -289,11 +277,7 @@ const CallScreen = () => {
         <View style>
           <Text style={{color: 'gray', marginLeft: 5}}>{signalState}</Text>
           <View style={sheet.border_view} />
-          <Text style={sheet.call_info_name}>
-            {StringeeCallManager.instance.callType === 'CALL_IN'
-              ? StringeeCallManager.instance.call.from
-              : StringeeCallManager.instance.call.to}
-          </Text>
+          <Text style={sheet.call_info_name}>{callInfo.call_with}</Text>
         </View>
         <View style={{flex: 1}} />
         <View>
@@ -311,9 +295,11 @@ const CallScreen = () => {
   };
 
   const footerNormalCall = () => {
+    console.log('footerNormalCall', callInfo.isIncoming && signalState);
     if (
-      StringeeCallManager.instance.callType === 'CALL_IN' &&
-      signalState === 'ringing'
+      callInfo.isIncoming &&
+      (signalState === SignalingState.ringing ||
+        signalState === SignalingState.calling)
     ) {
       return incomingCallButtonAction();
     }
@@ -325,13 +311,12 @@ const CallScreen = () => {
       <View style={{flex: 1}}>
         <View style={sheet.call_info_view}>
           <View style={{flex: 1, flexDirection: 'column-reverse'}}>
-            {(StringeeCallManager.instance.callType !== 'CALL_IN' ||
-              signalState !== SignalingState.ringing) &&
+            {(!callInfo.isIncoming || signalState !== SignalingState.ringing) &&
               callInfoView()}
           </View>
           <View style={{flex: 3}}>
             <View style={{flex: 1}}>
-              {StringeeCallManager.instance.callType === 'CALL_IN' &&
+              {callInfo.isIncoming &&
                 signalState === SignalingState.ringing &&
                 incomingCallView()}
             </View>
@@ -400,7 +385,7 @@ const CallScreen = () => {
   };
 
   const mainRender = () => {
-    if (StringeeCallManager.instance.call.isVideoCall && mediaConnected) {
+    if (callInfo.isVideo && mediaConnected) {
       return videoCallScreen();
     }
     return normalCallScreen();

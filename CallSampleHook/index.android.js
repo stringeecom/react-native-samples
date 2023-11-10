@@ -27,6 +27,7 @@ async function onMessageReceived(message) {
   switch (data.callStatus) {
     case 'ended':
     case 'agentEnded':
+    case 'answered':
       StringeeCallManager.instance.endSectionCall();
       await notifee.cancelNotification(NOTIFICATION_ID);
       break;

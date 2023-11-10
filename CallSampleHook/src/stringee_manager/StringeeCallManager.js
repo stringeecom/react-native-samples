@@ -31,23 +31,20 @@ import {name} from '../../app.json';
  * @property {StringeeCall | StringeeCall2 | undefined} call current call handle
  * @property {'CALL_IN' | 'CALLOUT'} callType type of call
  * @property {object | undefined} callkeep The call from push
- * @callback didAns
+ * @callback didAnswer
  */
 class StringeeCallManager {
   static instance = new StringeeCallManager();
   call;
   callType;
-  callKeeps = [];
-  didAns;
-  answered = false;
-  callDidAnsFromPush;
-  callDidRejectFromPush;
+  callKeeps;
+  didAnswer;
+  callkeepAnswered = [];
+  callkeepRejected = [];
   signalingState;
   events;
-  didAnsItem;
   callEvents = {
     onChangeSignalingState: (_, signalingState, __, ___, ____) => {
-      console.log('onChangeSignalingState', signalingState);
       this.signalingState = signalingState;
       if (
         signalingState === SignalingState.ended ||
@@ -95,7 +92,8 @@ class StringeeCallManager {
    * @param {string} to To user_id or phone_number
    * @param {boolean} isVideoCall The call is video call or not
    */
-  initializeCall(to, isVideoCall) {
+  makeCall(to, isVideoCall) {
+    console.log('makeCall???');
     this.call = new StringeeCall({
       stringeeClient: StringeeClientManager.instance.client,
       from: StringeeClientManager.instance.client.userId,
@@ -104,6 +102,12 @@ class StringeeCallManager {
     this.call.isVideoCall = isVideoCall;
     this.callType = 'CALL_OUT';
     this.call.registerEvents(this.callEvents);
+    this.call.makeCall((status, code, message) => {
+      if (status) {
+        this.call.setSpeakerphoneOn(this.call.isVideoCall, (_, __, ___) => {});
+      }
+      console.log(status, code, message);
+    });
   }
   /**
    * create a call2
@@ -111,7 +115,8 @@ class StringeeCallManager {
    * @param {string} to To user_id or phone_number
    * @param {boolean} isVideoCall The call is video call or not
    */
-  initializeCall2(to, isVideoCall) {
+  makeCall2(to, isVideoCall) {
+    console.log('makeCall2');
     this.call = new StringeeCall2({
       stringeeClient: StringeeClientManager.instance.client,
       from: StringeeClientManager.instance.client.userId,
@@ -120,6 +125,13 @@ class StringeeCallManager {
     this.call.isVideoCall = isVideoCall;
     this.callType = 'CALL_OUT';
     this.call.registerEvents(this.callEvents);
+
+    this.call.makeCall((status, code, message) => {
+      if (status) {
+        this.call.setSpeakerphoneOn(this.call.isVideoCall, (_, __, ___) => {});
+      }
+      console.log('makeCall', status, code, message);
+    });
   }
 
   /**
@@ -132,14 +144,12 @@ class StringeeCallManager {
     }
     if (this.call) {
       this.call.unregisterEvents();
+      this.events = null;
+      this.callKeeps = null;
+      this.call = null;
+      this.callkeepAnswered = [];
+      this.callkeepRejected = [];
     }
-    this.didAns = null;
-    this.events = null;
-    this.callKeeps = [];
-    this.call = null;
-    this.answered = false;
-    this.callDidAnsFromPush = null;
-    this.callDidRejectFromPush = null;
   }
   /**
    * handle incoming call from stringee server
@@ -147,7 +157,7 @@ class StringeeCallManager {
    * @param {StringeeCall | undefined} call The call from onIncomingCall
    */
   handleIncomingCall(call) {
-    console.log('handleIncomingCall', call);
+    console.log('handleIncomingCall', call.callId);
     if (!isIos) {
       InCallManager.startRingtone('_BUNDLE_');
       if (AppState.currentState === 'background') {
@@ -156,7 +166,7 @@ class StringeeCallManager {
         );
       }
     }
-
+    this.signalingState = SignalingState.calling;
     call.initAnswer((status, code, message) => {
       console.log('initAnswer', status, code, message);
     });
@@ -165,21 +175,10 @@ class StringeeCallManager {
       this.call.registerEvents(this.callEvents);
     }
     this.callType = 'CALL_IN';
-    if (isIos) {
-      if (
-        this.callDidAnsFromPush &&
-        this.callDidAnsFromPush.callId === call.callId
-      ) {
-        this.answerCallKeep();
-      }
-      if (this.callDidRejectFromPush) {
-        this.endCallKeep(this.callDidRejectFromPush);
-      }
-    }
     this.call
       .generateUUID()
       .then(uuid => {
-        this.handleCallkeep({
+        this.displayCallKeepIfNeed({
           uuid: uuid,
           callId: call.callId,
           callName: call.fromAlias,
@@ -187,8 +186,7 @@ class StringeeCallManager {
       })
       .catch(console.log);
   }
-
-  async showIncomingCallNotification(from: String) {
+  async showIncomingCallNotification(from: string) {
     const channelId = await notifee.createChannel({
       id: CHANNEL_ID,
       name: CHANNEL_NAME,
@@ -252,11 +250,7 @@ class StringeeCallManager {
     if (this.call) {
       this.call.mute(isMute, callback);
       if (isIos) {
-        this.callKeeps.forEach(item => {
-          if (item.callId === this.call.callId) {
-            RNCallKeep.toggleAudioRouteSpeaker(item.uuid, isMute);
-          }
-        });
+        RNCallKeep.toggleAudioRouteSpeaker(this.callKeeps.uuid, isMute);
       }
     }
   }
@@ -325,44 +319,22 @@ class StringeeCallManager {
         }
         callback(status, code, message);
       });
-      if (isIos) {
-        this.callKeeps.forEach(item => {
-          if (item.callId === this.call.callId) {
-            RNCallKeep.answerIncomingCall(item.uuid);
-            this.didAnsItem = item;
-          }
-        });
-      }
+    } else if (this.callKeeps) {
+      RNCallKeep.answerIncomingCall(this.callKeeps.uuid);
     }
-  }
-
-  /**
-   * make the call
-   * @param {StringeeCallBackEvent} callback stringee callback event
-   */
-  makeCall(callback) {
-    if (this.call) {
-      this.call.makeCall((status, code, message) => {
-        if (status) {
-          this.call.setSpeakerphoneOn(
-            this.call.isVideoCall,
-            (_, __, ___) => {},
-          );
-        }
-        callback(status, code, message);
-      });
-    }
+    this.signalingState = SignalingState.answered;
   }
   /**
    * hang up the call
    * @param {StringeeCallBackEvent} callback stringee callback event
    */
   hangup(callback) {
+    if (isIos && this.callKeeps) {
+      RNCallKeep.endCall(this.callKeeps.uuid);
+      return;
+    }
     if (this.call) {
       this.call.hangup(callback);
-    }
-    if (this.events) {
-      this.events.onChangeSignalingState(SignalingState.ended);
     }
   }
   /**
@@ -370,92 +342,77 @@ class StringeeCallManager {
    * @param {StringeeCallBackEvent} callback stringee callback event
    */
   rejectCall(callback) {
+    if (isIos && this.callKeeps) {
+      RNCallKeep.endCall(this.callKeeps.uuid);
+      return;
+    }
     if (this.call) {
       this.call.reject(callback);
     }
-    if (this.events) {
-      this.events.onChangeSignalingState(SignalingState.ended);
-    }
   }
+
   /**
    *
    * @param {object} data data from call keep
    */
-  handleCallkeep(data) {
-    if (
-      this.callKeeps.find(item => {
-        return item.callId === data.callId;
-      }) == null
-    ) {
-      console.log('uuid js: ', data.uuid);
-      RNCallKeep.getCalls().then(items => {
-        if (
-          items.find(item => {
-            return item.callUUID === data.uuid;
-          }) == null
-        ) {
-          RNCallKeep.displayIncomingCall(
-            data.uuid,
-            name,
-            data.callName,
-            'generic',
-            false,
-            data,
-          );
-        }
-      });
-      this.callKeeps.push(data);
-    }
-  }
-  /**
-   * If the manager class is handling the call check if the call is anwered from callkeep or not
-   */
 
-  handleAnswerCallKeep(uuid) {
-    this.didAnsItem = this.callKeeps.find(item => {
-      return item.uuid === uuid;
+  displayCallKeepIfNeed(data) {
+    this.callKeeps = data;
+    console.log(data);
+    RNCallKeep.getCalls().then(items => {
+      if (
+        items.find(item => {
+          return item.callUUID === data.uuid;
+        }) == null
+      ) {
+        RNCallKeep.displayIncomingCall(
+          data.uuid,
+          name,
+          data.callName,
+          'generic',
+          false,
+        );
+      }
+      if (this.signalingState === SignalingState.ringing) {
+        // Người dùng trả lời cuộc gọi trước khi client nhận được event incomingCall
+        if (this.callkeepAnswered.find(item => item === data.uuid)) {
+          this.call.answer();
+          this.didAnswer();
+        }
+        // Nguời dùng từ chối cuộc gọi trước khi client nhận được event incomingCall
+        if (this.callkeepRejected.find(item => item === data.uuid)) {
+          this.call.reject();
+        }
+      }
     });
   }
 
-  answerCallKeep(): void {
-    if (
-      this.call &&
-      this.call.callId === this.didAnsItem.callId &&
-      this.call.callId
-    ) {
-      this.call.answer((status, code, message) => {
-        console.log('answer', status, code, message);
-        if (!isIos) {
-          InCallManager.stopRingtone();
-        }
-        if (this.didAns && status) {
-          this.didAns();
-          console.log('did answerCallKeep');
-          this.call.setSpeakerphoneOn(
-            this.call.isVideoCall,
-            (_, __, ___) => {},
-          );
-        }
-      });
-    } else {
-      this.callDidAnsFromPush = this.didAnsItem;
+  callkeepActiveAudio() {
+    if (this.callKeeps != null) {
+      if (this.callkeepAnswered.find(item => item === this.callKeeps.uuid)) {
+        this.call.answer();
+        this.didAnswer();
+      }
     }
   }
-  /**
-   * @param {string} uuid end call uuid
-   */
-  endCallKeep(uuid: string): void {
-    console.log('reject call keep');
-    if (this.call) {
-      this.callKeeps.forEach(item => {
-        if (item.uuid === uuid && item.callId === this.call.callId) {
-          this.call.reject();
-        }
-      });
-    } else {
-      this.callDidRejectFromPush = uuid;
+
+  callKeepEndCall(uuid) {
+    console.log('end calluuid: ', uuid, this.signalingState);
+    if (this.callKeeps && uuid === this.callKeeps.uuid && this.call) {
+      if (
+        this.signalingState === SignalingState.ringing ||
+        this.signalingState === SignalingState.calling
+      ) {
+        console.log('reject');
+        this.call.reject((status, code, message) => {
+          console.log('reject', status, code, message);
+        });
+      } else {
+        this.call.hangup((status, code, message) => {
+          console.log('hangup', status, code, message);
+        });
+      }
     }
   }
 }
-
 export default StringeeCallManager;

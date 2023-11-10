@@ -107,7 +107,6 @@ class StringeeClientManager {
     ) => {
       console.log('onIncomingCall: callId - ', call.callId);
       if (StringeeCallManager.instance.call != null) {
-        console.log('vao day ko: ');
         call.reject();
       } else {
         StringeeCallManager.instance.handleIncomingCall(call);

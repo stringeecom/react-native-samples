@@ -6,62 +6,37 @@ import {NativeModules} from 'react-native';
 
 const stringeePushConfig = () => {
   console.log('config push Stringee', NativeModules.RNManagerUUID);
-  const client = StringeeClientManager.instance;
-  const call = StringeeCallManager.instance;
+  const clientManager = StringeeClientManager.instance;
+  const callManager = StringeeCallManager.instance;
 
   RNVoipPushNotification.addEventListener('register', token => {
-    client.updatePushToken(token);
-  });
-
-  RNVoipPushNotification.addEventListener('notification', payload => {
-    call.callKeeps.push(payload);
-  });
-
-  RNVoipPushNotification.addEventListener('didLoadWithEvents', events => {
-    if (!events || !Array.isArray(events) || events.length < 1) {
-      return;
-    }
-    for (let voipEvent of events) {
-      let {name, data} = voipEvent;
-      if (
-        name ===
-        RNVoipPushNotification.RNVoipPushRemoteNotificationsRegisteredEvent
-      ) {
-        client.updatePushToken(data);
-      }
-      if (
-        name ===
-        RNVoipPushNotification.RNVoipPushRemoteNotificationReceivedEvent
-      ) {
-        call.handleCallkeep(data);
-        RNVoipPushNotification.onVoipNotificationCompleted(data.uuid);
-      }
-    }
+    clientManager.updatePushToken(token);
   });
 
   RNVoipPushNotification.registerVoipToken();
 
   RNCallKeep.addEventListener('didDisplayIncomingCall', ({callUUID}) => {
-    setTimeout(() => {
-      if (!call.call) {
-        console.log('end call time out');
-        RNCallKeep.endCall(callUUID);
-      }
-    }, 5000);
+    if (callManager.callKeeps && callManager.callKeeps.uuid !== callUUID) {
+      RNCallKeep.endAllCalls(callUUID);
+    }
+    // setTimeout(() => {
+    //   if (!callManager.call) {
+    //     console.log('end call time out');
+    //     RNCallKeep.endCall(callUUID);
+    //   }
+    // }, 5000);
   });
 
   RNCallKeep.addEventListener('endCall', ({callUUID}) => {
-    if (call.callKeeps.find(item => item.uuid === callUUID) != null) {
-      call.endCallKeep(callUUID);
-    }
+    callManager.callKeepEndCall(callUUID);
   });
 
   RNCallKeep.addEventListener('answerCall', ({callUUID}) => {
-    call.handleAnswerCallKeep(callUUID);
+    callManager.callkeepAnswered.push(callUUID);
   });
 
   RNCallKeep.addEventListener('didActivateAudioSession', () => {
-    call.answerCallKeep();
+    callManager.callkeepActiveAudio();
   });
 };
 

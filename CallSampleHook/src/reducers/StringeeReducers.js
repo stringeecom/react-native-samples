@@ -14,9 +14,12 @@ const INIT_STATE = {
   },
   call: {
     call_with: 'Callee',
+    isVideo: false,
+    useCall2: false,
+    isIncoming: false,
   },
   callScreen: CALL_STATE_SCREEN.normal,
-  signalState: SignalingState.ended,
+  signalState: SignalingState.calling,
 };
 
 const stringeeReducer = (state = INIT_STATE, action) => {

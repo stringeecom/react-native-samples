@@ -21,9 +21,10 @@ import {
 import {each} from 'underscore';
 import notifee from '@notifee/react-native';
 import {StringeeClientListener} from 'stringee-react-native-v2';
-
 const stringee_token =
-  'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZULTE2OTkzNDA5MzUiLCJpc3MiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZUIiwiZXhwIjoxNzAxOTMyOTM1LCJ1c2VySWQiOiJhbmRyb2lkIn0.KA5vCIO7HVCRrU4wKLROnIWYYc_LGWEupNDA5pYH8LI';
+  'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZULTE2OTk0Mjc4MDEiLCJpc3MiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZUIiwiZXhwIjoxNzAyMDE5ODAxLCJ1c2VySWQiOiJpb3MxIn0.jjXPXqiG4BsLSEauJOjSyUQR3flH5uaJfZLakOOPgOY';
+//const stringee_token =
+//  'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZULTE2OTk1MDE1ODYiLCJpc3MiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZUIiwiZXhwIjoxNzAyMDkzNTg2LCJ1c2VySWQiOiJpb3MyIn0.QLT1aNlfk5YjFpKHsuJqz7T8spUUfbYeApb3i-uG_vk';
 const HomeScreen = () => {
   const [callWith, setCallWith] = useState('');
   const isOnline = useSelector(state => state.stringee.client.isOnline);
@@ -45,6 +46,9 @@ const HomeScreen = () => {
         dispatch(
           setCallInfo({
             call_with: StringeeCallManager.instance.call.from,
+            isVideo: StringeeCallManager.instance.call.isVideoCall,
+            useCall2: false,
+            isIncoming: true,
           }),
         );
         navigation.navigate(CALL_SCREEN_NAME);
@@ -62,6 +66,9 @@ const HomeScreen = () => {
         dispatch(
           setCallInfo({
             call_with: StringeeCallManager.instance.call.from,
+            isVideo: StringeeCallManager.instance.call.isVideoCall,
+            useCall2: false,
+            isIncoming: true,
           }),
         );
         navigation.navigate(CALL_SCREEN_NAME);
@@ -91,7 +98,6 @@ const HomeScreen = () => {
     clientManager.instance.listener = new StringeeClientListener();
 
     clientManager.instance.listener.onConnect = (_, id) => {
-      console.log(id);
       dispatch(setClientInfo({isOnline: true, client_id: id}));
     };
 
@@ -102,7 +108,10 @@ const HomeScreen = () => {
     clientManager.instance.listener.onIncomingCall = (_, call) => {
       dispatch(
         setCallInfo({
-          call_with: call.from,
+          call_with: call.fromAlias,
+          isVideo: call.isVideoCall,
+          useCall2: false,
+          isIncoming: true,
         }),
       );
       navigation.navigate(CALL_SCREEN_NAME);
@@ -110,7 +119,10 @@ const HomeScreen = () => {
     clientManager.instance.listener.onIncomingCall2 = (_, call) => {
       dispatch(
         setCallInfo({
-          call_with: call.from,
+          call_with: call.fromAlias,
+          isVideo: call.isVideoCall,
+          useCall2: true,
+          isIncoming: true,
         }),
       );
       navigation.navigate(CALL_SCREEN_NAME);
@@ -146,20 +158,24 @@ const HomeScreen = () => {
     }).then();
   };
   const makeCall = isVideo => {
-    StringeeCallManager.instance.initializeCall(callWith, isVideo);
     dispatch(
       setCallInfo({
         call_with: callWith,
+        isVideo: isVideo,
+        useCall2: false,
+        isIncoming: false,
       }),
     );
     navigation.navigate(CALL_SCREEN_NAME);
   };
 
   const makeCall2 = isVideo => {
-    StringeeCallManager.instance.initializeCall2(callWith, isVideo);
     dispatch(
       setCallInfo({
         call_with: callWith,
+        isVideo: isVideo,
+        useCall2: true,
+        isIncoming: false,
       }),
     );
     navigation.navigate(CALL_SCREEN_NAME);
