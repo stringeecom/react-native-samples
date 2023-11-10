@@ -24,6 +24,11 @@ import notifee, {
 } from '@notifee/react-native';
 import {name} from '../../app.json';
 
+const CallType = {
+  in: 'CALL_IN',
+  out: 'CALL_OUT',
+};
+
 /**
  * call manager object.
  * @class StringeeCallManager
@@ -43,49 +48,56 @@ class StringeeCallManager {
   callkeepRejected = [];
   signalingState;
   events;
-  callEvents = {
-    onChangeSignalingState: (_, signalingState, __, ___, ____) => {
-      this.signalingState = signalingState;
-      if (
-        signalingState === SignalingState.ended ||
-        signalingState === SignalingState.answered
-      ) {
-        if (!isIos) {
-          InCallManager.stopRingtone();
-        }
+
+  onChangeSignalingState = (_, signalingState, __, ___, ____) => {
+    console.log('onChangeSignalingState', signalingState);
+    this.signalingState = signalingState;
+    if (
+      signalingState === SignalingState.ended ||
+      signalingState === SignalingState.answered
+    ) {
+      if (!isIos) {
+        InCallManager.stopRingtone();
       }
-      if (this.events) {
-        this.events.onChangeSignalingState(signalingState);
-      }
-    },
-    onReceiveRemoteStream: _ => {
-      if (this.events) {
-        this.events.onReceiveRemoteStream();
-      }
-    },
-    onReceiveLocalStream: _ => {
-      if (this.events) {
-        console.log('events' + JSON.stringify(this.events));
-        this.events.onReceiveLocalStream();
-      }
-    },
-    onChangeMediaState: (_, mediaState, __) => {
-      console.log('onChangeMediaState', mediaState);
-      if (this.events) {
-        this.events.onChangeMediaState(_, mediaState, __);
-      }
-    },
-    onHandleOnAnotherDevice: (_, signalingState, __) => {
-      console.log('onHandleOnAnotherDevice');
-      if (this.events) {
-        this.events.onHandleOnAnotherDevice(signalingState);
-      }
-    },
+    }
+    if (this.events) {
+      this.events.onChangeSignalingState(signalingState);
+    }
+  };
+  onReceiveRemoteStream = _ => {
+    console.log('onReceiveRemoteStream');
+    if (this.events) {
+      this.events.onReceiveRemoteStream();
+    }
+  };
+  onReceiveLocalStream = _ => {
+    console.log('onReceiveLocalStream');
+    if (this.events) {
+      this.events.onReceiveLocalStream();
+    }
+  };
+  onChangeMediaState = (_, mediaState, __) => {
+    console.log('onChangeMediaState', mediaState);
+    if (this.events) {
+      this.events.onChangeMediaState(_, mediaState, __);
+    }
+  };
+  onHandleOnAnotherDevice = (_, signalingState, __) => {
+    console.log('onHandleOnAnotherDevice');
+    if (this.events) {
+      this.events.onHandleOnAnotherDevice(signalingState);
+    }
   };
 
-  constructor() {
-    console.log('khoi tao StringeeCall');
-  }
+  callEvents = {
+    onChangeSignalingState: this.onChangeSignalingState,
+    onReceiveRemoteStream: this.onReceiveRemoteStream,
+    onReceiveLocalStream: this.onReceiveLocalStream,
+    onChangeMediaState: this.onChangeMediaState,
+    onHandleOnAnotherDevice: this.onHandleOnAnotherDevice,
+  };
+
+  constructor() {}
   /**
    * create a call
    * @function initializeCall
@@ -99,7 +111,7 @@ class StringeeCallManager {
       to: to,
     });
     this.call.isVideoCall = isVideoCall;
-    this.callType = 'CALL_OUT';
+    this.callType = CallType.out;
     this.call.registerEvents(this.callEvents);
     this.call.makeCall((status, code, message) => {
       if (status) {
@@ -122,7 +134,7 @@ class StringeeCallManager {
       to: to,
     });
     this.call.isVideoCall = isVideoCall;
-    this.callType = 'CALL_OUT';
+    this.callType = CallType.out;
     this.call.registerEvents(this.callEvents);
 
     this.call.makeCall((status, code, message) => {
@@ -173,7 +185,8 @@ class StringeeCallManager {
     if (this.events) {
       this.call.registerEvents(this.callEvents);
     }
-    this.callType = 'CALL_IN';
+    this.callType = CallType.out;
+    // generate uuid and display callkeep
     this.call
       .generateUUID()
       .then(uuid => {
@@ -193,7 +206,6 @@ class StringeeCallManager {
       vibration: true,
       importance: AndroidImportance.HIGH,
     });
-    console.log('vao day ko');
     await notifee.displayNotification({
       id: NOTIFICATION_ID,
       title: 'Incoming Call',

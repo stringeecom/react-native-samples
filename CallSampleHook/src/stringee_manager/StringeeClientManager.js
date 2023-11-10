@@ -38,122 +38,113 @@ class StringeeClientManager {
     );
   }
 
-  registerEvent() {
-    const clientListener = new StringeeClientListener();
-    clientListener.onConnect = async (_, userId: string) => {
-      console.log('onConnect: ', userId);
-      this.isConnected = true;
-      const isPushRegistered = await getRegisterStatus();
-      if (!isPushRegistered) {
-        if (isIos) {
-          console.log('Register push ios: ', this.pushToken);
-          RNVoipPushNotification.onVoipNotificationCompleted('JS_DID_ACTIVE');
-          if (this.pushToken) {
-            console.log('register push while client connected');
+  onConnect = async (_, userId: string) => {
+    console.log('onConnect: ', userId);
+    this.isConnected = true;
+    const isPushRegistered = await getRegisterStatus();
+    if (!isPushRegistered) {
+      if (isIos) {
+        console.log('Register push ios: ', this.pushToken);
+        RNVoipPushNotification.onVoipNotificationCompleted('JS_DID_ACTIVE');
+        if (this.pushToken) {
+          console.log('register push while client connected');
+          this.client.registerPush(
+            this.pushToken,
+            false,
+            true,
+            async (status: boolean, code: number, message: string) => {
+              console.log('registerPush', status, code, message);
+              if (status) {
+                await saveRegisterState(true);
+              }
+            },
+          );
+        }
+      } else {
+        console.log('Register push android');
+        messaging()
+          .getToken()
+          .then(token => {
             this.client.registerPush(
-              this.pushToken,
+              token,
               false,
               true,
-              async (status: boolean, code: number, message: string) => {
-                console.log('registerPush', status, code, message);
+              async (status, code, desc) => {
+                console.log(
+                  'registerPush: status-' +
+                    status +
+                    ' code-' +
+                    code +
+                    ' desc-' +
+                    desc,
+                );
                 if (status) {
                   await saveRegisterState(true);
                 }
               },
             );
-          }
-        } else {
-          console.log('Register push android');
-          messaging()
-            .getToken()
-            .then(token => {
-              this.client.registerPush(
-                token,
-                false,
-                true,
-                async (status, code, desc) => {
-                  console.log(
-                    'registerPush: status-' +
-                      status +
-                      ' code-' +
-                      code +
-                      ' desc-' +
-                      desc,
-                  );
-                  if (status) {
-                    await saveRegisterState(true);
-                  }
-                },
-              );
-            });
-        }
+          });
       }
+    }
 
-      if (this.listener && this.listener.onConnect) {
-        this.listener.onConnect(this.client, userId);
+    if (this.listener && this.listener.onConnect) {
+      this.listener.onConnect(this.client, userId);
+    }
+  };
+  onDisConnect = client => {
+    console.log('onDisConnect: ');
+    this.isConnected = false;
+    if (this.listener.onDisConnect) {
+      this.listener.onDisConnect(client);
+    }
+  };
+  onIncomingCall2 = (client: StringeeClient, call: StringeeCall2) => {
+    console.log('onIncomingCall2: callId - ', call.callId);
+    if (StringeeCallManager.instance.call != null) {
+      call.reject();
+    } else {
+      StringeeCallManager.instance.handleIncomingCall(call);
+      if (this.listener.onIncomingCall2) {
+        this.listener.onIncomingCall2(client, call);
       }
-    };
-    clientListener.onDisConnect = client => {
-      console.log('onDisConnect: ');
-      this.isConnected = false;
-      if (this.listener.onDisConnect) {
-        this.listener.onDisConnect(client);
-      }
-    };
+    }
+  };
 
-    clientListener.onIncomingCall = (
-      client: StringeeClient,
-      call: StringeeCall,
-    ) => {
-      console.log('onIncomingCall: callId - ', call.callId);
-      if (StringeeCallManager.instance.call != null) {
-        call.reject();
-      } else {
-        StringeeCallManager.instance.handleIncomingCall(call);
-        if (this.listener && this.listener.onIncomingCall) {
-          this.listener.onIncomingCall(client, call);
-        }
+  onIncomingCall2 = (client: StringeeClient, call: StringeeCall2) => {
+    console.log('onIncomingCall2: callId - ', call.callId);
+    if (StringeeCallManager.instance.call != null) {
+      call.reject();
+    } else {
+      StringeeCallManager.instance.handleIncomingCall(call);
+      if (this.listener.onIncomingCall2) {
+        this.listener.onIncomingCall2(client, call);
       }
-    };
+    }
+  };
 
-    clientListener.onIncomingCall2 = (
-      client: StringeeClient,
-      call: StringeeCall2,
-    ) => {
-      if (call == null) {
-        console.log('sdk invalid: ');
-        return;
-      }
+  onFailWithError = (client: StringeeClient, code: number, message: string) => {
+    console.log('onFailWithError: code-' + code + ' message: ' + message);
+    this.isConnected = false;
+    if (this.listener.onFailWithError) {
+      this.listener.onFailWithError(client, code, message);
+    }
+  };
 
-      console.log('onIncomingCall2: callId - ', call.callId);
-      if (StringeeCallManager.instance.call != null) {
-        call.reject();
-      } else {
-        StringeeCallManager.instance.handleIncomingCall(call);
-        if (this.listener.onIncomingCall2) {
-          this.listener.onIncomingCall2(client, call);
-        }
-      }
-    };
+  onRequestAccessToken = () => {
+    console.log('onRequestAccessToken');
+    if (this.listener.onRequestAccessToken) {
+      this.listener.onRequestAccessToken();
+    }
+  };
 
-    clientListener.onFailWithError = (
-      client: StringeeClient,
-      code: number,
-      message: string,
-    ) => {
-      console.log('onFailWithError: code-' + code + ' message: ' + message);
-      this.isConnected = false;
-      if (this.listener.onFailWithError) {
-        this.listener.onFailWithError(client, code, message);
-      }
-    };
-
-    clientListener.onRequestAccessToken = () => {
-      console.log('onRequestAccessToken');
-      if (this.listener.onRequestAccessToken) {
-        this.listener.onRequestAccessToken();
-      }
-    };
+  registerEvent() {
+    const clientListener = new StringeeClientListener();
+    clientListener.onConnect = this.onConnect;
+    clientListener.onDisConnect = this.onDisConnect;
+    clientListener.onIncomingCall = this.onIncomingCall;
+    clientListener.onIncomingCall2 = this.onIncomingCall2;
+    clientListener.onFailWithError = this.onFailWithError;
+    clientListener.onRequestAccessToken = this.onRequestAccessToken;
     this.client.registerEvents(clientListener);
   }
 

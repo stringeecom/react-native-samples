@@ -19,12 +19,12 @@ const stringeePushConfig = () => {
     if (callManager.callKeeps && callManager.callKeeps.uuid !== callUUID) {
       RNCallKeep.endAllCalls(callUUID);
     }
-    // setTimeout(() => {
-    //   if (!callManager.call) {
-    //     console.log('end call time out');
-    //     RNCallKeep.endCall(callUUID);
-    //   }
-    // }, 5000);
+    setTimeout(() => {
+      if (!callManager.call) {
+        console.log('end call time out');
+        RNCallKeep.endCall(callUUID);
+      }
+    }, 5000);
   });
 
   RNCallKeep.addEventListener('endCall', ({callUUID}) => {

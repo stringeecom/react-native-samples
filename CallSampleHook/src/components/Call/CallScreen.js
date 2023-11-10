@@ -12,7 +12,11 @@ import icon from '../../../assets/icon';
 import StringeeCallManager from '../../stringee_manager/StringeeCallManager';
 import {useNavigation} from '@react-navigation/native';
 import {setSignalState} from '../../redux/actions';
-import {SignalingState, StringeeVideoView} from 'stringee-react-native-v2';
+import {
+  SignalingState,
+  StringeeVideoView,
+  MediaState,
+} from 'stringee-react-native-v2';
 import {HOME_SCREEN_NAME} from '../../const';
 import RNCallKeep from 'react-native-callkeep';
 
@@ -77,12 +81,15 @@ const CallScreen = () => {
     setIsSpeakerOn(callInfo.isVideo);
 
     StringeeCallManager.instance.didAnswer = () => {
-      dispatch(setSignalState('answered'));
+      dispatch(setSignalState(SignalingState.answered));
     };
 
     StringeeCallManager.instance.registerEvent({
       onChangeSignalingState: signalingState => {
-        if (signalingState === 'busy' || signalingState === 'ended') {
+        if (
+          signalingState === SignalingState.busy ||
+          signalingState === SignalingState.ended
+        ) {
           clearDataAndGoBack();
         }
         dispatch(setSignalState(signalingState));
@@ -94,12 +101,12 @@ const CallScreen = () => {
         setActiveLocal(true);
       },
       onChangeMediaState: (_, mediaState, __) => {
-        if (mediaState === 'connected') {
+        if (mediaState === MediaState.connected) {
           setMediaConnected(true);
         }
       },
       onHandleOnAnotherDevice: signalingState => {
-        if (signalingState !== 'ringing') {
+        if (signalingState !== SignalingState.ringing) {
           clearDataAndGoBack();
         }
       },
