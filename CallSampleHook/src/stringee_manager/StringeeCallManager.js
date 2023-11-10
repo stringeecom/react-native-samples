@@ -93,7 +93,6 @@ class StringeeCallManager {
    * @param {boolean} isVideoCall The call is video call or not
    */
   makeCall(to, isVideoCall) {
-    console.log('makeCall???');
     this.call = new StringeeCall({
       stringeeClient: StringeeClientManager.instance.client,
       from: StringeeClientManager.instance.client.userId,
@@ -106,7 +105,7 @@ class StringeeCallManager {
       if (status) {
         this.call.setSpeakerphoneOn(this.call.isVideoCall, (_, __, ___) => {});
       }
-      console.log(status, code, message);
+      console.log('makeCall', status, code, message);
     });
   }
   /**
@@ -130,7 +129,7 @@ class StringeeCallManager {
       if (status) {
         this.call.setSpeakerphoneOn(this.call.isVideoCall, (_, __, ___) => {});
       }
-      console.log('makeCall', status, code, message);
+      console.log('makeCall2', status, code, message);
     });
   }
 

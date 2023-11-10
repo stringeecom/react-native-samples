@@ -85,7 +85,6 @@ const CallScreen = () => {
         if (signalingState === 'busy' || signalingState === 'ended') {
           clearDataAndGoBack();
         }
-        console.log('dispatch(setSignalState(signalingState));', signalState);
         dispatch(setSignalState(signalingState));
       },
       onReceiveRemoteStream: () => {
@@ -108,8 +107,9 @@ const CallScreen = () => {
   };
 
   const duration2time = time => {
-    let h = (time / 60).toFixed(0).toString();
     let m = (time % 60).toString();
+    let h = ((time - m) / 60).toFixed(0).toString();
+
     if (h.length === 1) {
       h = '0' + h;
     }
@@ -295,7 +295,6 @@ const CallScreen = () => {
   };
 
   const footerNormalCall = () => {
-    console.log('footerNormalCall', callInfo.isIncoming && signalState);
     if (
       callInfo.isIncoming &&
       (signalState === SignalingState.ringing ||
