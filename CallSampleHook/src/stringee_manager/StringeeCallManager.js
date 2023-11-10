@@ -189,6 +189,9 @@ class StringeeCallManager {
     this.signalingState = SignalingState.calling;
     call.initAnswer((status, code, message) => {
       console.log('initAnswer', status, code, message);
+      if (this.events) {
+        this.events.onChangeSignalingState(SignalingState.ringing);
+      }
     });
     this.call = call;
     if (this.events) {
@@ -337,7 +340,9 @@ class StringeeCallManager {
             (_, __, ___) => {},
           );
         }
-        callback(status, code, message);
+        if (callback){
+          callback(status, code, message);
+        }
       });
     } else if (this.callKeeps) {
       RNCallKeep.answerIncomingCall(this.callKeeps.uuid);

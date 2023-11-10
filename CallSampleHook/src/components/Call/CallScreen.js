@@ -75,8 +75,8 @@ const CallScreen = () => {
           callInfo.isVideo,
         );
       }
+      dispatch(setSignalState(SignalingState.calling));
     }
-    dispatch(setSignalState(SignalingState.calling));
 
     setIsSpeakerOn(callInfo.isVideo);
 
