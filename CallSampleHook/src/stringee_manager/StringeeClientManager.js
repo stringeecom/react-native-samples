@@ -6,7 +6,7 @@ import {
 } from 'stringee-react-native-v2';
 import messaging from '@react-native-firebase/messaging';
 import StringeeCallManager from './StringeeCallManager';
-import {isIos, KEY_PUSH_REGISTERED} from '../const';
+import {isIos} from '../const';
 import RNVoipPushNotification from 'react-native-voip-push-notification';
 import {getRegisterStatus, saveRegisterState} from '../storage';
 
@@ -39,12 +39,12 @@ class StringeeClientManager {
   }
 
   onConnect = async (_, userId: string) => {
-    console.log('onConnect: ', userId);
+    console.log('onConnect', userId);
     this.isConnected = true;
     const isPushRegistered = await getRegisterStatus();
     if (!isPushRegistered) {
       if (isIos) {
-        console.log('Register push ios: ', this.pushToken);
+        console.log('Register push ios', this.pushToken);
         RNVoipPushNotification.onVoipNotificationCompleted('JS_DID_ACTIVE');
         if (this.pushToken) {
           console.log('register push while client connected');
@@ -69,15 +69,8 @@ class StringeeClientManager {
               token,
               false,
               true,
-              async (status, code, desc) => {
-                console.log(
-                  'registerPush: status-' +
-                    status +
-                    ' code-' +
-                    code +
-                    ' desc-' +
-                    desc,
-                );
+              async (status, code, message) => {
+                console.log('registerPush', status, code, message);
                 if (status) {
                   await saveRegisterState(true);
                 }
@@ -92,26 +85,26 @@ class StringeeClientManager {
     }
   };
   onDisConnect = client => {
-    console.log('onDisConnect: ');
+    console.log('onDisConnect');
     this.isConnected = false;
     if (this.listener.onDisConnect) {
       this.listener.onDisConnect(client);
     }
   };
-  onIncomingCall2 = (client: StringeeClient, call: StringeeCall2) => {
-    console.log('onIncomingCall2: callId - ', call.callId);
+  onIncomingCall = (client: StringeeClient, call: StringeeCall) => {
+    console.log('onIncomingCall', call.callId);
     if (StringeeCallManager.instance.call != null) {
       call.reject();
     } else {
       StringeeCallManager.instance.handleIncomingCall(call);
-      if (this.listener.onIncomingCall2) {
-        this.listener.onIncomingCall2(client, call);
+      if (this.listener.onIncomingCall) {
+        this.listener.onIncomingCall(client, call);
       }
     }
   };
 
   onIncomingCall2 = (client: StringeeClient, call: StringeeCall2) => {
-    console.log('onIncomingCall2: callId - ', call.callId);
+    console.log('onIncomingCall2', call.callId);
     if (StringeeCallManager.instance.call != null) {
       call.reject();
     } else {
@@ -123,7 +116,7 @@ class StringeeClientManager {
   };
 
   onFailWithError = (client: StringeeClient, code: number, message: string) => {
-    console.log('onFailWithError: code-' + code + ' message: ' + message);
+    console.log('onFailWithError', code, message);
     this.isConnected = false;
     if (this.listener.onFailWithError) {
       this.listener.onFailWithError(client, code, message);
@@ -158,9 +151,7 @@ class StringeeClientManager {
 
   unregisterPush() {
     this.client.unregisterPush(this.pushToken, async (status, code, desc) => {
-      console.log(
-        'unregisterPush: status-' + status + ' code-' + code + ' desc-' + desc,
-      );
+      console.log('unregisterPush', status, code, desc);
       if (status) {
         await saveRegisterState(false);
       }

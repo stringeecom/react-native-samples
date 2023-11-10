@@ -28,9 +28,7 @@ const Stack = createNativeStackNavigator();
  * handle press action from notification when app is in background
  */
 notifee.onBackgroundEvent(async event => {
-  console.log(
-    'onBackgroundEvent - ' + JSON.stringify(event.detail.pressAction),
-  );
+  console.log('onBackgroundEvent' + JSON.stringify(event.detail.pressAction));
   if (event.type === EventType.ACTION_PRESS) {
     switch (event.detail.pressAction.id) {
       case ANSWER_ACTION_ID:

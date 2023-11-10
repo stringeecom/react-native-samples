@@ -39,7 +39,7 @@ const HomeScreen = () => {
     const initialNotification = await notifee.getInitialNotification();
     if (initialNotification && StringeeCallManager.instance.call) {
       console.log(
-        'initialNotification - ' +
+        'initialNotification' +
           JSON.stringify(initialNotification.pressAction),
       );
       if (initialNotification.pressAction) {
@@ -81,7 +81,7 @@ const HomeScreen = () => {
     if (!isIos) {
       requestPermission();
       bootstrap().then(r => {
-        console.log(r);
+        console.log('bootstrap',r);
       });
     }
     if (clientManager.instance.client.userId !== undefined) {
@@ -92,8 +92,6 @@ const HomeScreen = () => {
         }),
       );
     }
-
-    clientManager.instance.connect(stringee_token);
 
     clientManager.instance.listener = new StringeeClientListener();
 
@@ -127,6 +125,8 @@ const HomeScreen = () => {
       );
       navigation.navigate(CALL_SCREEN_NAME);
     };
+
+    clientManager.instance.connect(stringee_token);
   }, []);
 
   const requestPermission = () => {

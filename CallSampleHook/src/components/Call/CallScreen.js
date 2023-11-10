@@ -205,7 +205,7 @@ const CallScreen = () => {
           style={sheet.stack_item_button}
           onPress={() => {
             StringeeCallManager.instance.hangup((status, code, message) => {
-              console.log('end video call: ', status, code, message);
+              console.log('end video call', status, code, message);
             });
           }}>
           <Image source={icon.endCall} style={sheet.button_size} />

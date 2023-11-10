@@ -89,12 +89,21 @@ class StringeeCallManager {
     }
   };
 
+  onAudioDeviceChange = (_, selectedAudioDevice, availableAudioDevices) => {
+    console.log(
+      'onHandleOnAudioDeviceChange',
+      selectedAudioDevice,
+      availableAudioDevices,
+    );
+  };
+
   callEvents = {
     onChangeSignalingState: this.onChangeSignalingState,
     onReceiveRemoteStream: this.onReceiveRemoteStream,
     onReceiveLocalStream: this.onReceiveLocalStream,
     onChangeMediaState: this.onChangeMediaState,
     onHandleOnAnotherDevice: this.onHandleOnAnotherDevice,
+    onAudioDeviceChange: this.onAudioDeviceChange,
   };
 
   constructor() {}
@@ -408,7 +417,7 @@ class StringeeCallManager {
   }
 
   callKeepEndCall(uuid) {
-    console.log('end calluuid: ', uuid, this.signalingState);
+    console.log('end calluuid', uuid, this.signalingState);
     if (this.callKeeps && uuid === this.callKeeps.uuid && this.call) {
       if (
         this.signalingState === SignalingState.ringing ||
