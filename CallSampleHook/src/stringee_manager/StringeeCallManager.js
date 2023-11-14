@@ -125,7 +125,7 @@ class StringeeCallManager {
     this.call
       .makeCall()
       .then(() => {
-        this.call.setSpeakerphoneOn.then().catch(console.log);
+        this.call.setSpeakerphoneOn(true).then().catch(console.log);
       })
       .catch(console.log);
   }
@@ -148,7 +148,7 @@ class StringeeCallManager {
     this.call
       .makeCall()
       .then(() => {
-        this.call.setSpeakerphoneOn.then().catch(console.log);
+        this.call.setSpeakerphoneOn(false).then().catch(console.log);
       })
       .catch(console.log);
   }
@@ -276,7 +276,7 @@ class StringeeCallManager {
         .mute(isMute)
         .then(() => {})
         .catch(console.log);
-      if (isIos) {
+      if (this.callKeeps) {
         RNCallKeep.toggleAudioRouteSpeaker(this.callKeeps.uuid, isMute);
       }
     }
@@ -328,12 +328,8 @@ class StringeeCallManager {
         .setSpeakerphoneOn(isOn)
         .then(() => {})
         .catch(console.log);
-      if (isIos) {
-        this.callKeeps.forEach(item => {
-          if (item.callId === this.call.callId) {
-            RNCallKeep.toggleAudioRouteSpeaker(item.uuid, isOn);
-          }
-        });
+      if (this.callKeeps) {
+        RNCallKeep.toggleAudioRouteSpeaker(this.callKeeps.uuid, isOn);
       }
     }
   }
@@ -361,8 +357,8 @@ class StringeeCallManager {
    * hang up the call
    * @param {StringeeCallBackEvent} callback stringee callback event
    */
-  hangup(callback) {
-    if (isIos && this.callKeeps) {
+  hangup() {
+    if (this.callKeeps) {
       RNCallKeep.endCall(this.callKeeps.uuid);
       return;
     }
@@ -377,8 +373,8 @@ class StringeeCallManager {
    * reject the call
    * @param {StringeeCallBackEvent} callback stringee callback event
    */
-  rejectCall(callback) {
-    if (isIos && this.callKeeps) {
+  rejectCall() {
+    if (this.callKeeps) {
       RNCallKeep.endCall(this.callKeeps.uuid);
       return;
     }

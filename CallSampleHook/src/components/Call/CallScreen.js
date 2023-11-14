@@ -129,15 +129,8 @@ const CallScreen = () => {
   };
 
   const didTapCamera = () => {
-    StringeeCallManager.instance.enableVideo(
-      !isOnCamera,
-      (status, code, message) => {
-        if (status) {
-          setIsOnCamera(!isOnCamera);
-        }
-        console.log('enableVideo', status, code, message);
-      },
-    );
+    StringeeCallManager.instance.enableVideo(!isOnCamera);
+    setIsOnCamera(!isOnCamera);
   };
 
   const endCallButton = () => {
@@ -145,9 +138,7 @@ const CallScreen = () => {
       <TouchableOpacity
         style={{alignSelf: 'center', marginTop: '15%'}}
         onPress={() => {
-          StringeeCallManager.instance.hangup((status, code, message) => {
-            console.log('hangup: ', status, code, message);
-          });
+          StringeeCallManager.instance.hangup();
         }}>
         <Image source={icon.endCall} style={sheet.button_size} />
       </TouchableOpacity>
@@ -155,12 +146,8 @@ const CallScreen = () => {
   };
 
   const didTapMute = () => {
-    StringeeCallManager.instance.mute(!isMute, (status, code, message) => {
-      if (status) {
-        setIsMute(!isMute);
-      }
-      console.log('mute', status, code, message);
-    });
+    StringeeCallManager.instance.mute(!isMute);
+    setIsMute(!isMute);
   };
 
   const didTapSpeaker = () => {
