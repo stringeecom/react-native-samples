@@ -76,6 +76,8 @@ const CallScreen = () => {
         );
       }
       dispatch(setSignalState(SignalingState.calling));
+    } else {
+      dispatch(setSignalState(SignalingState.ringing));
     }
 
     setIsSpeakerOn(callInfo.isVideo);
@@ -162,15 +164,8 @@ const CallScreen = () => {
   };
 
   const didTapSpeaker = () => {
-    StringeeCallManager.instance.enableSpeaker(
-      !isSpeakerOn,
-      (status, code, message) => {
-        if (status) {
-          setIsSpeakerOn(!isSpeakerOn);
-        }
-        console.log('enableSpeaker', status, code, message);
-      },
-    );
+    StringeeCallManager.instance.enableSpeaker(!isSpeakerOn);
+    setIsSpeakerOn(!isSpeakerOn);
   };
 
   const videoCallActionButton = () => {
@@ -193,20 +188,14 @@ const CallScreen = () => {
         <TouchableOpacity
           style={sheet.stack_item_button}
           onPress={() => {
-            StringeeCallManager.instance.switchCamera(
-              (status, code, message) => {
-                console.log('switchCamera', status, code, message);
-              },
-            );
+            StringeeCallManager.instance.switchCamera();
           }}>
           <Image source={icon.cameraSwitch} style={sheet.button_size} />
         </TouchableOpacity>
         <TouchableOpacity
           style={sheet.stack_item_button}
           onPress={() => {
-            StringeeCallManager.instance.hangup((status, code, message) => {
-              console.log('end video call', status, code, message);
-            });
+            StringeeCallManager.instance.hangup();
           }}>
           <Image source={icon.endCall} style={sheet.button_size} />
         </TouchableOpacity>
@@ -226,9 +215,7 @@ const CallScreen = () => {
         <View style={{flex: 1}} />
         <TouchableOpacity
           onPress={() => {
-            StringeeCallManager.instance.rejectCall((status, code, message) => {
-              console.log('reject call', status, code, message);
-            });
+            StringeeCallManager.instance.rejectCall();
           }}>
           <Image source={icon.endCall} style={{width: 70, height: 70}} />
         </TouchableOpacity>
@@ -380,10 +367,7 @@ const CallScreen = () => {
           local={true}
           scalingType={'fit'}
           overlay={true}
-          style={
-            // activeRemote ? sheet.local_view_did_active_remote : sheet.local_view
-            sheet.local_view_did_active_remote
-          }
+          style={sheet.local_view_did_active_remote}
         />
         {videoCallActionButton()}
       </View>

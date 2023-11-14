@@ -122,12 +122,12 @@ class StringeeCallManager {
     this.call.isVideoCall = isVideoCall;
     this.callType = CallType.out;
     this.call.registerEvents(this.callEvents);
-    this.call.makeCall((status, code, message) => {
-      if (status) {
-        this.call.setSpeakerphoneOn(this.call.isVideoCall, (_, __, ___) => {});
-      }
-      console.log('makeCall', status, code, message);
-    });
+    this.call
+      .makeCall()
+      .then(() => {
+        this.call.setSpeakerphoneOn.then().catch(console.log);
+      })
+      .catch(console.log);
   }
   /**
    * create a call2
@@ -145,13 +145,12 @@ class StringeeCallManager {
     this.call.isVideoCall = isVideoCall;
     this.callType = CallType.out;
     this.call.registerEvents(this.callEvents);
-
-    this.call.makeCall((status, code, message) => {
-      if (status) {
-        this.call.setSpeakerphoneOn(this.call.isVideoCall, (_, __, ___) => {});
-      }
-      console.log('makeCall2', status, code, message);
-    });
+    this.call
+      .makeCall()
+      .then(() => {
+        this.call.setSpeakerphoneOn.then().catch(console.log);
+      })
+      .catch(console.log);
   }
 
   /**
@@ -187,12 +186,14 @@ class StringeeCallManager {
       }
     }
     this.signalingState = SignalingState.calling;
-    call.initAnswer((status, code, message) => {
-      console.log('initAnswer', status, code, message);
-      if (this.events) {
-        this.events.onChangeSignalingState(SignalingState.ringing);
-      }
-    });
+    call
+      .initAnswer()
+      .then(() => {
+        if (this.events) {
+          this.events.onChangeSignalingState(SignalingState.ringing);
+        }
+      })
+      .catch(console.log);
     this.call = call;
     if (this.events) {
       this.call.registerEvents(this.callEvents);
@@ -258,9 +259,9 @@ class StringeeCallManager {
    * init answer the call
    * @param { StringeeCallBackEvent } callback function completeion
    */
-  initAnswer(callback) {
+  initAnswer() {
     if (this.call) {
-      this.call.initAnswer(callback);
+      this.call.initAnswer().then().catch(console.log);
     }
   }
 
@@ -269,9 +270,12 @@ class StringeeCallManager {
    * @param {boolean} isMute
    * @param { StringeeCallBackEvent } callback function completeion
    */
-  mute(isMute, callback) {
+  mute(isMute) {
     if (this.call) {
-      this.call.mute(isMute, callback);
+      this.call
+        .mute(isMute)
+        .then(() => {})
+        .catch(console.log);
       if (isIos) {
         RNCallKeep.toggleAudioRouteSpeaker(this.callKeeps.uuid, isMute);
       }
@@ -281,9 +285,12 @@ class StringeeCallManager {
    *
    * @param {StringeeCallBackEvent} callback
    */
-  switchCamera(callback) {
+  switchCamera() {
     if (this.call) {
-      this.call.switchCamera(callback);
+      this.call
+        .switchCamera()
+        .then(() => {})
+        .catch(console.log);
     }
   }
 
@@ -302,9 +309,12 @@ class StringeeCallManager {
    * @param {boolean} isEnable Camera is on or off
    * @param {StringeeCallBackEvent} callback stringee callback event
    */
-  enableVideo(isEnable, callback) {
+  enableVideo(isEnable) {
     if (this.call) {
-      this.call.enableVideo(isEnable, callback);
+      this.call
+        .enableVideo(isEnable)
+        .then(() => {})
+        .catch(console.log);
     }
   }
   /**
@@ -312,9 +322,12 @@ class StringeeCallManager {
    * @param {boolean} isOn Speaker is on or off
    * @param {StringeeCallBackEvent} callback stringee callback event
    */
-  enableSpeaker(isOn, callback) {
+  enableSpeaker(isOn) {
     if (this.call) {
-      this.call.setSpeakerphoneOn(isOn, callback);
+      this.call
+        .setSpeakerphoneOn(isOn)
+        .then(() => {})
+        .catch(console.log);
       if (isIos) {
         this.callKeeps.forEach(item => {
           if (item.callId === this.call.callId) {
@@ -328,21 +341,16 @@ class StringeeCallManager {
    * answer the call
    * @param {StringeeCallBackEvent} callback stringee callback event
    */
-  answer(callback) {
+  answer() {
     if (this.call && !isIos) {
-      this.call.answer((status, code, message) => {
+      this.call.answer().then(() => {
         if (!isIos) {
           InCallManager.stopRingtone();
         }
-        if (status) {
-          this.call.setSpeakerphoneOn(
-            this.call.isVideoCall,
-            (_, __, ___) => {},
-          );
-        }
-        if (callback){
-          callback(status, code, message);
-        }
+        this.call
+          .setSpeakerphoneOn(this.call.isVideoCall)
+          .then(() => {})
+          .catch(console.log);
       });
     } else if (this.callKeeps) {
       RNCallKeep.answerIncomingCall(this.callKeeps.uuid);
@@ -359,7 +367,10 @@ class StringeeCallManager {
       return;
     }
     if (this.call) {
-      this.call.hangup(callback);
+      this.call
+        .hangup()
+        .then(() => {})
+        .catch(console.log);
     }
   }
   /**
@@ -372,7 +383,10 @@ class StringeeCallManager {
       return;
     }
     if (this.call) {
-      this.call.reject(callback);
+      this.call
+        .reject()
+        .then(() => {})
+        .catch(console.log);
     }
   }
 
@@ -383,7 +397,6 @@ class StringeeCallManager {
 
   displayCallKeepIfNeed(data) {
     this.callKeeps = data;
-    console.log(data);
     RNCallKeep.getCalls().then(items => {
       if (
         items.find(item => {
@@ -401,12 +414,18 @@ class StringeeCallManager {
       if (this.signalingState === SignalingState.ringing) {
         // Người dùng trả lời cuộc gọi trước khi client nhận được event incomingCall
         if (this.callkeepAnswered.find(item => item === data.uuid)) {
-          this.call.answer();
-          this.didAnswer();
+          this.call
+            .answer()
+            .then(() => {
+              this.didAnswer();
+            })
+            .catch(error => {
+              console.log('displayCallKeepIfNeed', error);
+            });
         }
         // Nguời dùng từ chối cuộc gọi trước khi client nhận được event incomingCall
         if (this.callkeepRejected.find(item => item === data.uuid)) {
-          this.call.reject();
+          this.call.then(() => {}).catch(console.log);
         }
       }
     });
@@ -415,27 +434,33 @@ class StringeeCallManager {
   callkeepActiveAudio() {
     if (this.callKeeps != null) {
       if (this.callkeepAnswered.find(item => item === this.callKeeps.uuid)) {
-        this.call.answer();
-        this.didAnswer();
+        this.call
+          .answer()
+          .then(() => {
+            this.didAnswer();
+          })
+          .catch(error => {
+            console.log('callkeepActiveAudio', error);
+          });
       }
     }
   }
 
   callKeepEndCall(uuid) {
-    console.log('end calluuid', uuid, this.signalingState);
     if (this.callKeeps && uuid === this.callKeeps.uuid && this.call) {
       if (
         this.signalingState === SignalingState.ringing ||
         this.signalingState === SignalingState.calling
       ) {
-        console.log('reject');
-        this.call.reject((status, code, message) => {
-          console.log('reject', status, code, message);
-        });
+        this.call
+          .reject()
+          .then(() => {})
+          .catch(console.log);
       } else {
-        this.call.hangup((status, code, message) => {
-          console.log('hangup', status, code, message);
-        });
+        this.call
+          .hangup()
+          .then(() => {})
+          .catch(console.log);
       }
     }
   }

@@ -28,58 +28,33 @@ class StringeeClientManager {
   updatePushToken(token: string) {
     console.log('token', token);
     this.pushToken = token;
-    this.client.registerPush(
-      token,
-      false,
-      true,
-      (status: boolean, code: number, message: string) => {
-        console.log('registerPush', status, code, message);
-      },
-    );
+    this.client.registerPush(token, false, true).then().catch(console.log);
   }
 
   onConnect = async (_, userId: string) => {
-    console.log('onConnect', userId);
-    this.isConnected = true;
-    const isPushRegistered = await getRegisterStatus();
-    if (!isPushRegistered) {
-      if (isIos) {
-        console.log('Register push ios', this.pushToken);
-        RNVoipPushNotification.onVoipNotificationCompleted('JS_DID_ACTIVE');
-        if (this.pushToken) {
-          console.log('register push while client connected');
-          this.client.registerPush(
-            this.pushToken,
-            false,
-            true,
-            async (status: boolean, code: number, message: string) => {
-              console.log('registerPush', status, code, message);
-              if (status) {
-                await saveRegisterState(true);
-              }
-            },
-          );
+    try {
+      console.log('onConnect', userId);
+      this.isConnected = true;
+      const isPushRegistered = await getRegisterStatus();
+      if (!isPushRegistered) {
+        if (isIos) {
+          console.log('Register push ios', this.pushToken);
+          RNVoipPushNotification.onVoipNotificationCompleted('JS_DID_ACTIVE');
+          if (this.pushToken) {
+            console.log('register push while client connected');
+            await this.client.registerPush(this.pushToken, false, true);
+            await saveRegisterState(true);
+          }
+        } else {
+          console.log('Register push android');
+          let token = await messaging().getToken();
+          await this.client.registerPush(token, false, true);
+          await saveRegisterState(true);
         }
-      } else {
-        console.log('Register push android');
-        messaging()
-          .getToken()
-          .then(token => {
-            this.client.registerPush(
-              token,
-              false,
-              true,
-              async (status, code, message) => {
-                console.log('registerPush', status, code, message);
-                if (status) {
-                  await saveRegisterState(true);
-                }
-              },
-            );
-          });
       }
+    } catch (error) {
+      console.log(error);
     }
-
     if (this.listener && this.listener.onConnect) {
       this.listener.onConnect(this.client, userId);
     }
@@ -149,13 +124,9 @@ class StringeeClientManager {
     this.client.disconnect();
   }
 
-  unregisterPush() {
-    this.client.unregisterPush(this.pushToken, async (status, code, desc) => {
-      console.log('unregisterPush', status, code, desc);
-      if (status) {
-        await saveRegisterState(false);
-      }
-    });
+  async unregisterPush() {
+    await this.client.unregisterPush(this.pushToken);
+    await saveRegisterState(false);
   }
 }
 
