@@ -125,7 +125,7 @@ class StringeeCallManager {
     this.call
       .makeCall()
       .then(() => {
-        this.call.setSpeakerphoneOn(true).then().catch(console.log);
+        this.call.setSpeakerphoneOn(isVideoCall).then().catch(console.log);
       })
       .catch(console.log);
   }
@@ -148,7 +148,7 @@ class StringeeCallManager {
     this.call
       .makeCall()
       .then(() => {
-        this.call.setSpeakerphoneOn(false).then().catch(console.log);
+        this.call.setSpeakerphoneOn(isVideoCall).then().catch(console.log);
       })
       .catch(console.log);
   }
