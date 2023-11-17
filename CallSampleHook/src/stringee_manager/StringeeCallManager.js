@@ -121,7 +121,7 @@ class StringeeCallManager {
     });
     this.call.isVideoCall = isVideoCall;
     this.callType = CallType.out;
-    this.call.registerEvents(this.callEvents);
+    this.call.setListener(this.callEvents);
     this.call
       .makeCall()
       .then(() => {
@@ -144,7 +144,7 @@ class StringeeCallManager {
     });
     this.call.isVideoCall = isVideoCall;
     this.callType = CallType.out;
-    this.call.registerEvents(this.callEvents);
+    this.call.setListener(this.callEvents);
     this.call
       .makeCall()
       .then(() => {
@@ -162,7 +162,6 @@ class StringeeCallManager {
       InCallManager.stopRingtone();
     }
     if (this.call) {
-      this.call.unregisterEvents();
       this.events = null;
       this.callKeeps = null;
       this.call = null;
@@ -196,7 +195,7 @@ class StringeeCallManager {
       .catch(console.log);
     this.call = call;
     if (this.events) {
-      this.call.registerEvents(this.callEvents);
+      this.call.setListener(this.callEvents);
     }
     this.callType = CallType.out;
     // generate uuid and display callkeep
@@ -298,10 +297,10 @@ class StringeeCallManager {
    *
    * @param {StringeeCallEvents} events call event
    */
-  registerEvent(events) {
+  setListener(events) {
     this.events = events;
     if (this.call) {
-      this.call.registerEvents(this.callEvents);
+      this.call.setListener(this.callEvents);
     }
   }
   /**

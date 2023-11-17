@@ -86,7 +86,7 @@ const CallScreen = () => {
       dispatch(setSignalState(SignalingState.answered));
     };
 
-    StringeeCallManager.instance.registerEvent({
+    StringeeCallManager.instance.setListener({
       onChangeSignalingState: signalingState => {
         if (
           signalingState === SignalingState.busy ||
