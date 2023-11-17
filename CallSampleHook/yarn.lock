@@ -6478,7 +6478,7 @@ string_decoder@~1.1.1:
 
 "stringee-react-native-v2@https://github.com/stringeecom/stringee-react-native-v2.git#hieph/feature/change-callback-to-promise-pattern":
   version "0.0.1"
-  resolved "https://github.com/stringeecom/stringee-react-native-v2.git#ceb3de0702ac19a7cbb3e87c8b61f4a59636c56b"
+  resolved "https://github.com/stringeecom/stringee-react-native-v2.git#64d03330ba8988a1aa37e0409b5aedf3c1f335dd"
   dependencies:
     underscore "^1.13.6"
 

@@ -103,6 +103,10 @@ const CallScreen = () => {
         setActiveLocal(true);
       },
       onChangeMediaState: (_, mediaState, __) => {
+        if (mediaConnected === false && mediaState === MediaState.connected) {
+          StringeeCallManager.instance.enableSpeaker(callInfo.isVideo);
+        }
+
         if (mediaState === MediaState.connected) {
           setMediaConnected(true);
         }
@@ -202,7 +206,11 @@ const CallScreen = () => {
         <View style={{flex: 1}} />
         <TouchableOpacity
           onPress={() => {
-            StringeeCallManager.instance.rejectCall();
+            if (callInfo.isIncoming) {
+              StringeeCallManager.instance.rejectCall();
+            } else {
+              StringeeCallManager.instance.hangup();
+            }
           }}>
           <Image source={icon.endCall} style={{width: 70, height: 70}} />
         </TouchableOpacity>
