@@ -22,7 +22,7 @@ class StringeeClientManager {
 
   constructor() {
     this.client = new StringeeClient();
-    this.registerEvent();
+    this.setListener();
   }
 
   updatePushToken(token: string) {
@@ -105,7 +105,7 @@ class StringeeClientManager {
     }
   };
 
-  registerEvent() {
+  setListener() {
     const clientListener = new StringeeClientListener();
     clientListener.onConnect = this.onConnect;
     clientListener.onDisConnect = this.onDisConnect;
@@ -113,7 +113,7 @@ class StringeeClientManager {
     clientListener.onIncomingCall2 = this.onIncomingCall2;
     clientListener.onFailWithError = this.onFailWithError;
     clientListener.onRequestAccessToken = this.onRequestAccessToken;
-    this.client.registerEvents(clientListener);
+    this.client.setListener(clientListener);
   }
 
   connect(token: string) {
