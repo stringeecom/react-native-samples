@@ -32,8 +32,8 @@ const CallScreen = () => {
   const [isSpeakerOn, setIsSpeakerOn] = useState(false);
   const [isMute, setIsMute] = useState(false);
   const [isOnCamera, setIsOnCamera] = useState(true);
-  const [activeRemote, setActiveRemote] = useState(false);
-  const [activeLocal, setActiveLocal] = useState(false);
+  const [remoteTrack, setRemoteTrack] = useState(null);
+  const [localTrack, setLocalTrack] = useState(null);
   const dispatch = useDispatch();
 
   const navigation = useNavigation();
@@ -97,11 +97,22 @@ const CallScreen = () => {
         dispatch(setSignalState(signalingState));
       },
       onReceiveRemoteStream: () => {
-        setActiveRemote(true);
+        if (remoteTrack == null) {
+          setRemoteTrack({});
+        }
       },
       onReceiveLocalStream: () => {
-        setActiveLocal(true);
+        if (localTrack == null) {
+          setLocalTrack({});
+        }
       },
+      onReceiptLocalTrack: track => {
+        setLocalTrack(track);
+      },
+      onReceiveRemoteTrack: track => {
+        setRemoteTrack(track);
+      },
+
       onChangeMediaState: (_, mediaState, __) => {
         if (mediaConnected === false && mediaState === MediaState.connected) {
           StringeeCallManager.instance.enableSpeaker(callInfo.isVideo);
@@ -330,9 +341,9 @@ const CallScreen = () => {
   const videoCallScreen = () => {
     return (
       <View style={{flex: 1}}>
-        {activeRemote && (
+        {remoteTrack && (
           <StringeeVideoView
-            callId={StringeeCallManager.instance.call.callId}
+            uuid={StringeeCallManager.instance.call.uuid}
             local={false}
             scalingType={'fit'}
             style={{
@@ -358,7 +369,7 @@ const CallScreen = () => {
           </View>
         )}
         <StringeeVideoView
-          callId={StringeeCallManager.instance.call.callId}
+          uuid={StringeeCallManager.instance.call.uuid}
           local={true}
           scalingType={'fit'}
           overlay={true}

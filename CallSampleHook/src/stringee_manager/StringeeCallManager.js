@@ -97,6 +97,20 @@ class StringeeCallManager {
     );
   };
 
+  onReceiveLocalTrack = (_, track) => {
+    console.log('onReceiveLocalTrack', track);
+    if (this.events) {
+      this.events.onReceiveLocalTrack(track);
+    }
+  };
+
+  onReceiveRemoteTrack = (_, track) => {
+    console.log('onReceiveRemoteTrack', track);
+    if (this.events) {
+      this.events.onReceiveRemoteTrack(track);
+    }
+  };
+
   callEvents = {
     onChangeSignalingState: this.onChangeSignalingState,
     onReceiveRemoteStream: this.onReceiveRemoteStream,
@@ -104,6 +118,8 @@ class StringeeCallManager {
     onChangeMediaState: this.onChangeMediaState,
     onHandleOnAnotherDevice: this.onHandleOnAnotherDevice,
     onAudioDeviceChange: this.onAudioDeviceChange,
+    onReceiveLocalTrack: this.onReceiveLocalTrack,
+    onReceiveRemoteTrack: this.onReceiveRemoteTrack,
   };
 
   constructor() {}
@@ -162,6 +178,7 @@ class StringeeCallManager {
       InCallManager.stopRingtone();
     }
     if (this.call) {
+      this.call.clean();
       this.events = null;
       this.callKeeps = null;
       this.call = null;

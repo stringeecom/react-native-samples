@@ -6,7 +6,7 @@
 #import <RNVoipPushNotificationManager.h>
 #import "RNCallKeep.h"
 #import "CustomPushPayload.h"
-#import <RNStringeeInstanceManager.h>
+#import <RNStringee/RNStringeeInstanceManager.h>
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
