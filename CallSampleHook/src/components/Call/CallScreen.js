@@ -86,7 +86,7 @@ const CallScreen = () => {
       dispatch(setSignalState(SignalingState.answered));
     };
 
-    StringeeCallManager.instance.setListener({
+    StringeeCallManager.instance.events = {
       onChangeSignalingState: signalingState => {
         if (
           signalingState === SignalingState.busy ||
@@ -106,7 +106,7 @@ const CallScreen = () => {
           setLocalTrack({});
         }
       },
-      onReceiptLocalTrack: track => {
+      onReceiveLocalTrack: track => {
         setLocalTrack(track);
       },
       onReceiveRemoteTrack: track => {
@@ -127,7 +127,7 @@ const CallScreen = () => {
           clearDataAndGoBack();
         }
       },
-    });
+    };
   };
 
   const duration2time = time => {
@@ -346,6 +346,7 @@ const CallScreen = () => {
             uuid={StringeeCallManager.instance.call.uuid}
             local={false}
             scalingType={'fit'}
+            videoTrack={remoteTrack}
             style={{
               flex: 1,
               width: width,
@@ -373,6 +374,7 @@ const CallScreen = () => {
           local={true}
           scalingType={'fit'}
           overlay={true}
+          videoTrack={localTrack}
           style={sheet.local_view_did_active_remote}
         />
         {videoCallActionButton()}

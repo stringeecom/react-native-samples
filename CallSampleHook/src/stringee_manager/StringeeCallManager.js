@@ -118,8 +118,6 @@ class StringeeCallManager {
     onChangeMediaState: this.onChangeMediaState,
     onHandleOnAnotherDevice: this.onHandleOnAnotherDevice,
     onAudioDeviceChange: this.onAudioDeviceChange,
-    onReceiveLocalTrack: this.onReceiveLocalTrack,
-    onReceiveRemoteTrack: this.onReceiveRemoteTrack,
   };
 
   constructor() {}
@@ -137,13 +135,13 @@ class StringeeCallManager {
     });
     this.call.isVideoCall = isVideoCall;
     this.callType = CallType.out;
-    this.call.setListener(this.callEvents);
     this.call
       .makeCall()
       .then(() => {
         this.call.setSpeakerphoneOn(isVideoCall).then().catch(console.log);
       })
       .catch(console.log);
+    this.setListenerForCall1();
   }
   /**
    * create a call2
@@ -160,13 +158,13 @@ class StringeeCallManager {
     });
     this.call.isVideoCall = isVideoCall;
     this.callType = CallType.out;
-    this.call.setListener(this.callEvents);
     this.call
       .makeCall()
       .then(() => {
         this.call.setSpeakerphoneOn(isVideoCall).then().catch(console.log);
       })
       .catch(console.log);
+    this.setListenerForCall2();
   }
 
   /**
@@ -211,9 +209,6 @@ class StringeeCallManager {
       })
       .catch(console.log);
     this.call = call;
-    if (this.events) {
-      this.call.setListener(this.callEvents);
-    }
     this.callType = CallType.out;
     // generate uuid and display callkeep
     this.call
@@ -314,10 +309,18 @@ class StringeeCallManager {
    *
    * @param {StringeeCallEvents} events call event
    */
-  setListener(events) {
-    this.events = events;
+  setListenerForCall1() {
     if (this.call) {
       this.call.setListener(this.callEvents);
+    }
+  }
+  setListenerForCall2() {
+    if (this.call) {
+      this.call.setListener({
+        ...this.callEvents,
+        onReceiveLocalTrack: this.onReceiveLocalTrack,
+        onReceiveRemoteTrack: this.onReceiveRemoteTrack,
+      });
     }
   }
   /**

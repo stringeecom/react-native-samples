@@ -75,6 +75,7 @@ class StringeeClientManager {
       if (this.listener.onIncomingCall) {
         this.listener.onIncomingCall(client, call);
       }
+      StringeeCallManager.instance.setListenerForCall1();
     }
   };
 
@@ -96,6 +97,7 @@ class StringeeClientManager {
     if (this.listener.onFailWithError) {
       this.listener.onFailWithError(client, code, message);
     }
+    StringeeCallManager.instance.setListenerForCall2();
   };
 
   onRequestAccessToken = () => {
