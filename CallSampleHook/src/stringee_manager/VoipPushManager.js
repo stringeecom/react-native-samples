@@ -33,10 +33,16 @@ const stringeePushConfig = () => {
 
   RNCallKeep.addEventListener('answerCall', ({callUUID}) => {
     callManager.callkeepAnswered.push(callUUID);
+    callManager.iOSAnswerCallTrigger();
   });
 
   RNCallKeep.addEventListener('didActivateAudioSession', () => {
-    callManager.callkeepActiveAudio();
+    callManager.didActiveAudioSection = true;
+    callManager.iOSAnswerCallTrigger();
+  });
+
+  RNCallKeep.addEventListener('didDeactivateAudioSession', () => {
+    callManager.didActiveAudioSection = false;
   });
 };
 

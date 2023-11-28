@@ -48,6 +48,7 @@ class StringeeCallManager {
   callkeepRejected = [];
   signalingState;
   events;
+  didActiveAudioSection = false;
 
   onChangeSignalingState = (_, signalingState, __, ___, ____) => {
     console.log('onChangeSignalingState', signalingState);
@@ -205,6 +206,9 @@ class StringeeCallManager {
       .then(() => {
         if (this.events) {
           this.events.onChangeSignalingState(SignalingState.ringing);
+          if (isIos) {
+            this.iOSAnswerCallTrigger();
+          }
         }
       })
       .catch(console.log);
@@ -368,6 +372,7 @@ class StringeeCallManager {
           .catch(console.log);
       });
     } else if (this.callKeeps) {
+      // đồng bộ trả lời cuộc gọi với CallKeep
       RNCallKeep.answerIncomingCall(this.callKeeps.uuid);
     }
     this.signalingState = SignalingState.answered;
@@ -412,6 +417,7 @@ class StringeeCallManager {
 
   displayCallKeepIfNeed(data) {
     this.callKeeps = data;
+    // Kiểm tra cuộc gọi đã được hiển thị phía native hay chưa
     RNCallKeep.getCalls().then(items => {
       if (
         items.find(item => {
@@ -427,41 +433,48 @@ class StringeeCallManager {
         );
       }
       if (this.signalingState === SignalingState.ringing) {
-        // Người dùng trả lời cuộc gọi trước khi client nhận được event incomingCall
-        if (this.callkeepAnswered.find(item => item === data.uuid)) {
-          this.call
-            .answer()
-            .then(() => {
-              this.didAnswer();
-            })
-            .catch(error => {
-              console.log('displayCallKeepIfNeed', error);
-            });
-        }
         // Nguời dùng từ chối cuộc gọi trước khi client nhận được event incomingCall
-        if (this.callkeepRejected.find(item => item === data.uuid)) {
-          this.call.then(() => {}).catch(console.log);
+        if (this.callkeepRejected.includes(data.uuid)) {
+          this.call
+            .reject()
+            .then(() => {})
+            .catch(console.log);
         }
       }
     });
   }
 
-  callkeepActiveAudio() {
-    if (this.callKeeps != null) {
-      if (this.callkeepAnswered.find(item => item === this.callKeeps.uuid)) {
-        this.call
-          .answer()
-          .then(() => {
-            this.didAnswer();
-          })
-          .catch(error => {
-            console.log('callkeepActiveAudio', error);
-          });
-      }
+  iOSAnswerCallTrigger() {
+    /*
+     Xử lý đồng bộ cuộc gọi với native ios. Để đảm bảo cuộc gọi được trả lời cần đảm bảo:
+      + Event active audio section đã được gọi
+      + Nhận được call từ StringeeServer
+      + Hàm call.initAnswer được gọi
+      + Người dùng trả lời cuộc gọi.
+    */
+    if (!this.didActiveAudioSection) {
+      console.log('Chưa active audio section');
     }
+    if (this.call == null) {
+      console.log('Chưa nhận được call từ StringeeServer');
+    }
+    if (this.signalingState !== SignalingState.ringing) {
+      console.log('Chưa gọi hàm initAnswer');
+    }
+    this.call.generateUUID(uuid => {
+      if (this.callkeepAnswered.includes(uuid)) {
+        this.call.answer().then(this.didAnswer).catch(console.log);
+      } else {
+        console.log('Người dùng chưa trả lời cuộc gọi');
+      }
+    });
   }
 
   callKeepEndCall(uuid) {
+    /*
+      Trong trường hợp người dùng nhấn endcall từ phía callkeep nhưng sdk chưa ghi nhận call
+      push vào mảng callkeepRejected để xử lý sau.
+    */
     if (this.callKeeps && uuid === this.callKeeps.uuid && this.call) {
       if (
         this.signalingState === SignalingState.ringing ||
@@ -477,6 +490,8 @@ class StringeeCallManager {
           .then(() => {})
           .catch(console.log);
       }
+    } else {
+      this.callkeepRejected.push(uuid);
     }
   }
 }

@@ -4,7 +4,7 @@ import {configureStore} from '@reduxjs/toolkit';
 import reducers from './reducers';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {NavigationContainer} from '@react-navigation/native';
-import {HomeScreen} from './components/Home';
+import {HomeScreen} from './components/home';
 import {
   ANSWER_ACTION_ID,
   CALL_SCREEN_NAME,
@@ -13,7 +13,7 @@ import {
   OPEN_APP_IN_FULL_SCREEN_MODE_ACTION_ID,
   REJECT_ACTION_ID,
 } from './const';
-import CallScreen from './components/Call/CallScreen';
+import CallScreen from './components/call';
 import 'react-native-reanimated';
 import notifee, {EventType} from '@notifee/react-native';
 import StringeeCallManager from './stringee_manager/StringeeCallManager';
@@ -34,8 +34,8 @@ notifee.onBackgroundEvent(async event => {
       case ANSWER_ACTION_ID:
         if (StringeeCallManager.instance.call) {
           StringeeCallManager.instance.answer((status, _, __) => {
-            if (StringeeCallManager.instance.didAns && status) {
-              StringeeCallManager.instance.didAns();
+            if (StringeeCallManager.instance.didAnswer && status) {
+              StringeeCallManager.instance.didAnswer();
             }
           });
         }
