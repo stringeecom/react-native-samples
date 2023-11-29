@@ -206,7 +206,6 @@ class StringeeCallManager {
       .then(() => {
         if (this.events) {
           this.events.onChangeSignalingState(SignalingState.ringing);
-          this.signalingState = SignalingState.ringing;
           if (isIos) {
             this.iOSAnswerCallTrigger();
           }
@@ -459,16 +458,12 @@ class StringeeCallManager {
     if (this.call == null) {
       console.log('Chưa nhận được call từ StringeeServer');
     }
-    if (this.signalingState !== SignalingState.ringing) {
-      console.log('Chưa gọi hàm initAnswer');
+
+    if (this.callKeeps && this.callkeepAnswered.includes(this.callKeeps.uuid)) {
+      this.call.answer().then(this.didAnswer).catch(console.log);
+    } else {
+      console.log('Người dùng chưa trả lời cuộc gọi');
     }
-    this.call.generateUUID(uuid => {
-      if (this.callkeepAnswered.includes(uuid)) {
-        this.call.answer().then(this.didAnswer).catch(console.log);
-      } else {
-        console.log('Người dùng chưa trả lời cuộc gọi');
-      }
-    });
   }
 
   callKeepEndCall(uuid) {
