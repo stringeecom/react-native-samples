@@ -361,22 +361,23 @@ class StringeeCallManager {
    * answer the call
    * @param {StringeeCallBackEvent} callback stringee callback event
    */
-  answer() {
-    if (this.call && !isIos) {
-      this.call.answer().then(() => {
-        if (!isIos) {
+  answer(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      if (this.call && !isIos) {
+        this.call.answer().then(() => {
           InCallManager.stopRingtone();
-        }
-        this.call
-          .setSpeakerphoneOn(this.call.isVideoCall)
-          .then(() => {})
-          .catch(console.log);
-      });
-    } else if (this.callKeeps) {
-      // đồng bộ trả lời cuộc gọi với CallKeep
-      RNCallKeep.answerIncomingCall(this.callKeeps.uuid);
-    }
-    this.signalingState = SignalingState.answered;
+          this.call
+            .setSpeakerphoneOn(this.call.isVideoCall)
+            .then(() => {})
+            .catch(console.log);
+          resolve();
+        });
+      } else if (this.callKeeps) {
+        // đồng bộ trả lời cuộc gọi với CallKeep
+        RNCallKeep.answerIncomingCall(this.callKeeps.uuid);
+      }
+      this.signalingState = SignalingState.answered;
+    });
   }
   /**
    * hang up the call

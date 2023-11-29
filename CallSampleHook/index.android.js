@@ -10,7 +10,7 @@ import notifee from '@notifee/react-native';
 import {NOTIFICATION_ID} from './src/const';
 import StringeeCallManager from './src/stringee_manager/StringeeCallManager';
 import StringeeClientManager from './src/stringee_manager/StringeeClientManager';
-import {stringee_token} from './src/components/Home';
+import {stringee_token} from './src/components/home';
 
 /**
  * handle message from firebase and show the call notification

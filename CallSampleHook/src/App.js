@@ -33,8 +33,8 @@ notifee.onBackgroundEvent(async event => {
     switch (event.detail.pressAction.id) {
       case ANSWER_ACTION_ID:
         if (StringeeCallManager.instance.call) {
-          StringeeCallManager.instance.answer((status, _, __) => {
-            if (StringeeCallManager.instance.didAnswer && status) {
+          StringeeCallManager.instance.answer().then(() => {
+            if (StringeeCallManager.instance.didAnswer) {
               StringeeCallManager.instance.didAnswer();
             }
           });

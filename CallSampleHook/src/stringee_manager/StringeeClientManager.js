@@ -7,7 +7,6 @@ import {
 import messaging from '@react-native-firebase/messaging';
 import StringeeCallManager from './StringeeCallManager';
 import {isIos} from '../const';
-import RNVoipPushNotification from 'react-native-voip-push-notification';
 import {getRegisterStatus, saveRegisterState} from '../storage';
 
 class StringeeClientManager {
@@ -64,7 +63,7 @@ class StringeeClientManager {
   onDisConnect = client => {
     console.log('onDisConnect');
     this.isConnected = false;
-    if (this.listener.onDisConnect) {
+    if (this.listener && this.listener.onDisConnect) {
       this.listener.onDisConnect(client);
     }
   };
@@ -74,10 +73,10 @@ class StringeeClientManager {
       call.reject();
     } else {
       StringeeCallManager.instance.handleIncomingCall(call);
-      if (this.listener.onIncomingCall) {
+      StringeeCallManager.instance.setListenerForCall1();
+      if (this.listener && this.listener.onIncomingCall) {
         this.listener.onIncomingCall(client, call);
       }
-      StringeeCallManager.instance.setListenerForCall1();
     }
   };
 
@@ -87,24 +86,24 @@ class StringeeClientManager {
       call.reject();
     } else {
       StringeeCallManager.instance.handleIncomingCall(call);
-      if (this.listener.onIncomingCall2) {
+      StringeeCallManager.instance.setListenerForCall2();
+      if (this.listener && this.listener.onIncomingCall2) {
         this.listener.onIncomingCall2(client, call);
       }
-      StringeeCallManager.instance.setListenerForCall2();
     }
   };
 
   onFailWithError = (client: StringeeClient, code: number, message: string) => {
     console.log('onFailWithError', code, message);
     this.isConnected = false;
-    if (this.listener.onFailWithError) {
+    if (this.listener && this.listener.onFailWithError) {
       this.listener.onFailWithError(client, code, message);
     }
   };
 
   onRequestAccessToken = () => {
     console.log('onRequestAccessToken');
-    if (this.listener.onRequestAccessToken) {
+    if (this.listener && this.listener.onRequestAccessToken) {
       this.listener.onRequestAccessToken();
     }
   };
