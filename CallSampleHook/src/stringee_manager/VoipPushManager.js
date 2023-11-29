@@ -13,6 +13,19 @@ const stringeePushConfig = () => {
     clientManager.updatePushToken(token);
   });
 
+  RNCallKeep.getCalls().then(async items => {
+    try {
+      items.forEach(async item => {
+        if (await RNCallKeep.isCallActive(item.callUUID)) {
+          this.call.didActiveAudioSection = true;
+          return;
+        }
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
   RNVoipPushNotification.registerVoipToken();
 
   RNCallKeep.addEventListener('didDisplayIncomingCall', ({callUUID}) => {
@@ -37,6 +50,7 @@ const stringeePushConfig = () => {
   });
 
   RNCallKeep.addEventListener('didActivateAudioSession', () => {
+    console.log('didActivateAudioSession');
     callManager.didActiveAudioSection = true;
     callManager.iOSAnswerCallTrigger();
   });
