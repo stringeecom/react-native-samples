@@ -206,6 +206,7 @@ class StringeeCallManager {
       .then(() => {
         if (this.events) {
           this.events.onChangeSignalingState(SignalingState.ringing);
+          this.signalingState = SignalingState.ringing;
           if (isIos) {
             this.iOSAnswerCallTrigger();
           }
