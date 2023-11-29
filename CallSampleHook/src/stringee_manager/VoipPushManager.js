@@ -5,7 +5,7 @@ import RNCallKeep from 'react-native-callkeep';
 import {NativeModules} from 'react-native';
 
 const stringeePushConfig = () => {
-  console.log('config push Stringee', NativeModules.RNManagerUUID);
+  console.log('Config push Stringee', NativeModules.RNManagerUUID);
   const clientManager = StringeeClientManager.instance;
   const callManager = StringeeCallManager.instance;
 
@@ -34,7 +34,7 @@ const stringeePushConfig = () => {
     }
     setTimeout(() => {
       if (!callManager.call) {
-        console.log('end call time out');
+        console.log('End call time out');
         RNCallKeep.endCall(callUUID);
       }
     }, 5000);

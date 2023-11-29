@@ -21,10 +21,7 @@ import {
 import {each} from 'underscore';
 import notifee from '@notifee/react-native';
 import {StringeeClientListener} from 'stringee-react-native-v2';
-//const stringee_token =
-//  'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZULTE2OTk1ODg2MTciLCJpc3MiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZUIiwiZXhwIjoxNzAyMTgwNjE3LCJ1c2VySWQiOiJhbmRyb2lkIn0.Krr1m1c42QOkbNseGxbBZASkSUAt5qA-ghkQBOeRpRc';
-const stringee_token =
-  'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZULTE2OTk1MDE1ODYiLCJpc3MiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZUIiwiZXhwIjoxNzAyMDkzNTg2LCJ1c2VySWQiOiJpb3MyIn0.QLT1aNlfk5YjFpKHsuJqz7T8spUUfbYeApb3i-uG_vk';
+const access_token = 'PUT_YOUR_TOKEN_HERE';
 const HomeScreen = () => {
   const [callWith, setCallWith] = useState('');
   const isOnline = useSelector(state => state.stringee.client.isOnline);
@@ -33,14 +30,13 @@ const HomeScreen = () => {
   const dispatch = useDispatch();
 
   /**
-   * handle press action from notification when app is killed
+   * Handle press action from notification when app is killed in android
    */
   async function bootstrap() {
     const initialNotification = await notifee.getInitialNotification();
+    console.log('initialNotification: ', JSON.stringify(initialNotification));
     if (initialNotification && StringeeCallManager.instance.call) {
-      console.log(
-        'initialNotification' + JSON.stringify(initialNotification.pressAction),
-      );
+      // Handle when press on notification
       if (initialNotification.pressAction) {
         dispatch(
           setCallInfo({
@@ -51,6 +47,7 @@ const HomeScreen = () => {
           }),
         );
         navigation.navigate(CALL_SCREEN_NAME);
+        // Handle when press on answer button in notification
         if (initialNotification.pressAction.id === ANSWER_ACTION_ID) {
           StringeeCallManager.instance.answer().then(() => {
             if (StringeeCallManager.instance.didAnswer) {
@@ -79,9 +76,7 @@ const HomeScreen = () => {
   useEffect(() => {
     if (!isIos) {
       requestPermission();
-      bootstrap().then(r => {
-        console.log('bootstrap', r);
-      });
+      bootstrap();
     }
     if (clientManager.instance.client.userId !== undefined) {
       dispatch(
@@ -125,7 +120,7 @@ const HomeScreen = () => {
       navigation.navigate(CALL_SCREEN_NAME);
     };
 
-    clientManager.instance.connect(stringee_token);
+    clientManager.instance.connect(access_token);
   }, []);
 
   const requestPermission = () => {
@@ -251,7 +246,7 @@ const HomeScreen = () => {
   );
 };
 
-export {HomeScreen, stringee_token};
+export {HomeScreen, access_token};
 
 const style = StyleSheet.create({
   callButton: {
