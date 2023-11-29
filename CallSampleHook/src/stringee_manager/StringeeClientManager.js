@@ -28,18 +28,14 @@ class StringeeClientManager {
   updatePushToken(token: string) {
     console.log('token', token);
     this.pushToken = token;
-    this.client.registerPush(token, false, true).then().catch(console.log);
+    this.registerTokenToStringee();
   }
 
-  onConnect = async (_, userId: string) => {
+  registerTokenToStringee = async () => {
     try {
-      console.log('onConnect', userId);
-      this.isConnected = true;
       const isPushRegistered = await getRegisterStatus();
       if (!isPushRegistered) {
         if (isIos) {
-          console.log('Register push ios', this.pushToken);
-          RNVoipPushNotification.onVoipNotificationCompleted('JS_DID_ACTIVE');
           if (this.pushToken) {
             console.log('register push while client connected');
             await this.client.registerPush(this.pushToken, false, true);
@@ -55,6 +51,12 @@ class StringeeClientManager {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  onConnect = (_, userId: string) => {
+    console.log('onConnect', userId);
+    this.isConnected = true;
+    this.registerTokenToStringee().then().catch();
     if (this.listener && this.listener.onConnect) {
       this.listener.onConnect(this.client, userId);
     }
