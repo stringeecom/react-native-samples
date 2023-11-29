@@ -9,6 +9,13 @@ const stringeePushConfig = () => {
   const clientManager = StringeeClientManager.instance;
   const callManager = StringeeCallManager.instance;
 
+  RNCallKeep.setup({
+    ios: {
+      appName: appName,
+      includesCallsInRecents: true,
+    },
+  });
+
   RNVoipPushNotification.addEventListener('register', token => {
     clientManager.updatePushToken(token);
   });
