@@ -25,7 +25,7 @@ const store = configureStore({
 const Stack = createNativeStackNavigator();
 
 /**
- * handle press action from notification when app is in background
+ * Handle press action from notification when app is in background
  */
 notifee.onBackgroundEvent(async event => {
   console.log('onBackgroundEvent' + JSON.stringify(event.detail.pressAction));

@@ -36,22 +36,23 @@ class StringeeClientManager {
       if (!isPushRegistered) {
         if (isIos) {
           if (this.pushToken) {
-            console.log('register push while client connected');
             await this.client.registerPush(this.pushToken, false, true);
+            console.log('Register push success');
             await saveRegisterState(true);
           }
         } else {
-          console.log('Register push android');
           let token = await messaging().getToken();
           await this.client.registerPush(token, false, true);
+          console.log('Register push success');
           await saveRegisterState(true);
         }
       }
     } catch (error) {
-      console.log(error);
+      console.log('Register push error: ', error);
     }
   };
 
+  // Invoked when the StringeeClient is connected
   onConnect = (_, userId: string) => {
     console.log('onConnect', userId);
     this.isConnected = true;
@@ -60,6 +61,8 @@ class StringeeClientManager {
       this.listener.onConnect(this.client, userId);
     }
   };
+
+  // Invoked when the StringeeClient is disconnected
   onDisConnect = client => {
     console.log('onDisConnect');
     this.isConnected = false;
@@ -67,6 +70,8 @@ class StringeeClientManager {
       this.listener.onDisConnect(client);
     }
   };
+
+  // Invoked when receive an incoming of StringeeCall
   onIncomingCall = (client: StringeeClient, call: StringeeCall) => {
     console.log('onIncomingCall', call.callId);
     if (StringeeCallManager.instance.call != null) {
@@ -80,6 +85,7 @@ class StringeeClientManager {
     }
   };
 
+  // Invoked when receive an incoming of StringeeCall2
   onIncomingCall2 = (client: StringeeClient, call: StringeeCall2) => {
     console.log('onIncomingCall2', call.callId);
     if (StringeeCallManager.instance.call != null) {
@@ -93,6 +99,7 @@ class StringeeClientManager {
     }
   };
 
+  // Invoked when StringeeClient connect false
   onFailWithError = (client: StringeeClient, code: number, message: string) => {
     console.log('onFailWithError', code, message);
     this.isConnected = false;
@@ -101,6 +108,7 @@ class StringeeClientManager {
     }
   };
 
+  // Invoked when your token is expired. You must get a new token and reconnect
   onRequestAccessToken = () => {
     console.log('onRequestAccessToken');
     if (this.listener && this.listener.onRequestAccessToken) {

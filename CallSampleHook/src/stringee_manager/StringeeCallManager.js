@@ -30,14 +30,20 @@ const CallType = {
 };
 
 /**
- * call manager object.
+ * Call manager object.
  * @class StringeeCallManager
  * @property {StringeeCallManager} instance instants object.
  * @property {StringeeCall | StringeeCall2 | undefined} call current call handle
  * @property {'CALL_IN' | 'CALLOUT'} callType type of call
  * @property {object | undefined} callkeep The call from push
- * @callback didAnswer
+ * @callback didAnswer callback to CallScreen when call is answered
+ * @property callkeepAnswered list of the answered call from CallKeep
+ * @property callkeepRejected list of the rejected call from CallKeep
+ * @property signalingState the signaling state of the call
+ * @property events the call manager event send to CallScreen
+ * @property didActiveAudioSection the status of AudioSection in CallKeep
  */
+
 class StringeeCallManager {
   static instance = new StringeeCallManager();
   call;
@@ -50,6 +56,7 @@ class StringeeCallManager {
   events;
   didActiveAudioSection = false;
 
+  // Invoked when the call's signaling state changes
   onChangeSignalingState = (_, signalingState, __, ___, ____) => {
     console.log('onChangeSignalingState', signalingState);
     this.signalingState = signalingState;
@@ -65,24 +72,32 @@ class StringeeCallManager {
       this.events.onChangeSignalingState(signalingState);
     }
   };
+
+  // Invoked when remote stream in video call is ready to play
   onReceiveRemoteStream = _ => {
     console.log('onReceiveRemoteStream');
     if (this.events) {
       this.events.onReceiveRemoteStream();
     }
   };
+
+  // Invoked when local stream in video call is ready to play
   onReceiveLocalStream = _ => {
     console.log('onReceiveLocalStream');
     if (this.events) {
       this.events.onReceiveLocalStream();
     }
   };
+
+  // Invoked when the call's media state changes
   onChangeMediaState = (_, mediaState, __) => {
     console.log('onChangeMediaState', mediaState);
     if (this.events) {
       this.events.onChangeMediaState(_, mediaState, __);
     }
   };
+
+  // Invoked when an incoming call is handle on another device
   onHandleOnAnotherDevice = (_, signalingState, __) => {
     console.log('onHandleOnAnotherDevice');
     if (this.events) {
@@ -90,6 +105,7 @@ class StringeeCallManager {
     }
   };
 
+  // Invoked when the current audio device changes in android
   onAudioDeviceChange = (_, selectedAudioDevice, availableAudioDevices) => {
     console.log(
       'onHandleOnAudioDeviceChange',
@@ -98,6 +114,7 @@ class StringeeCallManager {
     );
   };
 
+  // Invoked when local track in video call is ready to play
   onReceiveLocalTrack = (_, track) => {
     console.log('onReceiveLocalTrack', track);
     if (this.events) {
@@ -105,6 +122,7 @@ class StringeeCallManager {
     }
   };
 
+  // Invoked when remote track in video call is ready to play
   onReceiveRemoteTrack = (_, track) => {
     console.log('onReceiveRemoteTrack', track);
     if (this.events) {
@@ -123,8 +141,8 @@ class StringeeCallManager {
 
   constructor() {}
   /**
-   * create a call
-   * @function initializeCall
+   * Make a call
+   * @function makeCall
    * @param {string} to To user_id or phone_number
    * @param {boolean} isVideoCall The call is video call or not
    */
@@ -144,14 +162,14 @@ class StringeeCallManager {
       .catch(console.log);
     this.setListenerForCall1();
   }
+
   /**
-   * create a call2
-   * @function initializeCall2
+   * Make a call2
+   * @function makeCall2
    * @param {string} to To user_id or phone_number
    * @param {boolean} isVideoCall The call is video call or not
    */
   makeCall2(to, isVideoCall) {
-    console.log('makeCall2');
     this.call = new StringeeCall2({
       stringeeClient: StringeeClientManager.instance.client,
       from: StringeeClientManager.instance.client.userId,
@@ -185,8 +203,9 @@ class StringeeCallManager {
       this.callkeepRejected = [];
     }
   }
+
   /**
-   * handle incoming call from stringee server
+   * Handle incoming call from stringee server
    * @funcion handleIncomingCall
    * @param {StringeeCall | undefined} call The call from onIncomingCall
    */
@@ -226,6 +245,8 @@ class StringeeCallManager {
       })
       .catch(console.log);
   }
+
+  // Show incoming call notification in android
   async showIncomingCallNotification(from: string) {
     const channelId = await notifee.createChannel({
       id: CHANNEL_ID,
@@ -270,9 +291,9 @@ class StringeeCallManager {
       },
     });
   }
+
   /**
-   * init answer the call
-   * @param { StringeeCallBackEvent } callback function completeion
+   * Init answer the call
    */
   initAnswer() {
     if (this.call) {
@@ -281,9 +302,8 @@ class StringeeCallManager {
   }
 
   /**
-   * set mute micro
+   * Set mute/unmute micro
    * @param {boolean} isMute
-   * @param { StringeeCallBackEvent } callback function completeion
    */
   mute(isMute) {
     if (this.call) {
@@ -296,9 +316,9 @@ class StringeeCallManager {
       }
     }
   }
+
   /**
-   *
-   * @param {StringeeCallBackEvent} callback
+   * Switch camera
    */
   switchCamera() {
     if (this.call) {
@@ -310,14 +330,17 @@ class StringeeCallManager {
   }
 
   /**
-   *
-   * @param {StringeeCallEvents} events call event
+   * Set call listener for StringeeCall
    */
   setListenerForCall1() {
     if (this.call) {
       this.call.setListener(this.callEvents);
     }
   }
+
+  /**
+   * Set call listener for StringeeCall2
+   */
   setListenerForCall2() {
     if (this.call) {
       this.call.setListener({
@@ -327,10 +350,10 @@ class StringeeCallManager {
       });
     }
   }
+
   /**
-   *
+   * Enable/Disable camera
    * @param {boolean} isEnable Camera is on or off
-   * @param {StringeeCallBackEvent} callback stringee callback event
    */
   enableVideo(isEnable) {
     if (this.call) {
@@ -340,10 +363,10 @@ class StringeeCallManager {
         .catch(console.log);
     }
   }
+
   /**
-   *
+   * Change speaker to earpiece/speaker
    * @param {boolean} isOn Speaker is on or off
-   * @param {StringeeCallBackEvent} callback stringee callback event
    */
   enableSpeaker(isOn) {
     if (this.call) {
@@ -357,8 +380,7 @@ class StringeeCallManager {
     }
   }
   /**
-   * answer the call
-   * @param {StringeeCallBackEvent} callback stringee callback event
+   * Answer the call
    */
   answer(): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -378,9 +400,9 @@ class StringeeCallManager {
       this.signalingState = SignalingState.answered;
     });
   }
+
   /**
-   * hang up the call
-   * @param {StringeeCallBackEvent} callback stringee callback event
+   * Hang up the call
    */
   hangup() {
     if (this.callKeeps) {
@@ -394,9 +416,9 @@ class StringeeCallManager {
         .catch(console.log);
     }
   }
+
   /**
-   * reject the call
-   * @param {StringeeCallBackEvent} callback stringee callback event
+   * Reject the call
    */
   rejectCall() {
     if (this.callKeeps) {
@@ -412,13 +434,13 @@ class StringeeCallManager {
   }
 
   /**
-   *
+   * Display callkeep if need in ios
    * @param {object} data data from call keep
    */
 
   displayCallKeepIfNeed(data) {
     this.callKeeps = data;
-    // Kiểm tra cuộc gọi đã được hiển thị phía native hay chưa
+    // Whether the incoming call is show on native screen or not
     RNCallKeep.getCalls().then(items => {
       if (
         items.find(item => {
@@ -434,7 +456,7 @@ class StringeeCallManager {
         );
       }
       if (this.signalingState === SignalingState.ringing) {
-        // Nguời dùng từ chối cuộc gọi trước khi client nhận được event incomingCall
+        // User reject the call before the StringeeClient receive incomingCall event
         if (this.callkeepRejected.includes(data.uuid)) {
           this.call
             .reject()
@@ -447,30 +469,29 @@ class StringeeCallManager {
 
   answerStringeeCallIfConditionMatch() {
     /*
-     Xử lý đồng bộ cuộc gọi với native ios. Để đảm bảo cuộc gọi được trả lời cần đảm bảo:
-      + Event active audio section đã được gọi
-      + Nhận được call từ StringeeServer
-      + Hàm call.initAnswer được gọi
-      + Người dùng trả lời cuộc gọi.
+     Handle calls synchronously with native iOS. To ensure calls are answered, ensure:
+       + Event active audio section has been called
+       + Receive call from StringeeServer
+       + The call.initAnswer function is called
+       + User answers the call.
     */
     if (!this.didActiveAudioSection) {
-      console.log('Chưa active audio section');
+      console.log('The audio section has not been activated yet');
     }
     if (this.call == null) {
-      console.log('Chưa nhận được call từ StringeeServer');
+      console.log('Have not received a call from StringeeServer');
     }
 
     if (this.callKeeps && this.callkeepAnswered.includes(this.callKeeps.uuid)) {
       this.call.answer().then(this.didAnswer).catch(console.log);
     } else {
-      console.log('Người dùng chưa trả lời cuộc gọi');
+      console.log('The user has not answered the call');
     }
   }
 
   callKeepEndCall(uuid) {
     /*
-      Trong trường hợp người dùng nhấn endcall từ phía callkeep nhưng sdk chưa ghi nhận call
-      push vào mảng callkeepRejected để xử lý sau.
+      In case the user presses endcall from the callkeep side but the sdk has not recorded the push call into the callkeepRejected array for later processing.
     */
     if (this.callKeeps && uuid === this.callKeeps.uuid && this.call) {
       if (

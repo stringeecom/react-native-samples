@@ -10,19 +10,18 @@ import notifee from '@notifee/react-native';
 import {NOTIFICATION_ID} from './src/const';
 import StringeeCallManager from './src/stringee_manager/StringeeCallManager';
 import StringeeClientManager from './src/stringee_manager/StringeeClientManager';
-import {stringee_token} from './src/components/home';
+import {access_token} from './src/components/home';
 
 /**
- * handle message from firebase and show the call notification
+ * Handle message from firebase and show the call notification
  * @param message
- * @returns {Promise<void>}
  */
 async function onMessageReceived(message) {
   const data = JSON.parse(message.data.data);
   console.log('data: ' + JSON.stringify(data));
   const stringeeClientManager = StringeeClientManager.instance;
   if (!stringeeClientManager.client.isConnected) {
-    stringeeClientManager.connect(stringee_token);
+    stringeeClientManager.connect(access_token);
   }
   switch (data.callStatus) {
     case 'ended':
@@ -35,7 +34,7 @@ async function onMessageReceived(message) {
 }
 
 /**
- * listen message from firebase when app is in background or killed
+ * Listen message from firebase when app is in background or killed
  */
 messaging().setBackgroundMessageHandler(onMessageReceived);
 
