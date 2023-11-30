@@ -11,7 +11,7 @@ const stringeePushConfig = () => {
 
   RNCallKeep.setup({
     ios: {
-      appName: appName,
+      appName: 'CallSampleHook',
       includesCallsInRecents: true,
     },
   });
@@ -53,13 +53,13 @@ const stringeePushConfig = () => {
 
   RNCallKeep.addEventListener('answerCall', ({callUUID}) => {
     callManager.callkeepAnswered.push(callUUID);
-    callManager.iOSAnswerCallTrigger();
+    callManager.answerStringeeCallIfConditionMatch();
   });
 
   RNCallKeep.addEventListener('didActivateAudioSession', () => {
     console.log('didActivateAudioSession');
     callManager.didActiveAudioSection = true;
-    callManager.iOSAnswerCallTrigger();
+    callManager.answerStringeeCallIfConditionMatch();
   });
 
   RNCallKeep.addEventListener('didDeactivateAudioSession', () => {

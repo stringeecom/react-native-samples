@@ -605,7 +605,7 @@ PODS:
     - React-Core
   - RNCallKeep (4.3.12):
     - React
-  - RNCAsyncStorage (1.20.0):
+  - RNCAsyncStorage (1.21.0):
     - React-Core
   - RNFBApp (18.7.1):
     - Firebase/CoreOnly (= 10.18.0)
@@ -926,7 +926,7 @@ SPEC CHECKSUMS:
   ReactCommon: 3ccb8fb14e6b3277e38c73b0ff5e4a1b8db017a9
   ReactNativeIncallManager: 2385505fa5dfdbbc78925e3b8d23b30ce0cde40e
   RNCallKeep: aa9b1f9286f8f60d7b7d41ee5de47de564356aac
-  RNCAsyncStorage: f861badaced77231ab3781c465a8425f000191aa
+  RNCAsyncStorage: 618d03a5f52fbccb3d7010076bc54712844c18ef
   RNFBApp: faf815f60546ca522eb9ef09d21dfd3fc70d3e27
   RNFBMessaging: dac12b09a0838563518ab59988d8a0051648eb3d
   RNGestureHandler: 32a01c29ecc9bb0b5bf7bc0a33547f61b4dc2741

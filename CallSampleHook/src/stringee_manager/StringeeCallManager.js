@@ -188,9 +188,9 @@ class StringeeCallManager {
 
   /**
    * the call finish, reset manager
-   * @function endSectionCall
+   * @function endCallSection
    */
-  endSectionCall() {
+  endCallSection() {
     if (!isIos) {
       InCallManager.stopRingtone();
     }
@@ -226,7 +226,7 @@ class StringeeCallManager {
         if (this.events) {
           this.events.onChangeSignalingState(SignalingState.ringing);
           if (isIos) {
-            this.iOSAnswerCallTrigger();
+            this.answerStringeeCallIfConditionMatch();
           }
         }
       })
@@ -467,7 +467,7 @@ class StringeeCallManager {
     });
   }
 
-  iOSAnswerCallTrigger() {
+  answerStringeeCallIfConditionMatch() {
     /*
      Handle calls synchronously with native iOS. To ensure calls are answered, ensure:
        + Event active audio section has been called
