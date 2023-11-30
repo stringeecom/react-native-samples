@@ -54,7 +54,7 @@ const CallScreen = () => {
   }, [duration, mediaConnected]);
 
   const clearDataAndGoBack = () => {
-    StringeeCallManager.instance.endSectionCall();
+    StringeeCallManager.instance.endCallSection();
     if (navigation.canGoBack()) {
       navigation.goBack();
     } else {

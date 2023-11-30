@@ -170,9 +170,9 @@ class StringeeCallManager {
 
   /**
    * the call finish, reset manager
-   * @function endSectionCall
+   * @function endCallSection
    */
-  endSectionCall() {
+  endCallSection() {
     if (!isIos) {
       InCallManager.stopRingtone();
     }
@@ -207,7 +207,7 @@ class StringeeCallManager {
         if (this.events) {
           this.events.onChangeSignalingState(SignalingState.ringing);
           if (isIos) {
-            this.iOSAnswerCallTrigger();
+            this.answerStringeeCallIfConditionMatch();
           }
         }
       })
@@ -445,7 +445,7 @@ class StringeeCallManager {
     });
   }
 
-  iOSAnswerCallTrigger() {
+  answerStringeeCallIfConditionMatch() {
     /*
      Xử lý đồng bộ cuộc gọi với native ios. Để đảm bảo cuộc gọi được trả lời cần đảm bảo:
       + Event active audio section đã được gọi
