@@ -445,7 +445,8 @@ class StringeeCallManager {
       if (
         items.find(item => {
           return item.callUUID === data.uuid;
-        }) == null
+        }) == null &&
+        !this.callkeepRejected.includes(data.uuid)
       ) {
         RNCallKeep.displayIncomingCall(
           data.uuid,
