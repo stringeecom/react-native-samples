@@ -1,5 +1,5 @@
 import React, {Component, createRef} from 'react';
-import ActionSheet from 'react-native-actions-sheet/src/index';
+import ActionSheet from 'react-native-actions-sheet';
 import {
   StyleSheet,
   Text,
@@ -7,9 +7,10 @@ import {
   TouchableOpacity,
   View,
   SafeAreaView,
-  ScrollView, Alert,
+  ScrollView,
+  Alert,
 } from 'react-native';
-import {UserInfoParam} from 'stringee-react-native';
+import type {UserInfo} from 'stringee-react-native-v2';
 
 export default class ActShtUpdateUserInfo extends Component {
   constructor(props) {
@@ -205,7 +206,7 @@ export default class ActShtUpdateUserInfo extends Component {
                     return;
                   }
                   this.hide();
-                  let userInfo: UserInfoParam = new UserInfoParam();
+                  let userInfo: UserInfo = new UserInfo();
                   userInfo.name = this.state.name;
                   userInfo.email = this.state.email;
                   userInfo.avatar = this.state.avatar;

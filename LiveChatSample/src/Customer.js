@@ -1,4 +1,4 @@
-import React, {Component, createRef} from 'react';
+import React, {Component} from 'react';
 import {
   View,
   Text,
@@ -7,14 +7,25 @@ import {
   StyleSheet,
   FlatList,
 } from 'react-native';
-import {StringeeClient, Conversation} from 'stringee-react-native';
+import {
+  StringeeClient,
+  Conversation,
+  StringeeClientListener,
+  ObjectType,
+  ChangeType,
+  NewMessageInfo,
+} from 'stringee-react-native-v2';
 
-const widgetKey = 'YOUR_WIDGET_KEY';
-var _conversation: Conversation;
+const widgetKey = 'QXlQZHVWRlc1eTRLcjhuSjlPV2pHM0ZXQlNNK2ljTFZiSkdDdFNuMkJQL0Ztdy9MYzFBOXkwbDdGSm5UZTFNcA==';
+let _conversation: Conversation;
 
 export default class Customer extends Component {
+  stringeeClient: StringeeClient;
+
   constructor(props) {
     super(props);
+
+    this.stringeeClient = new StringeeClient();
 
     this.state = {
       userId: '',
@@ -23,47 +34,47 @@ export default class Customer extends Component {
       clientId: '',
       log: [],
     };
-    this.client = createRef();
-    this.clientEventHandlers = {
-      onConnect: this.onConnect,
-      onDisConnect: this.onDisConnect,
-      onFailWithError: this.onFailWithError,
-      onRequestAccessToken: this.onRequestAccessToken,
-      onCustomMessage: this.onCustomMessage,
-      onObjectChange: this.onObjectChange,
-      onTimeoutInQueue: this.onTimeoutInQueue,
-      onConversationEnded: this.onConversationEnded,
-      onUserBeginTyping: this.onUserBeginTyping,
-      onUserEndTyping: this.onUserEndTyping,
-    };
+
+    const clientListener = new StringeeClientListener();
+    clientListener.onConnect = this.onConnect;
+    clientListener.onDisConnect = this.onDisConnect;
+    clientListener.onFailWithError = this.onFailWithError;
+    clientListener.onRequestAccessToken = this.onRequestAccessToken;
+    clientListener.onObjectChange = this.onObjectChange;
+    clientListener.onTimeoutInQueue = this.onTimeoutInQueue;
+    clientListener.onConversationEnded = this.onConversationEnded;
+    clientListener.onUserBeginTyping = this.onUserBeginTyping;
+    clientListener.onUserEndTyping = this.onUserEndTyping;
+    this.stringeeClient.setListener(clientListener);
   }
 
   componentDidMount(): void {
     // Get chat profile
-    this.client.current.getChatProfile(
-      widgetKey,
-      (status, code, message, chatProfile) => {
+    this.stringeeClient
+      .getChatProfile(widgetKey)
+      .then(chatProfile => {
         console.log(
-          'getChatProfile, msg: ' +
-            message +
-            ' Profile: ' +
-            JSON.stringify(chatProfile),
+          'getChatProfile: success - Profile: ' + JSON.stringify(chatProfile),
         );
-        if (chatProfile != null) {
-          this.state.log.push({
-            data: 'getChatProfile - ' + JSON.stringify(chatProfile),
-          });
-          this.setState({
-            queueId: chatProfile.queues[1].id,
-          });
-        }
-      },
-    );
+        this.state.log.push({
+          data:
+            'getChatProfile: success - Profile: ' + JSON.stringify(chatProfile),
+        });
+        this.setState({
+          queueId: chatProfile.queues[1].id,
+        });
+      })
+      .catch(error => {
+        console.log('getChatProfile: ', error.message);
+        this.state.log.push({
+          data: 'getChatProfile: ' + error.message,
+        });
+      });
   }
 
   //Event
   // The client connects to Stringee server
-  onConnect = ({userId}) => {
+  onConnect = (stringeeClient: StringeeClient, userId: string) => {
     console.log('onConnect - ' + userId);
     this.state.log.push({
       data: 'onConnect - ' + userId,
@@ -75,12 +86,12 @@ export default class Customer extends Component {
   };
 
   // The client disconnects from Stringee server
-  onDisConnect = () => {
+  onDisConnect = (stringeeClient: StringeeClient) => {
     console.log('onDisConnect');
     this.state.log.push({
       data: 'onDisConnect',
     });
-    this.client.current.disconnect();
+    this.stringeeClient.disconnect();
     this.setState({
       userId: 'Disconnected',
       connected: false,
@@ -88,7 +99,11 @@ export default class Customer extends Component {
   };
 
   // The client fails to connects to Stringee server
-  onFailWithError = ({code, message}) => {
+  onFailWithError = (
+    stringeeClient: StringeeClient,
+    code: number,
+    message: string,
+  ) => {
     console.log('onFailWithError: code-' + code + ' message: ' + message);
     this.state.log.push({
       data: 'onFailWithError: code-' + code + ' message: ' + message,
@@ -97,7 +112,7 @@ export default class Customer extends Component {
   };
 
   // Access token is expired. A new access token is required to connect to Stringee server
-  onRequestAccessToken = () => {
+  onRequestAccessToken = (stringeeClient: StringeeClient) => {
     console.log('onRequestAccessToken');
     this.state.log.push({
       data: 'onRequestAccessToken',
@@ -107,16 +122,13 @@ export default class Customer extends Component {
     // this.client.current.connect('NEW_TOKEN');
   };
 
-  // Receive custom message
-  onCustomMessage = ({data}) => {
-    console.log('onCustomMessage: ' + data);
-    this.state.log.push({
-      data: 'onCustomMessage: ' + data,
-    });
-  };
-
   // Receive event of Conversation or Message
-  onObjectChange = ({objectType, objectChanges, changeType}) => {
+  onObjectChange = (
+    stringeeClient: StringeeClient,
+    objectType: ObjectType,
+    objectChanges: Array,
+    changeType: ChangeType,
+  ) => {
     console.log(
       'onObjectChange: objectType - ' +
         objectType +
@@ -137,7 +149,12 @@ export default class Customer extends Component {
   };
 
   // Receive when chat request to queue is timeout
-  onTimeoutInQueue = ({convId, customerId, customerName}) => {
+  onTimeoutInQueue = (
+    stringeeClient: StringeeClient,
+    convId: string,
+    customerId: string,
+    customerName: string,
+  ) => {
     console.log(
       'onTimeoutInQueue: convId - ' +
         convId +
@@ -161,13 +178,17 @@ export default class Customer extends Component {
   };
 
   // Receive when conversation ended
-  onConversationEnded = ({convId, endedby}) => {
+  onConversationEnded = (
+    stringeeClient: StringeeClient,
+    convId: string,
+    endedBy: string,
+  ) => {
     console.log(
-      'onConversationEnded: convId - ' + convId + '\n endedby - ' + endedby,
+      'onConversationEnded: convId - ' + convId + '\n endedby - ' + endedBy,
     );
     this.state.log.push({
       data:
-        'onConversationEnded: convId - ' + convId + '\n endedby - ' + endedby,
+        'onConversationEnded: convId - ' + convId + '\n endedby - ' + endedBy,
     });
     this.setState({
       inConv: false,
@@ -175,7 +196,12 @@ export default class Customer extends Component {
   };
 
   // Receive when user send beginTyping
-  onUserBeginTyping = ({convId, userId, displayName}) => {
+  onUserBeginTyping = (
+    stringeeClient: StringeeClient,
+    convId: string,
+    userId: string,
+    displayName: string,
+  ) => {
     console.log(
       'onUserBeginTyping: convId - ' +
         convId +
@@ -196,7 +222,12 @@ export default class Customer extends Component {
   };
 
   // Receive when user send endTyping
-  onUserEndTyping = ({convId, userId, displayName}) => {
+  onUserEndTyping = (
+    stringeeClient: StringeeClient,
+    convId: string,
+    userId: string,
+    displayName: string,
+  ) => {
     console.log(
       'onUserEndTyping: convId - ' +
         convId +
@@ -240,18 +271,21 @@ export default class Customer extends Component {
           style={this.styles.button}
           onPress={() => {
             // Get live chat token
-            this.client.current.getLiveChatToken(
-              widgetKey,
-              this.state.name,
-              this.state.email,
-              (status, code, message, token) => {
+            this.stringeeClient
+              .getLiveChatToken(widgetKey, this.state.name, this.state.email)
+              .then(token => {
                 console.log('getLiveChatToken: ' + JSON.stringify(token));
                 this.state.log.push({
                   data: 'getLiveChatToken - ' + JSON.stringify(token),
                 });
-                this.client.current.connect(token);
-              },
-            );
+                this.stringeeClient.connect(token);
+              })
+              .catch(error => {
+                console.log('getLiveChatToken: ', error.message);
+                this.state.log.push({
+                  data: 'getLiveChatToken: ' + error.message,
+                });
+              });
           }}>
           <Text style={this.styles.text}>Connect</Text>
         </TouchableOpacity>
@@ -265,24 +299,29 @@ export default class Customer extends Component {
         <TouchableOpacity
           style={this.styles.button}
           onPress={() => {
-            this.client.current.createLiveChatConversation(
-              this.state.queueId,
-              (status, code, message, conversation) => {
+            this.stringeeClient
+              .createLiveChatConversation(this.state.queueId)
+              .then(conversation => {
                 _conversation = conversation;
                 console.log(
-                  'createLiveChatConversation - ' +
+                  'createLiveChatConversation: success - conversation:' +
                     JSON.stringify(_conversation),
                 );
                 this.state.log.push({
                   data:
-                    'createLiveChatConversation - ' +
+                    'createLiveChatConversation: success - conversation:' +
                     JSON.stringify(_conversation),
                 });
                 this.setState({
                   inConv: true,
                 });
-              },
-            );
+              })
+              .catch(error => {
+                console.log('createLiveChatConversation: ', error.message);
+                this.state.log.push({
+                  data: 'createLiveChatConversation: ' + error.message,
+                });
+              });
           }}>
           <Text style={this.styles.text}>Create live-chat</Text>
         </TouchableOpacity>
@@ -297,67 +336,51 @@ export default class Customer extends Component {
           <TouchableOpacity
             style={this.styles.button}
             onPress={() => {
-              const message = {
+              const message: NewMessageInfo = new NewMessageInfo({
                 message: {
                   content: 'Test',
                 },
                 type: 1,
                 convId: _conversation.id,
-              };
+              });
 
-              this.client.current.sendMessage(
-                message,
-                (status, code, message) => {
-                  console.log(
-                    'sendMessage: status - ' +
-                      status +
-                      ' code - ' +
-                      code +
-                      ' message - ' +
-                      message,
-                  );
+              _conversation
+                .sendMessage(message)
+                .then(() => {
+                  console.log('sendMessage: success');
                   this.state.log.push({
-                    data:
-                      'sendMessage: status - ' +
-                      status +
-                      ' code - ' +
-                      code +
-                      ' message - ' +
-                      message,
+                    data: 'sendMessage: success',
                   });
-                },
-              );
+                })
+                .catch(error => {
+                  console.log('sendMessage: ', error.message);
+                  this.state.log.push({
+                    data: 'sendMessage: ' + error.message,
+                  });
+                });
             }}>
             <Text style={this.styles.text}>Send message</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={this.styles.button}
             onPress={() => {
-              this.client.current.endChat(
-                _conversation.id,
-                (status, code, message) => {
-                  console.log(
-                    'endChat: status - ' +
-                      status +
-                      ' code - ' +
-                      code +
-                      ' message - ' +
-                      message,
-                  );
+              _conversation
+                .endChat()
+                .then(() => {
+                  console.log('endChat: success');
                   this.state.log.push({
-                    data:
-                      'endChat: status - ' +
-                      status +
-                      ' code - ' +
-                      code +
-                      ' message - ' +
-                      message,
+                    data: 'endChat: success',
                   });
                   this.setState({
                     inConv: false,
                   });
-                },
-              );
+                })
+                .catch(error => {
+                  console.log('endChat: ', error.message);
+                  this.state.log.push({
+                    data: 'endChat: ' + error.message,
+                  });
+                });
             }}>
             <Text style={this.styles.text}>End chat</Text>
           </TouchableOpacity>
@@ -387,11 +410,6 @@ export default class Customer extends Component {
           : !this.state.inConv
           ? this.btnStartLiveChat()
           : this.viewInConv()}
-
-        <StringeeClient
-          ref={this.client}
-          eventHandlers={this.clientEventHandlers}
-        />
       </View>
     );
   }

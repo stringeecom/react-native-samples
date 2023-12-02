@@ -1,5 +1,5 @@
 import React, {Component, createRef} from 'react';
-import ActionSheet from 'react-native-actions-sheet/src/index';
+import ActionSheet from 'react-native-actions-sheet';
 import {
   StyleSheet,
   Text,
@@ -51,7 +51,9 @@ export default class ActShtGetUserInfo extends Component {
             <TouchableOpacity
               style={this.styles.button}
               onPress={() => {
-                const userIds = this.state.userIds.replace(/ /g, '').split(',');
+                const userIds: Array<string> = this.state.userIds
+                  .replace(/ /g, '')
+                  .split(',');
 
                 if (userIds.length === 0) {
                   Alert.alert('user id is empty');

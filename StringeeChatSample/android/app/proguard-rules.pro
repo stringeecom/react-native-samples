@@ -9,15 +9,5 @@
 
 # Add any project specific keep options here:
 -dontwarn org.webrtc.**
--dontwarn com.google.android.gms.internal.zzbeb
--dontwarn com.google.android.gms.internal.zzbec
 -keep class org.webrtc.** { *; }
--dontwarn org.apache.http.**
--keep class org.apache.http.** { *; }
--assumenosideeffects class android.util.Log {
-    public static *** d(...);
-    public static *** w(...);
-    public static *** v(...);
-    public static *** i(...);
-    public static *** e(...);
-}
+-keep class com.stringee.** { *; }

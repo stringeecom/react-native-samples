@@ -1,5 +1,5 @@
 import React, {Component, createRef} from 'react';
-import ActionSheet from 'react-native-actions-sheet/src/index';
+import ActionSheet from 'react-native-actions-sheet';
 import {
   StyleSheet,
   Text,

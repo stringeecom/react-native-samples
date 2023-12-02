@@ -9,7 +9,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {StringeeClient} from 'stringee-react-native';
 import {Icon} from 'react-native-elements';
 import ActShtCreateConversation from './src/ActShtCreateConversation';
 import ActShtGetConversation from './src/ActShtGetConversation';
@@ -20,11 +19,22 @@ import ActShtGetMessage from './src/ActShtGetMessage';
 import ActShtMsgAction from './src/ActShtMsgAction';
 import ActShtGetUserInfo from './src/ActShtGetUserInfo';
 import ActShtUpdateUserInfo from './src/ActShtUpdateUserInfo';
+import {
+  StringeeClient,
+  StringeeClientListener,
+  ConversationOption,
+  ObjectType,
+  ChangeType,
+  UserInfo,
+  NewMessageInfo,
+} from 'stringee-react-native-v2';
 
 const token =
-  'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZULTE2NjMwNDMyMjQiLCJpc3MiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZUIiwiZXhwIjoxNjY1NjM1MjI0LCJ1c2VySWQiOiJ1c2VyMSJ9.O6E7_IHRejlgPv8A9ag722FuDp0bKMeDK8y_9lMs_iY';
+  'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZULTE3MDEyNDcyODUiLCJpc3MiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZUIiwiZXhwIjoxNzAzODM5Mjg1LCJ1c2VySWQiOiJ1c2VyMiJ9.F6r5g4zxUlp-hfmRFyLNF7yRZiPH_vnoJyx4YYt0C08';
 
 export default class App extends Component {
+  stringeeClient: StringeeClient;
+
   constructor(props) {
     super(props);
 
@@ -40,7 +50,7 @@ export default class App extends Component {
       title: '',
     };
 
-    this.client = createRef();
+    this.stringeeClient = new StringeeClient();
 
     this.createConvRef = createRef();
     this.getConvByIdRef = createRef();
@@ -59,80 +69,82 @@ export default class App extends Component {
     this.getMsgBeforeRef = createRef();
     this.getMsgById = createRef();
 
-    this.clientEventHandlers = {
-      onConnect: this.onConnect,
-      onDisConnect: this.onDisConnect,
-      onFailWithError: this.onFailWithError,
-      onRequestAccessToken: this.onRequestAccessToken,
-      onCustomMessage: this.onCustomMessage,
-      onObjectChange: this.onObjectChange,
-      onUserBeginTyping: this.onUserBeginTyping,
-      onUserEndTyping: this.onUserEndTyping,
-    };
+    const clientListener = new StringeeClientListener();
+    clientListener.onConnect = this.onConnect;
+    clientListener.onDisConnect = this.onDisConnect;
+    clientListener.onFailWithError = this.onFailWithError;
+    clientListener.onRequestAccessToken = this.onRequestAccessToken;
+    clientListener.onObjectChange = this.onObjectChange;
+    clientListener.onUserBeginTyping = this.onUserBeginTyping;
+    clientListener.onUserEndTyping = this.onUserEndTyping;
+    this.stringeeClient.setListener(clientListener);
   }
 
   componentDidMount(): void {
-    this.client.current.connect(token);
+    this.stringeeClient.connect(token);
   }
 
   //Event
   // The client connects to Stringee server
-  onConnect = ({userId}) => {
-    console.log('onConnect - ' + userId);
+  onConnect = (stringeeClient: StringeeClient, userId: string) => {
+    console.log('onConnect: ', userId);
     this.setState({
       userId: userId,
     });
-    this.addLog('onConnect - ' + userId);
+    this.addLog('onConnect: ' + userId);
   };
 
   // The client disconnects from Stringee server
-  onDisConnect = () => {
+  onDisConnect = (stringeeClient: StringeeClient) => {
     console.log('onDisConnect');
     this.setState({
-      userId: '',
+      userId: 'Disconnected',
     });
     this.addLog('onDisConnect');
   };
 
   // The client fails to connects to Stringee server
-  onFailWithError = ({code, message}) => {
-    console.log('onFailWithError: code-' + code + ' message: ' + message);
+  onFailWithError = (
+    stringeeClient: StringeeClient,
+    code: number,
+    message: string,
+  ) => {
+    console.log('onFailWithError: code - ' + code + ', message - ' + message);
     this.setState({
-      userId: '',
+      userId: message,
     });
-    this.addLog('onFailWithError: code-' + code + ' message: ' + message);
+    this.addLog('onFailWithError: code - ' + code + ', message - ' + message);
   };
 
   // Access token is expired. A new access token is required to connect to Stringee server
-  onRequestAccessToken = () => {
+  onRequestAccessToken = (stringeeClient: StringeeClient) => {
     console.log('onRequestAccessToken');
     this.addLog('onRequestAccessToken');
     // Token để kết nối tới Stringee server đã hết bạn. Bạn cần lấy token mới và gọi connect lại ở đây
     // this.client.current.connect('NEW_TOKEN');
   };
 
-  // Receive custom message
-  onCustomMessage = ({data}) => {
-    console.log('onCustomMessage: ' + data);
-    this.addLog('onCustomMessage: ' + data);
-  };
-
   // Receive event of Conversation or Message
-  onObjectChange = ({objectType, objectChanges, changeType}) => {
+  onObjectChange = (
+    stringeeClient: StringeeClient,
+    objectType: ObjectType,
+    objectChanges: Array,
+    changeType: ChangeType,
+  ) => {
     console.log(
       'onObjectChange: \nobjectType - ' +
         objectType +
-        '\n changeType - ' +
+        '\nchangeType - ' +
         changeType +
-        '\n objectChanges - ' +
+        '\nobjectChanges - ' +
         JSON.stringify(objectChanges),
     );
     this.addLog(
       'onObjectChange: \nobjectType - ' +
         objectType +
-        '\n changeType - ' +
+        '\nchangeType - ' +
         changeType +
-        '\n objectChanges - ' +
+        '\nobjectChanges - ' +
         JSON.stringify(objectChanges),
     );
 
@@ -165,41 +177,51 @@ export default class App extends Component {
   };
 
   // Receive when user send beginTyping
-  onUserBeginTyping = ({convId, userId, displayName}) => {
+  onUserBeginTyping = (
+    stringeeClient: StringeeClient,
+    convId: string,
+    userId: string,
+    displayName: string,
+  ) => {
     console.log(
       'onUserBeginTyping: \nconvId - ' +
         convId +
-        '\n userId - ' +
+        '\nuserId - ' +
         userId +
-        '\n displayName - ' +
+        '\ndisplayName - ' +
         displayName,
     );
     this.addLog(
       'onUserBeginTyping: \nconvId - ' +
         convId +
-        '\n userId - ' +
+        '\nuserId - ' +
         userId +
-        '\n displayName - ' +
+        '\ndisplayName - ' +
         displayName,
     );
   };
 
   // Receive when user send endTyping
-  onUserEndTyping = ({convId, userId, displayName}) => {
+  onUserEndTyping = (
+    stringeeClient: StringeeClient,
+    convId: string,
+    userId: string,
+    displayName: string,
+  ) => {
     console.log(
       'onUserEndTyping: \nconvId - ' +
         convId +
-        '\n userId - ' +
+        '\nuserId - ' +
         userId +
-        '\n displayName - ' +
+        '\ndisplayName - ' +
         displayName,
     );
     this.addLog(
       'onUserEndTyping: \nconvId - ' +
         convId +
-        '\n userId - ' +
+        '\nuserId - ' +
         userId +
-        '\n displayName - ' +
+        '\ndisplayName - ' +
         displayName,
     );
   };
@@ -229,299 +251,332 @@ export default class App extends Component {
   };
 
   // Actions
-  createConversation = (options, participant) => {
-    this.client.current.createConversation(
-      participant,
-      options,
-      (status, code, message, conversation) => {
+  createConversation = (
+    options: ConversationOption,
+    participant: Array<string>,
+  ) => {
+    this.stringeeClient
+      .createConversation(participant, options)
+      .then(conversation => {
         console.log(
-          'Create conversation: ' +
-            message +
-            ' \nconversation -' +
+          'createConversation: success \nconversation - ' +
             JSON.stringify(conversation),
         );
-        this.addLog('Create conversation: ' + message);
-        if (status) {
-          this.clearConversations();
-          this.addConversation(conversation);
-        }
-      },
-    );
+        this.addLog(
+          'createConversation: success \nconversation - ' +
+            JSON.stringify(conversation),
+        );
+        this.clearConversations();
+        this.addConversation(conversation);
+      })
+      .catch(error => {
+        console.log('createConversation: ', error.message);
+        this.addLog('createConversation: ' + error.message);
+      });
   };
 
   getConversationById = convId => {
-    this.client.current.getConversationById(
-      convId,
-      (status, code, message, conversation) => {
+    this.stringeeClient
+      .getConversationById(convId)
+      .then(conversation => {
         console.log(
-          'Get conversation by id: ' +
-            message +
-            ' \nconversation -' +
+          'getConversationById: success \nconversation - ' +
             JSON.stringify(conversation),
         );
-        this.addLog('Get conversation by id: ' + message);
-        if (status) {
-          this.clearConversations();
-          this.addConversation(conversation);
-        }
-      },
-    );
+        this.addLog(
+          'getConversationById: success \nconversation - ' +
+            JSON.stringify(conversation),
+        );
+        this.clearConversations();
+        this.addConversation(conversation);
+      })
+      .catch(error => {
+        console.log('getConversationById: ', error.message);
+        this.addLog('getConversationById: ' + error.message);
+      });
   };
 
   getLocalConversations = () => {
     const count = 10;
     const isAscending = true;
 
-    this.client.current.getLocalConversations(
-      this.state.userId,
-      count,
-      isAscending,
-      (status, code, message, conversations) => {
+    this.stringeeClient
+      .getLocalConversations(this.state.userId, count, isAscending)
+      .then(conversations => {
         console.log(
-          'Get local conversations: ' +
-            message +
-            ' \nconversations -' +
+          'getLocalConversations: success \nconversations - ' +
             JSON.stringify(conversations),
         );
-        this.addLog('Get local conversations: ' + message);
-        if (status) {
-          this.clearConversations();
-          conversations.forEach(conversation => {
-            this.addConversation(conversation);
-          });
-        }
-      },
-    );
+        this.addLog(
+          'getLocalConversations: success \nconversations - ' +
+            JSON.stringify(conversations),
+        );
+        this.clearConversations();
+        conversations.forEach(conversation => {
+          this.addConversation(conversation);
+        });
+      })
+      .catch(error => {
+        console.log('getLocalConversations: ', error.message);
+        this.addLog('getLocalConversations: ' + error.message);
+      });
   };
 
   getLastConversations = () => {
     const count = 10;
     const isAscending = true;
 
-    this.client.current.getLastConversations(
-      count,
-      isAscending,
-      (status, code, message, conversations) => {
+    this.stringeeClient
+      .getLastConversations(count, isAscending)
+      .then(conversations => {
         console.log(
-          'Get last conversations: ' +
-            message +
-            ' \nconversations -' +
+          'getLastConversations: success \nconversations - ' +
             JSON.stringify(conversations),
         );
-        this.addLog('Get last conversations: ' + message);
-        if (status) {
-          this.clearConversations();
-          conversations.forEach(conversation => {
-            this.addConversation(conversation);
-          });
-        }
-      },
-    );
+        this.addLog(
+          'getLastConversations: success \nconversations - ' +
+            JSON.stringify(conversations),
+        );
+        this.clearConversations();
+        conversations.forEach(conversation => {
+          this.addConversation(conversation);
+        });
+      })
+      .catch(error => {
+        console.log('getLastConversations: ', error.message);
+        this.addLog('getLastConversations: ' + error.message);
+      });
   };
 
   getConversationsBefore = dateTime => {
     const count = 10;
     const isAscending = true;
 
-    this.client.current.getConversationsBefore(
-      dateTime,
-      count,
-      isAscending,
-      (status, code, message, conversations) => {
+    this.stringeeClient
+      .getConversationsBefore(dateTime, count, isAscending)
+      .then(conversations => {
         console.log(
-          'Get conversations before: ' +
-            message +
-            ' \nconversations -' +
+          'getConversationsBefore: success \nconversations - ' +
             JSON.stringify(conversations),
         );
-        this.addLog('Get conversations before: ' + message);
-        if (status) {
-          this.clearConversations();
-          conversations.forEach(conversation => {
-            this.addConversation(conversation);
-          });
-        }
-      },
-    );
+        this.addLog(
+          'getConversationsBefore: success \nconversations - ' +
+            JSON.stringify(conversations),
+        );
+        this.clearConversations();
+        conversations.forEach(conversation => {
+          this.addConversation(conversation);
+        });
+      })
+      .catch(error => {
+        console.log('getConversationsBefore: ', error.message);
+        this.addLog('getConversationsBefore: ' + error.message);
+      });
   };
 
   getConversationsAfter = dateTime => {
     const count = 10;
     const isAscending = true;
 
-    this.client.current.getConversationsAfter(
-      dateTime,
-      count,
-      isAscending,
-      (status, code, message, conversations) => {
+    this.stringeeClient
+      .getConversationsAfter(dateTime, count, isAscending)
+      .then(conversations => {
         console.log(
-          'Get conversations after: ' +
-            message +
-            ' \nconversations -' +
+          'getConversationsAfter: success \nconversations - ' +
             JSON.stringify(conversations),
         );
-        this.addLog('Get conversations after: ' + message);
-        if (status) {
-          this.clearConversations();
-          conversations.forEach(conversation => {
-            this.addConversation(conversation);
-          });
-        }
-      },
-    );
+        this.addLog(
+          'getConversationsAfter: success \nconversations - ' +
+            JSON.stringify(conversations),
+        );
+        this.clearConversations();
+        conversations.forEach(conversation => {
+          this.addConversation(conversation);
+        });
+      })
+      .catch(error => {
+        console.log('getConversationsAfter: ', error.message);
+        this.addLog('getConversationsAfter: ' + error.message);
+      });
   };
 
   getConversationWithUser = userId => {
-    this.client.current.getConversationWithUser(
-      userId,
-      (status, code, message, conversation) => {
+    this.stringeeClient
+      .getConversationWithUser(userId)
+      .then(conversation => {
         console.log(
-          'Get conversation with user: ' +
-            message +
-            ' \nconversations -' +
+          'getConversationWithUser: success \nconversations - ' +
             JSON.stringify(conversation),
         );
-        this.addLog('Get conversations with user: ' + message);
-        if (status) {
-          this.clearConversations();
-          this.addConversation(conversation);
-        }
-      },
-    );
+        this.addLog(
+          'getConversationWithUser: success \nconversations - ' +
+            JSON.stringify(conversation),
+        );
+        this.clearConversations();
+        this.addConversation(conversation);
+      })
+      .catch(error => {
+        console.log('getConversationWithUser: ', error.message);
+        this.addLog('getConversationWithUser: ' + error.message);
+      });
   };
 
   getUnreadConversationCount = () => {
-    this.client.current.getUnreadConversationCount(
-      (status, code, message, count) => {
-        console.log(
-          'Get unread conversation count: ' + message + ' \ncount -' + count,
-        );
-        this.addLog('Get unread conversation count: ' + message);
-      },
-    );
+    this.stringeeClient
+      .getUnreadConversationCount()
+      .then(count => {
+        console.log('getUnreadConversationCount: success \ncount - ' + count);
+        this.addLog('getUnreadConversationCount: success \ncount - ' + count);
+      })
+      .catch(error => {
+        console.log('getUnreadConversationCount: ', error.message);
+        this.addLog('getUnreadConversationCount: ' + error.message);
+      });
   };
 
-  getUserInfo = userIds => {
-    this.client.current.getUserInfo(userIds, (status, code, message, users) => {
-      console.log(
-        'Get user info: ' + message + ' \nusers -' + JSON.stringify(users),
-      );
-      this.addLog(
-        'Get user info: ' + message + ' \nusers -' + JSON.stringify(users),
-      );
-    });
+  getUserInfo = (userIds: Array<string>) => {
+    this.stringeeClient
+      .getUserInfo(userIds)
+      .then(users => {
+        console.log('getUserInfo: success \nusers - ' + JSON.stringify(users));
+        this.addLog('getUserInfo: success \nusers - ' + JSON.stringify(users));
+      })
+      .catch(error => {
+        console.log('getUserInfo: ', error.message);
+        this.addLog('getUserInfo: ' + error.message);
+      });
   };
 
-  updateUserInfo = userInfo => {
-    this.client.current.updateUserInfoWithParam(
-      userInfo,
-      (status, code, message) => {
-        console.log('Update user info: ' + message);
-        this.addLog('Update user info: ' + message);
-      },
-    );
+  updateUserInfo = (userInfo: UserInfo) => {
+    this.stringeeClient
+      .updateUserInfo(userInfo)
+      .then(() => {
+        console.log('updateUserInfo: success');
+        this.addLog('updateUserInfo: success');
+      })
+      .catch(error => {
+        console.log('updateUserInfo: ', error.message);
+        this.addLog('updateUserInfo: ' + error.message);
+      });
   };
 
   clearDb = () => {
-    this.client.current.clearDb((status, code, message) => {
-      console.log('Get unread conversation count: ' + message);
-      this.addLog('Get unread conversation count: ' + message);
-    });
+    this.stringeeClient
+      .clearDb()
+      .then(() => {
+        console.log('clearDb: success');
+        this.addLog('clearDb: success');
+      })
+      .catch(error => {
+        console.log('clearDb: ', error.message);
+        this.addLog('clearDb: ' + error.message);
+      });
   };
 
   deleteConversation = () => {
-    this.client.current.deleteConversation(
-      this.state.selectedConv.id,
-      (status, code, message) => {
-        console.log('Delete conversation: ' + message);
-        this.addConversationLog('Delete conversation: ' + message);
-      },
-    );
+    this.state.selectedConv
+      .deleteConversation()
+      .then(() => {
+        console.log('deleteConversation: success');
+        this.addConversationLog('deleteConversation: success');
+      })
+      .catch(error => {
+        console.log('deleteConversation: ', error.message);
+        this.addConversationLog('deleteConversation: ' + error.message);
+      });
   };
 
   addParticipants = participants => {
     if (this.state.selectedConv.isGroup) {
-      this.client.current.addParticipants(
-        this.state.selectedConv.id,
-        participants,
-        (status, code, message, users) => {
+      this.state.selectedConv
+        .addParticipants(participants)
+        .then(users => {
           console.log(
-            'Add participants: ' +
-              message +
-              '\nusers - ' +
-              JSON.stringify(users),
+            'addParticipants: success \nusers - ' + JSON.stringify(users),
           );
           this.addConversationLog(
-            'Add participants: ' +
-              message +
-              '\nusers - ' +
-              JSON.stringify(users),
+            'addParticipants: success \nusers - ' + JSON.stringify(users),
           );
-        },
-      );
+        })
+        .catch(error => {
+          console.log('addParticipants: ', error.message);
+          this.addConversationLog('addParticipants: ' + error.message);
+        });
     }
   };
 
   removeParticipants = participants => {
     if (this.state.selectedConv.isGroup) {
-      this.client.current.removeParticipants(
-        this.state.selectedConv.id,
-        participants,
-        (status, code, message, users) => {
+      this.state.selectedConv
+        .removeParticipants(participants)
+        .then(users => {
           console.log(
-            'Remove participants: ' +
-              message +
-              '\nusers - ' +
-              JSON.stringify(users),
+            'removeParticipants: success \nusers - ' + JSON.stringify(users),
           );
           this.addConversationLog(
-            'Remove participants: ' +
-              message +
-              '\nusers - ' +
-              JSON.stringify(users),
+            'removeParticipants: success \nusers - ' + JSON.stringify(users),
           );
-        },
-      );
+        })
+        .catch(error => {
+          console.log('removeParticipants: ', error.message);
+          this.addConversationLog('removeParticipants: ' + error.message);
+        });
     }
   };
 
-  updateConversation = (convName, avatar) => {
-    const params = {
-      name: convName,
-      avatar: avatar,
-    };
-    this.client.current.updateConversation(
-      this.state.selectedConv.id,
-      params,
-      (status, code, message) => {
-        console.log('Update conversation: ' + message);
-        this.addConversationLog('Update conversation: ' + message);
-      },
-    );
+  updateConversation = conversationInfo => {
+    this.state.selectedConv
+      .updateConversation(conversationInfo)
+      .then(() => {
+        console.log('updateConversation: success');
+        this.addConversationLog('updateConversation: success');
+      })
+      .catch(error => {
+        console.log('updateConversation: ', error.message);
+        this.addConversationLog('updateConversation: ' + error.message);
+      });
   };
 
   sendBeginTyping = () => {
-    this.client.current.sendBeginTyping(
-      this.state.selectedConv.id,
-      (status, code, message) => {
-        console.log('Send begin typing: ' + message);
-        this.addConversationLog('Send begin typing: ' + message);
-      },
-    );
+    this.state.selectedConv
+      .sendBeginTyping()
+      .then(() => {
+        console.log('sendBeginTyping: success');
+        this.addConversationLog('sendBeginTyping: success');
+      })
+      .catch(error => {
+        console.log('sendBeginTyping: ', error.message);
+        this.addConversationLog('sendBeginTyping: ' + error.message);
+      });
   };
 
   sendEndTyping = () => {
-    this.client.current.sendEndTyping(
-      this.state.selectedConv.id,
-      (status, code, message) => {
-        console.log('Send end typing: ' + message);
-        this.addConversationLog('Send end typing: ' + message);
-      },
-    );
+    this.state.selectedConv
+      .sendEndTyping()
+      .then(() => {
+        console.log('sendEndTyping: success');
+        this.addConversationLog('sendEndTyping: success');
+      })
+      .catch(error => {
+        console.log('sendEndTyping: ', error.message);
+        this.addConversationLog('sendEndTyping: ' + error.message);
+      });
   };
 
   sendMessage = content => {
-    const msg = {
+    const newMessageInfo: NewMessageInfo = new NewMessageInfo({
+      // The type of the message:
+      // - type = 1: Text.
+      // - type = 2: Photo.
+      // - type = 3: Video.
+      // - type = 4: Audio.
+      // - type = 5: File.
+      // - type = 6: Link.
+      // - type = 9: Location.
+      // - type = 10: Contact.
+      // - type = 11: Sticker.
+      type: 1,
+      convId: this.state.selectedConv.id,
       message: {
         // for message text + message link
         content: content,
@@ -571,49 +626,41 @@ export default class App extends Component {
           name: 'sticker name',
         },
       },
-      // The type of the message:
-      // - type = 1: Text.
-      // - type = 2: Photo.
-      // - type = 3: Video.
-      // - type = 4: Audio.
-      // - type = 5: File.
-      // - type = 6: Link.
-      // - type = 9: Location.
-      // - type = 10: Contact.
-      // - type = 11: Sticker.
-      type: 1,
-      convId: this.state.selectedConv.id,
-    };
-    this.client.current.sendMessage(msg, (status, code, message) => {
-      console.log('Send message: ' + message);
-      this.addConversationLog('Send message: ' + message);
     });
+    this.state.selectedConv
+      .sendMessage(newMessageInfo)
+      .then(() => {
+        console.log('sendMessage: success');
+        this.addConversationLog('sendMessage: success');
+      })
+      .catch(error => {
+        console.log('sendMessage: ', error.message);
+        this.addConversationLog('sendMessage: ' + error.message);
+      });
   };
 
   getLocalMessages = () => {
     const count = 10;
     const isAscending = true;
 
-    this.client.current.getLocalMessages(
-      this.state.selectedConv.id,
-      count,
-      isAscending,
-      (status, code, message, messages) => {
+    this.state.selectedConv
+      .getLocalMessages(count, isAscending)
+      .then(messages => {
         console.log(
-          'Get local messages: ' +
-            message +
-            '\nmessages - ' +
-            JSON.stringify(messages),
+          'getLocalMessages: success \nmessages - ' + JSON.stringify(messages),
         );
-        this.addConversationLog('Get local messages: ' + message);
-        if (status) {
-          this.clearMsgs();
-          messages.forEach(msg => {
-            this.addMessage(msg);
-          });
-        }
-      },
-    );
+        this.addConversationLog(
+          'getLocalMessages: success \nmessages - ' + JSON.stringify(messages),
+        );
+        this.clearMsgs();
+        messages.forEach(msg => {
+          this.addMessage(msg);
+        });
+      })
+      .catch(error => {
+        console.log('getLocalMessages: ', error.message);
+        this.addConversationLog('getLocalMessages: ' + error.message);
+      });
   };
 
   getLastMessages = () => {
@@ -622,28 +669,29 @@ export default class App extends Component {
     const loadDeletedMessage = false;
     const loadDeletedMessageContent = false;
 
-    this.client.current.getLastMessages(
-      this.state.selectedConv.id,
-      count,
-      isAscending,
-      loadDeletedMessage,
-      loadDeletedMessageContent,
-      (status, code, message, messages) => {
+    this.state.selectedConv
+      .getLastMessages(
+        count,
+        isAscending,
+        loadDeletedMessage,
+        loadDeletedMessageContent,
+      )
+      .then(messages => {
         console.log(
-          'Get last messages: ' +
-            message +
-            '\nmessages - ' +
-            JSON.stringify(messages),
+          'getLastMessages: success \nmessages - ' + JSON.stringify(messages),
         );
-        this.addConversationLog('Get last messages: ' + message);
-        if (status) {
-          this.clearMsgs();
-          messages.forEach(msg => {
-            this.addMessage(msg);
-          });
-        }
-      },
-    );
+        this.addConversationLog(
+          'getLastMessages: success \nmessages - ' + JSON.stringify(messages),
+        );
+        this.clearMsgs();
+        messages.forEach(msg => {
+          this.addMessage(msg);
+        });
+      })
+      .catch(error => {
+        console.log('getLastMessages: ', error.message);
+        this.addConversationLog('getLastMessages: ' + error.message);
+      });
   };
 
   getMessagesAfter = sequence => {
@@ -652,29 +700,30 @@ export default class App extends Component {
     const loadDeletedMessage = false;
     const loadDeletedMessageContent = false;
 
-    this.client.current.getMessagesAfter(
-      this.state.selectedConv.id,
-      sequence,
-      count,
-      isAscending,
-      loadDeletedMessage,
-      loadDeletedMessageContent,
-      (status, code, message, messages) => {
+    this.state.selectedConv
+      .getMessagesAfter(
+        sequence,
+        count,
+        isAscending,
+        loadDeletedMessage,
+        loadDeletedMessageContent,
+      )
+      .then(messages => {
         console.log(
-          'Get messages after: ' +
-            message +
-            '\nmessages - ' +
-            JSON.stringify(messages),
+          'getMessagesAfter: success \nmessages - ' + JSON.stringify(messages),
         );
-        this.addConversationLog('Get messages after: ' + message);
-        if (status) {
-          this.clearMsgs();
-          messages.forEach(msg => {
-            this.addMessage(msg);
-          });
-        }
-      },
-    );
+        this.addConversationLog(
+          'getMessagesAfter: success \nmessages - ' + JSON.stringify(messages),
+        );
+        this.clearMsgs();
+        messages.forEach(msg => {
+          this.addMessage(msg);
+        });
+      })
+      .catch(error => {
+        console.log('getMessagesAfter: ', error.message);
+        this.addConversationLog('getMessagesAfter: ' + error.message);
+      });
   };
 
   getMessagesBefore = sequence => {
@@ -683,111 +732,115 @@ export default class App extends Component {
     const loadDeletedMessage = false;
     const loadDeletedMessageContent = false;
 
-    this.client.current.getMessagesBefore(
-      this.state.selectedConv.id,
-      sequence,
-      count,
-      isAscending,
-      loadDeletedMessage,
-      loadDeletedMessageContent,
-      (status, code, message, messages) => {
+    this.state.selectedConv
+      .getMessagesBefore(
+        sequence,
+        count,
+        isAscending,
+        loadDeletedMessage,
+        loadDeletedMessageContent,
+      )
+      .then(messages => {
         console.log(
-          'Get messages before: ' +
-            message +
-            '\nmessages - ' +
-            JSON.stringify(messages),
+          'getMessagesBefore: success \nmessages - ' + JSON.stringify(messages),
         );
-        this.addConversationLog('Get messages before: ' + message);
-        if (status) {
-          this.clearMsgs();
-          messages.forEach(msg => {
-            this.addMessage(msg);
-          });
-        }
-      },
-    );
+        this.addConversationLog(
+          'getMessagesBefore: success \nmessages - ' + JSON.stringify(messages),
+        );
+        this.clearMsgs();
+        messages.forEach(msg => {
+          this.addMessage(msg);
+        });
+      })
+      .catch(error => {
+        console.log('getMessagesBefore: ', error.message);
+        this.addConversationLog('getMessagesBefore: ' + error.message);
+      });
   };
 
   getMessageById = msgId => {
-    this.client.current.getMessageById(
-      this.state.selectedConv.id,
-      msgId,
-      (status, code, message, msg) => {
+    this.state.selectedConv
+      .getMessageById(msgId)
+      .then(message => {
         console.log(
-          'Get message by id: ' +
-            message +
-            '\nmessage - ' +
-            JSON.stringify(msg),
+          'getMessageById: success \nmessage - ' + JSON.stringify(message),
         );
-        this.addConversationLog('Get message by id: ' + message);
-        if (status) {
-          this.clearMsgs();
-          this.addMessage(msg);
-        }
-      },
-    );
+        this.addConversationLog(
+          'getMessageById: success \nmessage - ' + JSON.stringify(message),
+        );
+        this.clearMsgs();
+        this.addMessage(message);
+      })
+      .catch(error => {
+        console.log('getMessageById: ', error.message);
+        this.addConversationLog('getMessageById: ' + error.message);
+      });
   };
 
   markConversationAsRead = () => {
-    this.client.current.markConversationAsRead(
-      this.state.selectedConv.id,
-      (status, code, message) => {
-        console.log('Mark conversation as read: ' + message);
-        this.addConversationLog('Mark conversation as read: ' + message);
-      },
-    );
+    this.state.selectedConv
+      .markConversationAsRead()
+      .then(() => {
+        console.log('markConversationAsRead: success');
+        this.addConversationLog('markConversationAsRead: success');
+      })
+      .catch(error => {
+        console.log('markConversationAsRead: ', error.message);
+        this.addConversationLog('markConversationAsRead: ' + error.message);
+      });
   };
 
   editMessage = newContent => {
-    this.client.current.editMessage(
-      this.state.selectedConv.id,
-      this.state.selectedMsg.id,
-      newContent,
-      (status, code, message) => {
-        console.log('Edit message: ' + message);
-        this.addConversationLog('Edit message: ' + message);
-      },
-    );
+    this.state.selectedMsg
+      .editMessage(newContent)
+      .then(() => {
+        console.log('editMessage: success');
+        this.addConversationLog('editMessage: success');
+      })
+      .catch(error => {
+        console.log('editMessage: ', error.message);
+        this.addConversationLog('editMessage: ' + error.message);
+      });
   };
 
   pinMessage = () => {
     const pin = this.state.selectedMsg.id !== this.state.selectedConv.pinMsgId;
-    this.client.current.pinMessage(
-      this.state.selectedConv.id,
-      this.state.selectedMsg.id,
-      pin,
-      (status, code, message) => {
-        if (pin) {
-          console.log('Pin message: ' + message);
-          this.addConversationLog('Pin message: ' + message);
-        } else {
-          console.log('Unpin message: ' + message);
-          this.addConversationLog('Unpin message: ' + message);
-        }
-      },
-    );
+    this.state.selectedMsg
+      .pinMessage(pin)
+      .then(() => {
+        console.log('pinMessage: success \npin - ' + pin);
+        this.addConversationLog('pinMessage: success \npin - ' + pin);
+      })
+      .catch(error => {
+        console.log('pinMessage: ', error.message);
+        this.addConversationLog('pinMessage: ' + error.message);
+      });
   };
 
   deleteMessage = () => {
-    this.client.current.deleteMessage(
-      this.state.selectedConv.id,
-      this.state.selectedMsg.id,
-      (status, code, message) => {
-        console.log('Delete message: ' + message);
-        this.addConversationLog('Delete message: ' + message);
-      },
-    );
+    this.state.selectedConv
+      .deleteMessage(this.state.selectedMsg.id)
+      .then(() => {
+        console.log('deleteMessage: success');
+        this.addConversationLog('deleteMessage: success');
+      })
+      .catch(error => {
+        console.log('deleteMessage: ', error.message);
+        this.addConversationLog('deleteMessage: ' + error.message);
+      });
   };
 
   revokeMessage = () => {
-    this.client.current.revokeMessage(
-      this.state.selectedConv.id,
-      this.state.selectedMsg.id,
-      (status, code, message) => {
-        console.log('Revoke message: ' + message);
-        this.addConversationLog('Revoke message: ' + message);
-      },
-    );
+    this.state.selectedConv
+      .revokeMessage(this.state.selectedMsg.id)
+      .then(() => {
+        console.log('revokeMessage: success');
+        this.addConversationLog('revokeMessage: success');
+      })
+      .catch(error => {
+        console.log('revokeMessage: ', error.message);
+        this.addConversationLog('revokeMessage: ' + error.message);
+      });
   };
 
   clearLog = () => {
@@ -942,15 +995,24 @@ export default class App extends Component {
                 <TouchableOpacity
                   style={this.styles.button}
                   onPress={() => {
-                    this.client.current.getUserInfo(
-                      [this.state.userId],
-                      (status, code, message, users) => {
-                        if (status) {
-                          this.updateUserInfoRef.current.setUserInfo(users[0]);
-                          this.updateUserInfoRef.current.show();
-                        }
-                      },
-                    );
+                    this.stringeeClient
+                      .getUserInfo([this.state.userId])
+                      .then(users => {
+                        console.log(
+                          'getUserInfo: success \nusers - ' +
+                            JSON.stringify(users),
+                        );
+                        this.addLog(
+                          'getUserInfo: success \nusers - ' +
+                            JSON.stringify(users),
+                        );
+                        this.updateUserInfoRef.current.setUserInfo(users[0]);
+                        this.updateUserInfoRef.current.show();
+                      })
+                      .catch(error => {
+                        console.log('getUserInfo: ', error.message);
+                        this.addLog('getUserInfo: ' + error.message);
+                      });
                   }}>
                   <Text style={this.styles.text}>Update user's info</Text>
                 </TouchableOpacity>
@@ -1175,8 +1237,8 @@ export default class App extends Component {
 
             <ActShtUpdateConversation
               ref={this.updateConvRef}
-              data={(convName, avatar) => {
-                this.updateConversation(convName, avatar);
+              data={conversationInfo => {
+                this.updateConversation(conversationInfo);
               }}
             />
 
@@ -1287,11 +1349,6 @@ export default class App extends Component {
             console.log(userInfo);
             this.updateUserInfo(userInfo);
           }}
-        />
-
-        <StringeeClient
-          ref={this.client}
-          eventHandlers={this.clientEventHandlers}
         />
       </SafeAreaView>
     );

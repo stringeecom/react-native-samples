@@ -1,5 +1,4 @@
 import React, {Component, createRef} from 'react';
-import ActionSheet from 'react-native-actions-sheet/src/index';
 import {
   StyleSheet,
   Text,
@@ -10,6 +9,8 @@ import {
   Alert,
 } from 'react-native';
 import {CheckBox} from 'react-native-elements';
+import {ConversationOption} from 'stringee-react-native-v2';
+import ActionSheet from 'react-native-actions-sheet';
 
 export default class ActShtCreateConversation extends Component {
   constructor(props) {
@@ -89,13 +90,12 @@ export default class ActShtCreateConversation extends Component {
             <TouchableOpacity
               style={this.styles.button}
               onPress={() => {
-                const options = {
-                  name: this.state.convName,
-                  isDistinct: this.state.isDistinct,
-                  isGroup: this.state.isGroup,
-                };
+                const options: ConversationOption = new ConversationOption();
+                options.name = this.state.convName;
+                options.isDistinct = this.state.isDistinct;
+                options.isGroup = this.state.isGroup;
 
-                const participant = this.state.participantString
+                const participant: Array<string> = this.state.participantString
                   .replace(/ /g, '')
                   .split(',');
 

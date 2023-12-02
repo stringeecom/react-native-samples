@@ -1,21 +1,25 @@
-import React, {Component, createRef} from 'react';
+import React, {Component} from 'react';
+import {View, Text, TouchableOpacity, StyleSheet, FlatList} from 'react-native';
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  FlatList,
-} from 'react-native';
-import {StringeeClient, Conversation, ChatRequest} from 'stringee-react-native';
+  StringeeClient,
+  Conversation,
+  ChatRequest,
+  StringeeClientListener,
+  ObjectType,
+  ChangeType,
+  NewMessageInfo,
+} from 'stringee-react-native-v2';
 
-const token = 'YOUR_ACCESS_TOKEN';
-var _conversation: Conversation;
-var _chatRequest: ChatRequest;
+const token = 'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS3RVaTBMZzNLa0lISkVwRTNiakZmMmd6UGtsNzlsU1otMTcwMTQ4MzU3OSIsImlzcyI6IlNLdFVpMExnM0trSUhKRXBFM2JqRmYyZ3pQa2w3OWxTWiIsImV4cCI6MTcwMTU2OTk3OSwidXNlcklkIjoiQUNUWFY3QlRBUCIsImljY19hcGkiOnRydWUsImNoYXRBZ2VudCI6dHJ1ZSwiZGlzcGxheU5hbWUiOiJPa3VtdXJhIFJpbiIsImF2YXRhclVybCI6Imh0dHBzOlwvXC9hcGkuc3RyaW5nZWV4LmNvbVwvdjFcL2N1c3RvbWl6ZXJcL2F2YXRhclwvZGVmYXVsdFwvc3RyaW5nZWV4LmpwZ2UiLCJzdWJzY3JpYmUiOiJvbmxpbmVfc3RhdHVzX0dSNjZMN0lOLEFMTF9DQUxMX1NUQVRVUyxhZ2VudF9tYW51YWxfc3RhdHVzIiwiYXR0cmlidXRlcyI6Ilt7XCJhdHRyaWJ1dGVcIjpcIm9ubGluZVN0YXR1c1wiLFwidG9waWNcIjpcIm9ubGluZV9zdGF0dXNfR1I2Nkw3SU5cIn0se1wiYXR0cmlidXRlXCI6XCJjYWxsXCIsXCJ0b3BpY1wiOlwiY2FsbF9HUjY2TDdJTlwifV0ifQ.7KzTofavw1MpRBj-sfcstMhIjhMFOEX9A_6Rq3_MEZ0';
+let _conversation: Conversation;
+let _chatRequest: ChatRequest;
 
 export default class Agent extends Component {
+  stringeeClient: StringeeClient;
   constructor(props) {
     super(props);
+
+    this.stringeeClient = new StringeeClient();
 
     this.state = {
       userId: '',
@@ -24,30 +28,30 @@ export default class Agent extends Component {
       clientId: '',
       log: [],
     };
-    this.client = createRef();
-    this.clientEventHandlers = {
-      onConnect: this.onConnect,
-      onDisConnect: this.onDisConnect,
-      onFailWithError: this.onFailWithError,
-      onRequestAccessToken: this.onRequestAccessToken,
-      onCustomMessage: this.onCustomMessage,
-      onObjectChange: this.onObjectChange,
-      onReceiveChatRequest: this.onReceiveChatRequest,
-      onReceiveTransferChatRequest: this.onReceiveTransferChatRequest,
-      onTimeoutAnswerChat: this.onTimeoutAnswerChat,
-      onConversationEnded: this.onConversationEnded,
-      onUserBeginTyping: this.onUserBeginTyping,
-      onUserEndTyping: this.onUserEndTyping,
-    };
+
+    const clientListener = new StringeeClientListener();
+    clientListener.onConnect = this.onConnect;
+    clientListener.onDisConnect = this.onDisConnect;
+    clientListener.onFailWithError = this.onFailWithError;
+    clientListener.onRequestAccessToken = this.onRequestAccessToken;
+    clientListener.onObjectChange = this.onObjectChange;
+    clientListener.onReceiveChatRequest = this.onReceiveChatRequest;
+    clientListener.onReceiveTransferChatRequest =
+      this.onReceiveTransferChatRequest;
+    clientListener.onTimeoutAnswerChat = this.onTimeoutAnswerChat;
+    clientListener.onConversationEnded = this.onConversationEnded;
+    clientListener.onUserBeginTyping = this.onUserBeginTyping;
+    clientListener.onUserEndTyping = this.onUserEndTyping;
+    this.stringeeClient.setListener(clientListener);
   }
 
   componentDidMount(): void {
-    this.client.current.connect(token);
+    this.stringeeClient.connect(token);
   }
 
   //Event
   // The client connects to Stringee server
-  onConnect = ({userId}) => {
+  onConnect = (stringeeClient: StringeeClient, userId: string) => {
     console.log('onConnect - ' + userId);
     this.state.log.push({
       data: 'onConnect - ' + userId,
@@ -58,19 +62,23 @@ export default class Agent extends Component {
   };
 
   // The client disconnects from Stringee server
-  onDisConnect = () => {
+  onDisConnect = (stringeeClient: StringeeClient) => {
     console.log('onDisConnect');
     this.state.log.push({
       data: 'onDisConnect',
     });
-    this.client.current.disconnect();
+    this.stringeeClient.disconnect();
     this.setState({
       userId: 'Disconnected',
     });
   };
 
   // The client fails to connects to Stringee server
-  onFailWithError = ({code, message}) => {
+  onFailWithError = (
+    stringeeClient: StringeeClient,
+    code: number,
+    message: string,
+  ) => {
     console.log('onFailWithError: code-' + code + ' message: ' + message);
     this.state.log.push({
       data: 'onFailWithError: code-' + code + ' message: ' + message,
@@ -78,7 +86,7 @@ export default class Agent extends Component {
   };
 
   // Access token is expired. A new access token is required to connect to Stringee server
-  onRequestAccessToken = () => {
+  onRequestAccessToken = (stringeeClient: StringeeClient) => {
     console.log('onRequestAccessToken');
     this.state.log.push({
       data: 'onRequestAccessToken',
@@ -87,16 +95,13 @@ export default class Agent extends Component {
     // this.client.current.connect('NEW_TOKEN');
   };
 
-  // Receive custom message
-  onCustomMessage = ({data}) => {
-    console.log('onCustomMessage: ' + data);
-    this.state.log.push({
-      data: 'onCustomMessage: ' + data,
-    });
-  };
-
   // Receive event of Conversation or Message
-  onObjectChange = ({objectType, objectChanges, changeType}) => {
+  onObjectChange = (
+    stringeeClient: StringeeClient,
+    objectType: ObjectType,
+    objectChanges: Array,
+    changeType: ChangeType,
+  ) => {
     console.log(
       'onObjectChange: objectType - ' +
         objectType +
@@ -117,29 +122,37 @@ export default class Agent extends Component {
   };
 
   // Receive when chat request to queue is timeout
-  onReceiveChatRequest = ({request}) => {
+  onReceiveChatRequest = (
+    stringeeClient: StringeeClient,
+    chatRequest: ChatRequest,
+  ) => {
     console.log(
-      'onReceiveChatRequest: chatRequest - ' + JSON.stringify(request),
+      'onReceiveChatRequest: chatRequest - ' + JSON.stringify(chatRequest),
     );
     this.state.log.push({
-      data: 'onReceiveChatRequest: chatRequest - ' + JSON.stringify(request),
+      data:
+        'onReceiveChatRequest: chatRequest - ' + JSON.stringify(chatRequest),
     });
-    _chatRequest = request;
+    _chatRequest = chatRequest;
     this.setState({
       inRequest: true,
     });
   };
 
   // Receive when chat request to queue is timeout
-  onReceiveTransferChatRequest = ({request}) => {
+  onReceiveTransferChatRequest = (
+    stringeeClient: StringeeClient,
+    chatRequest: ChatRequest,
+  ) => {
     console.log(
-      'onReceiveTransferChatRequest: chatRequest - ' + JSON.stringify(request),
+      'onReceiveTransferChatRequest: chatRequest - ' +
+        JSON.stringify(chatRequest),
     );
-    _chatRequest = request;
+    _chatRequest = chatRequest;
     this.state.log.push({
       data:
         'onReceiveTransferChatRequest: chatRequest - ' +
-        JSON.stringify(request),
+        JSON.stringify(chatRequest),
     });
     this.setState({
       inRequest: true,
@@ -147,12 +160,15 @@ export default class Agent extends Component {
   };
 
   // Receive when chat request to queue is timeout
-  onTimeoutAnswerChat = ({request}) => {
+  onTimeoutAnswerChat = (
+    stringeeClient: StringeeClient,
+    chatRequest: ChatRequest,
+  ) => {
     console.log(
-      'onTimeoutAnswerChat: chatRequest - ' + JSON.stringify(request),
+      'onTimeoutAnswerChat: chatRequest - ' + JSON.stringify(chatRequest),
     );
     this.state.log.push({
-      data: 'onTimeoutAnswerChat: chatRequest - ' + JSON.stringify(request),
+      data: 'onTimeoutAnswerChat: chatRequest - ' + JSON.stringify(chatRequest),
     });
     this.setState({
       inRequest: false,
@@ -160,13 +176,17 @@ export default class Agent extends Component {
   };
 
   // Receive when conversation ended
-  onConversationEnded = ({convId, endedby}) => {
+  onConversationEnded = (
+    stringeeClient: StringeeClient,
+    convId: string,
+    endedBy: string,
+  ) => {
     console.log(
-      'onConversationEnded: convId - ' + convId + '\n endedby - ' + endedby,
+      'onConversationEnded: convId - ' + convId + '\n endedby - ' + endedBy,
     );
     this.state.log.push({
       data:
-        'onConversationEnded: convId - ' + convId + '\n endedby - ' + endedby,
+        'onConversationEnded: convId - ' + convId + '\n endedby - ' + endedBy,
     });
     this.setState({
       inConv: false,
@@ -174,7 +194,12 @@ export default class Agent extends Component {
   };
 
   // Receive when user send beginTyping
-  onUserBeginTyping = ({convId, userId, displayName}) => {
+  onUserBeginTyping = (
+    stringeeClient: StringeeClient,
+    convId: string,
+    userId: string,
+    displayName: string,
+  ) => {
     console.log(
       'onUserBeginTyping: convId - ' +
         convId +
@@ -195,7 +220,12 @@ export default class Agent extends Component {
   };
 
   // Receive when user send endTyping
-  onUserEndTyping = ({convId, userId, displayName}) => {
+  onUserEndTyping = (
+    stringeeClient: StringeeClient,
+    convId: string,
+    userId: string,
+    displayName: string,
+  ) => {
     console.log(
       'onUserEndTyping: convId - ' +
         convId +
@@ -222,67 +252,50 @@ export default class Agent extends Component {
           <TouchableOpacity
             style={this.styles.button}
             onPress={() => {
-              const message = {
+              const message: NewMessageInfo = new NewMessageInfo({
                 message: {
                   content: 'Test',
                 },
                 type: 1,
                 convId: _conversation.id,
-              };
-
-              this.client.current.sendMessage(
-                message,
-                (status, code, message) => {
-                  console.log(
-                    'sendMessage: status - ' +
-                      status +
-                      ' code - ' +
-                      code +
-                      ' message - ' +
-                      message,
-                  );
+              });
+              _conversation
+                .sendMessage(message)
+                .then(() => {
+                  console.log('sendMessage: success');
                   this.state.log.push({
-                    data:
-                      'sendMessage: status - ' +
-                      status +
-                      ' code - ' +
-                      code +
-                      ' message - ' +
-                      message,
+                    data: 'sendMessage: success',
                   });
-                },
-              );
+                })
+                .catch(error => {
+                  console.log('sendMessage: ', error.message);
+                  this.state.log.push({
+                    data: 'sendMessage: ' + error.message,
+                  });
+                });
             }}>
             <Text style={this.styles.text}>Send message</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={this.styles.button}
             onPress={() => {
-              this.client.current.endChat(
-                _conversation.id,
-                (status, code, message) => {
-                  console.log(
-                    'endChat: status - ' +
-                      status +
-                      ' code - ' +
-                      code +
-                      ' message - ' +
-                      message,
-                  );
+              _conversation
+                .endChat()
+                .then(() => {
+                  console.log('endChat: success');
                   this.state.log.push({
-                    data:
-                      'endChat: status - ' +
-                      status +
-                      ' code - ' +
-                      code +
-                      ' message - ' +
-                      message,
+                    data: 'endChat: success',
                   });
                   this.setState({
                     inConv: false,
                   });
-                },
-              );
+                })
+                .catch(error => {
+                  console.log('endChat: ', error.message);
+                  this.state.log.push({
+                    data: 'endChat: ' + error.message,
+                  });
+                });
             }}>
             <Text style={this.styles.text}>End chat</Text>
           </TouchableOpacity>
@@ -298,94 +311,69 @@ export default class Agent extends Component {
           <TouchableOpacity
             style={this.styles.button}
             onPress={() => {
-              this.client.current.acceptChatRequest(
-                _chatRequest,
-                (status, code, message) => {
-                  console.log(
-                    'acceptChatRequest: status - ' +
-                      status +
-                      ' code - ' +
-                      code +
-                      ' message - ' +
-                      message,
-                  );
+              _chatRequest
+                .acceptChatRequest()
+                .then(() => {
+                  console.log('acceptChatRequest: success');
                   this.state.log.push({
-                    data:
-                      'acceptChatRequest: status - ' +
-                      status +
-                      ' code - ' +
-                      code +
-                      ' message - ' +
-                      message,
+                    data: 'acceptChatRequest: success',
                   });
                   this.setState({
                     inRequest: false,
                   });
-                  if (status) {
-                    this.client.current.getConversationById(
-                      _chatRequest.convId,
-                      (status, code, message, conversation) => {
-                        _conversation = conversation;
-                        console.log(
-                          'getConversationById: status - ' +
-                            status +
-                            ' code - ' +
-                            code +
-                            ' message - ' +
-                            message +
-                            ' conversation - ' +
-                            JSON.stringify(conversation),
-                        );
-                        this.state.log.push({
-                          data:
-                            'getConversationById: status - ' +
-                            status +
-                            ' code - ' +
-                            code +
-                            ' message - ' +
-                            message +
-                            ' conversation - ' +
-                            JSON.stringify(conversation),
-                        });
-                        this.setState({
-                          inConv: true,
-                        });
-                      },
-                    );
-                  }
-                },
-              );
+                  this.stringeeClient
+                    .getConversationById(_chatRequest.convId)
+                    .then(conversation => {
+                      console.log(
+                        'getConversationById: success - conversation:',
+                        JSON.stringify(conversation),
+                      );
+                      this.state.log.push({
+                        data:
+                          'getConversationById: success - conversation:' +
+                          JSON.stringify(conversation),
+                      });
+                      _conversation = conversation;
+                      this.setState({
+                        inConv: true,
+                      });
+                    })
+                    .catch(error => {
+                      console.log('getConversationById: ', error.message);
+                      this.state.log.push({
+                        data: 'getConversationById: ' + error.message,
+                      });
+                    });
+                })
+                .catch(error => {
+                  console.log('acceptChatRequest: ', error.message);
+                  this.state.log.push({
+                    data: 'acceptChatRequest: ' + error.message,
+                  });
+                });
             }}>
             <Text style={this.styles.text}>Accept</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={this.styles.button}
             onPress={() => {
-              this.client.current.rejectChatRequest(
-                _chatRequest,
-                (status, code, message) => {
-                  console.log(
-                    'rejectChatRequest: status - ' +
-                      status +
-                      ' code - ' +
-                      code +
-                      ' message - ' +
-                      message,
-                  );
+              _chatRequest
+                .rejectChatRequest(_chatRequest)
+                .then(() => {
+                  console.log('acceptChatRequest: success');
                   this.state.log.push({
-                    data:
-                      'rejectChatRequest: status - ' +
-                      status +
-                      ' code - ' +
-                      code +
-                      ' message - ' +
-                      message,
+                    data: 'acceptChatRequest: success',
                   });
                   this.setState({
                     inRequest: false,
                   });
-                },
-              );
+                })
+                .catch(error => {
+                  console.log('rejectChatRequest: ', error.message);
+                  this.state.log.push({
+                    data: 'rejectChatRequest: ' + error.message,
+                  });
+                });
             }}>
             <Text style={this.styles.text}>Reject</Text>
           </TouchableOpacity>
@@ -413,11 +401,6 @@ export default class Agent extends Component {
         {this.state.inRequest
           ? this.viewInRequest()
           : this.state.inConv && this.viewInConv()}
-
-        <StringeeClient
-          ref={this.client}
-          eventHandlers={this.clientEventHandlers}
-        />
       </View>
     );
   }

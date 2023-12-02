@@ -1,5 +1,5 @@
 import React, {Component, createRef} from 'react';
-import ActionSheet from 'react-native-actions-sheet/src/index';
+import ActionSheet from 'react-native-actions-sheet';
 import {
   StyleSheet,
   Text,
@@ -8,6 +8,7 @@ import {
   View,
   SafeAreaView,
 } from 'react-native';
+import {ConversationInfo} from 'stringee-react-native-v2';
 
 export default class ActShtUpdateConversation extends Component {
   constructor(props) {
@@ -63,7 +64,10 @@ export default class ActShtUpdateConversation extends Component {
               style={this.styles.button}
               onPress={() => {
                 this.hide();
-                this.props.data(this.state.convName, this.state.avatar);
+                let conversationInfo: ConversationInfo = new ConversationInfo();
+                conversationInfo.name = this.state.convName;
+                conversationInfo.avatar = this.state.avatar;
+                this.props.data(conversationInfo);
               }}>
               <Text style={this.styles.text}>Update</Text>
             </TouchableOpacity>
