@@ -2,11 +2,9 @@ import RNVoipPushNotification from 'react-native-voip-push-notification';
 import StringeeClientManager from './StringeeClientManager';
 import StringeeCallManager from './StringeeCallManager';
 import RNCallKeep from 'react-native-callkeep';
-import {NativeModules} from 'react-native';
 import {SignalingState} from 'stringee-react-native-v2';
 
 const stringeePushConfig = () => {
-  console.log('Config push Stringee', NativeModules.RNManagerUUID);
   const clientManager = StringeeClientManager.instance;
   const callManager = StringeeCallManager.instance;
 
