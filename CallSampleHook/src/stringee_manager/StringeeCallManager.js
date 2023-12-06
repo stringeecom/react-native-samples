@@ -187,7 +187,7 @@ class StringeeCallManager {
   }
 
   /**
-   * the call finish, reset manager
+   * The call finish, reset manager
    * @function endCallSection
    */
   endCallSection() {
@@ -394,7 +394,7 @@ class StringeeCallManager {
           resolve();
         });
       } else if (this.callKeeps) {
-        // đồng bộ trả lời cuộc gọi với CallKeep
+        // Synchronize call answering with CallKeep
         RNCallKeep.answerIncomingCall(this.callKeeps.uuid);
       }
       this.signalingState = SignalingState.answered;

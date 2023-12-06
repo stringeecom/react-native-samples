@@ -1,13 +1,12 @@
 import {
   UPDATE_CALL_INFO,
-  UPDATE_CALL_SCREEN,
   UPDATE_SIGNAL_STATE,
-  USER_ONLINE_STAUS,
+  USER_ONLINE_STATUS,
 } from '../../const';
 
 export const setClientInfo = data => {
   return {
-    type: USER_ONLINE_STAUS,
+    type: USER_ONLINE_STATUS,
     payload: data,
   };
 };

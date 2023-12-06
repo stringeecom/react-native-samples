@@ -3,7 +3,7 @@ import {
   UPDATE_CALL_INFO,
   UPDATE_CALL_SCREEN,
   UPDATE_SIGNAL_STATE,
-  USER_ONLINE_STAUS,
+  USER_ONLINE_STATUS,
 } from '../const';
 import {SignalingState} from 'stringee-react-native-v2';
 
@@ -24,7 +24,7 @@ const INIT_STATE = {
 
 const stringeeReducer = (state = INIT_STATE, action) => {
   switch (action.type) {
-    case USER_ONLINE_STAUS:
+    case USER_ONLINE_STATUS:
       return {
         ...state,
         client: action.payload,
