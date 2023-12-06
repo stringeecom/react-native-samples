@@ -3,6 +3,7 @@ import StringeeClientManager from './StringeeClientManager';
 import StringeeCallManager from './StringeeCallManager';
 import RNCallKeep from 'react-native-callkeep';
 import {NativeModules} from 'react-native';
+import {SignalingState} from 'stringee-react-native-v2';
 
 const stringeePushConfig = () => {
   console.log('Config push Stringee', NativeModules.RNManagerUUID);
@@ -53,6 +54,7 @@ const stringeePushConfig = () => {
 
   RNCallKeep.addEventListener('answerCall', ({callUUID}) => {
     callManager.callkeepAnswered.push(callUUID);
+    callManager.signalingState = SignalingState.answered;
     callManager.answerStringeeCallIfConditionMatch();
   });
 
