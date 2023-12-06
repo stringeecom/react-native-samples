@@ -10,7 +10,7 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
-import type {UserInfo} from 'stringee-react-native-v2';
+import {UserInfo} from 'stringee-react-native-v2';
 
 export default class ActShtUpdateUserInfo extends Component {
   constructor(props) {

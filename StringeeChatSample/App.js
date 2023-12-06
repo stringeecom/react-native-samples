@@ -29,8 +29,7 @@ import {
   NewMessageInfo,
 } from 'stringee-react-native-v2';
 
-const token =
-  'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZULTE3MDEyNDcyODUiLCJpc3MiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZUIiwiZXhwIjoxNzAzODM5Mjg1LCJ1c2VySWQiOiJ1c2VyMiJ9.F6r5g4zxUlp-hfmRFyLNF7yRZiPH_vnoJyx4YYt0C08';
+const token = 'PUT_YOUR_TOKEN_HERE';
 
 export default class App extends Component {
   stringeeClient: StringeeClient;
@@ -1254,7 +1253,7 @@ export default class App extends Component {
               isNumber={true}
               title={'Sequence'}
               data={sequence => {
-                this.getMessagesAfter(sequence);
+                this.getMessagesAfter(parseFloat(sequence));
               }}
             />
 
@@ -1263,7 +1262,7 @@ export default class App extends Component {
               isNumber={true}
               title={'Sequence'}
               data={sequence => {
-                this.getMessagesBefore(sequence);
+                this.getMessagesBefore(parseFloat(sequence));
               }}
             />
 
@@ -1271,7 +1270,7 @@ export default class App extends Component {
               ref={this.getMsgById}
               title={'Message id'}
               data={msgId => {
-                this.getMessageById(msgId);
+                this.getMessageById('msg-vn-1-WI4Y6NAP8C-1646851800851');
               }}
             />
 
@@ -1306,7 +1305,7 @@ export default class App extends Component {
           ref={this.getConvByIdRef}
           title={'Conversation id'}
           data={convId => {
-            this.getConversationById(convId);
+            this.getConversationById('conv-vn-1-X2IZRTJI37-1625179974320');
           }}
         />
 
@@ -1315,7 +1314,7 @@ export default class App extends Component {
           isNumber={true}
           title={'Time in milli second'}
           data={dateTime => {
-            this.getConversationsAfter(dateTime);
+            this.getConversationsAfter(1667277024700);
           }}
         />
 
@@ -1324,7 +1323,7 @@ export default class App extends Component {
           isNumber={true}
           title={'Time in milli second'}
           data={dateTime => {
-            this.getConversationsBefore(dateTime);
+            this.getConversationsBefore(1667277024700);
           }}
         />
 

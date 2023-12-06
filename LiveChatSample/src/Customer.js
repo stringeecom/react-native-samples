@@ -16,7 +16,7 @@ import {
   NewMessageInfo,
 } from 'stringee-react-native-v2';
 
-const widgetKey = 'QXlQZHVWRlc1eTRLcjhuSjlPV2pHM0ZXQlNNK2ljTFZiSkdDdFNuMkJQL0Ztdy9MYzFBOXkwbDdGSm5UZTFNcA==';
+const widgetKey = 'PUT_YOUR_WIDGET_TOKEN_HERE';
 let _conversation: Conversation;
 
 export default class Customer extends Component {
