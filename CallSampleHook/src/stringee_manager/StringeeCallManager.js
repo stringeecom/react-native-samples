@@ -248,12 +248,13 @@ class StringeeCallManager {
 
   // Show incoming call notification in android
   async showIncomingCallNotification(from: string) {
+    // Create your notification channel
     const channelId = await notifee.createChannel({
       id: CHANNEL_ID,
       name: CHANNEL_NAME,
       description: CHANNEL_DESCRIPTION,
       vibration: true,
-      importance: AndroidImportance.HIGH,
+      importance: AndroidImportance.HIGH, // Must be HIGH for display notification over other app
     });
     await notifee.displayNotification({
       id: NOTIFICATION_ID,
@@ -261,20 +262,22 @@ class StringeeCallManager {
       body: 'Call from ' + from,
       android: {
         channelId,
-        importance: AndroidImportance.HIGH,
-        category: AndroidCategory.CALL,
+        importance: AndroidImportance.HIGH, // Must be HIGH for display notification over other app
+        category: AndroidCategory.CALL, // Must be CALL for display notification like system call notification
         autoCancel: false,
         ongoing: true,
+        // Press on the notification
         pressAction: {
           id: OPEN_APP_ACTION_ID,
-          launchActivity: 'default',
+          launchActivity: 'default', // `default` will open your MainActivity
         },
+        // Create 2 action button: Answer, Reject
         actions: [
           {
             title: 'Answer',
             pressAction: {
               id: ANSWER_ACTION_ID,
-              launchActivity: 'default',
+              launchActivity: 'default', // `default` will open your MainActivity
             },
           },
           {
@@ -284,9 +287,10 @@ class StringeeCallManager {
             },
           },
         ],
+        // Show full screen notification
         fullScreenAction: {
           id: OPEN_APP_IN_FULL_SCREEN_MODE_ACTION_ID,
-          launchActivity: 'default',
+          launchActivity: 'default', // `default` will open your MainActivity
         },
       },
     });

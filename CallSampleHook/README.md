@@ -62,7 +62,7 @@ The StringeeCallManager and VoipPushManager work together to manage and synchron
 First, make sure you have installed the necessary libraries and configured the project according to the [Tutorial](https://developer.stringee.com/docs/call-api-overview) instructions.
 And add all files in the **stringee_manager** directory to your project.
 
-## Conect to Stringee Server
+## Connect to Stringee Server
 To use events from StringeeClient for your UI, assign a value to **StringeeClientManager.instance.listener** and then use **StringeeClientManager.instance.setListener()**.
 for Example:
 
@@ -84,7 +84,7 @@ When receiving a call from the onIncomingCall event or when you want to initiate
 for Example: 
 
 ```javascript
-    const = onIncomingCall = (stringeeClient, call) => {
+    const onIncomingCall = (stringeeClient, call) => {
       dispatch(
         setCallInfo({
           call_with: call.fromAlias,
@@ -147,19 +147,19 @@ for Example:
 
     const localVideoView = () => {
         return <StringeeVideoView
-                    uuid={StringeeCallManager.instance.call.uuid}
+                    uuid={StringeeCallManager.instance.call.uuid} // for StringeeCall
                     local={true}
                     scalingType={'fit'}
                     overlay={true}
-                    videoTrack={localTrack}
+                    videoTrack={localTrack} // for StringeeCall2
                     style={sheet.local_view_did_active_remote}
-                >
+                />
     }
 ```
 
 ### Implement action incall
 
- You can easily implement user actions during a call, such as rejecting, hanging up, muting, switching cameras, and more, by using the corresponding functions in the StringeeCallManager.
+You can easily implement user actions during a call, such as rejecting, hanging up, muting, switching cameras, and more, by using the corresponding functions in the StringeeCallManager.
 
 Here are some examples of the functions you can use:
 
@@ -246,7 +246,196 @@ In the ios/AppDelegate.m file, when receiving a call from the StringeeServer, us
 
 By generating a UUID for CallKeep, you can ensure that the call is uniquely identified and properly synchronized between the native and React Native components, enabling seamless handling and management of the call across both platforms.
 
+### Implement Push notification android
 
+For android, we recommend using [React Native Firebase](https://rnfirebase.io/) to receive notification from Stringee and [Notifee](https://notifee.app/) to display and interact with the notifications.
+
+#### Receiving messages
+
+Ensure that you have successfully completed the setup steps for React Native Firebase. In your `index.android.js` file, using function setBackgroundMessageHandler for receive message when your device is in background state and quit state, and handle the message like this: 
+
+```javascript
+/**
+ * Handle message from firebase and show the call notification
+ * @param message
+ */
+async function onMessageReceived(message) {
+  const data = JSON.parse(message.data.data);
+  console.log('data: ' + JSON.stringify(data));
+  const stringeeClientManager = StringeeClientManager.instance;
+  if (!stringeeClientManager.client.isConnected) {
+    stringeeClientManager.connect(access_token);
+  }
+  switch (data.callStatus) {
+    case 'ended':
+    case 'agentEnded':
+    case 'answered':
+      StringeeCallManager.instance.endCallSection();
+      await notifee.cancelNotification(NOTIFICATION_ID);
+      break;
+  }
+}
+
+/**
+ * Listen message from firebase when app is in background or killed
+ */
+messaging().setBackgroundMessageHandler(onMessageReceived);
+```
+
+For each our call notification will have one the call status: started, ringing, answered, ended, agentEnded(for PCC call).
+
+#### Display and interact with notifications
+
+Ensure that you have successfully completed the setup steps for Notifee.
+
+After connect and receive incoming call, you can display the notification:
+
+```javascript
+async function showIncomingCallNotification(from: string) {
+  // Create your notification channel
+  const channelId = await notifee.createChannel({
+    id: CHANNEL_ID,
+    name: CHANNEL_NAME,
+    description: CHANNEL_DESCRIPTION,
+    vibration: true,
+    importance: AndroidImportance.HIGH, // Must be HIGH for display notification over other app
+  });
+  await notifee.displayNotification({
+    id: NOTIFICATION_ID,
+    title: 'Incoming Call',
+    body: 'Call from ' + from,
+    android: {
+      channelId,
+      importance: AndroidImportance.HIGH, // Must be HIGH for display notification over other app
+      category: AndroidCategory.CALL, // Must be CALL for display notification like system call notification
+      autoCancel: false,
+      ongoing: true,
+      // Press on the notification
+      pressAction: {
+        id: OPEN_APP_ACTION_ID,
+        launchActivity: 'default', // `default` will open your MainActivity
+      },
+      // Create 2 action button: Answer, Reject
+      actions: [
+        {
+          title: 'Answer',
+          pressAction: {
+            id: ANSWER_ACTION_ID,
+            launchActivity: 'default', // `default` will open your MainActivity
+          },
+        },
+        {
+          title: 'Reject',
+          pressAction: {
+            id: REJECT_ACTION_ID,
+          },
+        },
+      ],
+      // Show full screen notification
+      fullScreenAction: {
+        id: OPEN_APP_IN_FULL_SCREEN_MODE_ACTION_ID,
+        launchActivity: 'default', // `default` will open your MainActivity
+      },
+    },
+  });
+}
+```
+
+If you want to display notification in full screen following this doc https://notifee.app/react-native/docs/android/behaviour#full-screen
+For each state of the device, we will handle it in different places:
+- Background state:
+
+    In your `App.js` file:
+    ```javascript
+    /**
+    * Handle press action from notification when app is in background
+    */
+    notifee.onBackgroundEvent(async event => {
+      console.log('onBackgroundEvent' + JSON.stringify(event.detail.pressAction));
+      if (event.type === EventType.ACTION_PRESS) {
+        switch (event.detail.pressAction.id) {
+          case ANSWER_ACTION_ID:
+            if (StringeeCallManager.instance.call) {
+              StringeeCallManager.instance.answer().then(() => {
+                if (StringeeCallManager.instance.didAnswer) {
+                  StringeeCallManager.instance.didAnswer();
+                }
+              });
+            }
+            break;
+          case REJECT_ACTION_ID:
+            StringeeCallManager.instance.rejectCall();
+            StringeeCallManager.instance.endSectionCall();
+            break;
+          case OPEN_APP_IN_FULL_SCREEN_MODE_ACTION_ID:
+            break;
+        }
+        await notifee.cancelNotification(NOTIFICATION_ID);
+      }
+    });
+    ```
+- Quit state:
+
+    In your `App.js` file:
+    ```javascript
+  
+    /**
+    * Handle press action from notification when app is killed in android
+    */
+    async function bootstrap() {
+      const initialNotification = await notifee.getInitialNotification();
+      console.log('initialNotification: ', JSON.stringify(initialNotification));
+      if (initialNotification && StringeeCallManager.instance.call) {
+        // Handle when press on notification
+        if (initialNotification.pressAction) {
+          dispatch(
+            setCallInfo({
+              call_with: StringeeCallManager.instance.call.from,
+              isVideo: StringeeCallManager.instance.call.isVideoCall,
+              useCall2: false,
+              isIncoming: true,
+            }),
+          );
+          navigation.navigate(CALL_SCREEN_NAME);
+          // Handle when press on answer button in notification
+          if (initialNotification.pressAction.id === ANSWER_ACTION_ID) {
+            StringeeCallManager.instance.answer().then(() => {
+              if (StringeeCallManager.instance.didAnswer) {
+                StringeeCallManager.instance.didAnswer();
+              }
+            });
+          }
+        }
+      } else {
+        // Handle when app open in fullscreen mode
+        if (StringeeCallManager.instance.call) {
+          dispatch(
+            setCallInfo({
+              call_with: StringeeCallManager.instance.call.from,
+              isVideo: StringeeCallManager.instance.call.isVideoCall,
+              useCall2: false,
+              isIncoming: true,
+            }),
+          );
+          navigation.navigate(CALL_SCREEN_NAME);
+        }
+      }
+      await notifee.cancelNotification(NOTIFICATION_ID);
+    }
+    
+    useEffect(() => {
+      if (!isIos) {
+        requestPermission();
+        bootstrap();
+      }
+    }, []);
+    ```
+
+### Implement android permission
+
+For a call, it's necessary to request the following permissions: `RECORD_AUDIO`, `CAMERA` (specifically for video calls), `BLUETOOTH_CONNECT` (for Android 12 and above).
+For Android 13 and later versions, to display notifications, it's required to request the `POST_NOTIFICATIONS` permission.
+Make sure that the necessary permissions are granted before initiating a call or display a notification.
 
 # Learn More
 
