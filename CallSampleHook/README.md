@@ -179,6 +179,75 @@ To integrate Apple VoIP Push notifications with RNCallKeep, you can synchronize 
 
 By calling `stringeePushConfig()`, you can ensure that the necessary configurations are in place to receive VoIP Push notifications and handle incoming calls seamlessly within your React Native application.
 
+In the ios/AppDelegate.m file, when receiving a call from the StringeeServer, use [RNStringeeInstanceManager.instance generateUUID:callId serial:serial] to generate a UUID for CallKeep. This step allows you to have control and synchronization over the call, whether it is in the native or React Native environment.
+
+```
+- (void)pushRegistry:(PKPushRegistry *)registry didReceiveIncomingPushWithPayload:(PKPushPayload *)payload forType:(PKPushType)type withCompletionHandler:(void (^)(void))completion {
+  NSDictionary *payloadDataDic = payload.dictionaryPayload[@"data"][@"map"][@"data"][@"map"];
+  NSLog(@"didReceiveIncomingPushWithPayload: %@", payload.dictionaryPayload);
+  NSString *callId = payloadDataDic[@"callId"];
+  NSNumber *serial = payloadDataDic[@"serial"];
+  NSString *callStatus = payloadDataDic[@"callStatus"];
+
+  NSString *fromAlias = payloadDataDic[@"from"][@"map"][@"alias"];
+  NSString *fromNumber = payloadDataDic[@"from"][@"map"][@"number"];
+  NSString *callName = fromAlias != NULL ? fromAlias : fromNumber != NULL ? fromNumber : @"Connecting...";
+
+      
+  NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+  if (serial == NULL) {
+    serial = @(1);
+  }
+  
+  if (callId == NULL) {
+    callId = payloadDataDic[@"content"][@"map"][@"message"][@"map"][@"call_id"];
+  }
+  
+  NSString *uuid = [RNStringeeInstanceManager.instance generateUUID:callId serial:serial];
+
+  if (uuid.length == 0) {
+    uuid = [[[NSUUID UUID] UUIDString] lowercaseString];
+  }
+  
+  NSLog(@"info %@ %@ %@", uuid, serial, callId);
+  
+  [dict setObject:uuid forKey:@"uuid"];
+  [dict setObject:serial forKey:@"serial"];
+  [dict setObject:callId forKey:@"callId"];
+  [dict setObject:callName forKey:@"callName"];
+  
+  NSLog(@"voip push from stringee ---------------------");
+
+  if (callId != NULL && [callStatus isEqual: @"started"]) {
+    // --- Process the received push
+    CustomPushPayload* customPayload = [[CustomPushPayload alloc] init];
+    customPayload.customDictionaryPayload = dict;
+    
+    [RNVoipPushNotificationManager didReceiveIncomingPushWithPayload:customPayload forType:type];
+    CXCallObserver *callObs = [[CXCallObserver alloc] init];
+    BOOL didShow = false;
+    
+    for (CXCall * call in callObs.calls) {
+      if ([call.UUID.UUIDString.lowercaseString isEqualToString:uuid]) {
+        didShow = true;
+      }
+    }
+    if (!didShow) {
+      [RNCallKeep reportNewIncomingCall:uuid handle:@"Stringee" handleType:@"generic" hasVideo:true localizedCallerName:callName supportsHolding:false supportsDTMF:true supportsGrouping:false supportsUngrouping:false fromPushKit:true payload:nil withCompletionHandler:completion];
+    }
+  } else {
+    // Show fake call
+    NSLog(@"show fake call");
+    [RNCallKeep reportNewIncomingCall:uuid handle:@"Stringee" handleType:@"generic" hasVideo:true localizedCallerName:callName supportsHolding:false supportsDTMF:true supportsGrouping:false supportsUngrouping:false fromPushKit:true payload:nil withCompletionHandler:completion];
+    [RNCallKeep endCallWithUUID:uuid reason:1];
+  }
+}
+```
+
+By generating a UUID for CallKeep, you can ensure that the call is uniquely identified and properly synchronized between the native and React Native components, enabling seamless handling and management of the call across both platforms.
+
+
+
 # Learn More
 
 To learn more about `stringee-react-native-v2`, take a look at the following resources:
