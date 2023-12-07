@@ -181,7 +181,7 @@ By calling `stringeePushConfig()`, you can ensure that the necessary configurati
 
 In the ios/AppDelegate.m file, when receiving a call from the StringeeServer, use [RNStringeeInstanceManager.instance generateUUID:callId serial:serial] to generate a UUID for CallKeep. This step allows you to have control and synchronization over the call, whether it is in the native or React Native environment.
 
-```
+```objc
 - (void)pushRegistry:(PKPushRegistry *)registry didReceiveIncomingPushWithPayload:(PKPushPayload *)payload forType:(PKPushType)type withCompletionHandler:(void (^)(void))completion {
   NSDictionary *payloadDataDic = payload.dictionaryPayload[@"data"][@"map"][@"data"][@"map"];
   NSLog(@"didReceiveIncomingPushWithPayload: %@", payload.dictionaryPayload);
