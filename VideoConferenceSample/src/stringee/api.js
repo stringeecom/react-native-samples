@@ -12,7 +12,7 @@ export const createRoom = async (token, name) => {
   });
 };
 
-export const listRoom = async token => {
+export const listRoom = async (token) => {
   return await fetch('https://api.stringee.com/v1/room2/list', {
     headers: {
       'Content-Type': 'application/json',

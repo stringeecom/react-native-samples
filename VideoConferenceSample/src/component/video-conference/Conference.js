@@ -1,16 +1,9 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  Alert,
-} from 'react-native';
-import {StringeeVideoView, StringeeVideoRoom} from 'stringee-react-native-v2';
-import {RoomManager} from '../../stringee/RoomManager';
-import {useNavigation, useRoute} from '@react-navigation/native';
-import {CONFERCENE_SCREEN, chunk} from '../../utils';
+import React, { useEffect, useState } from 'react';
+import { Alert, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StringeeVideoScalingType, StringeeVideoView } from 'stringee-react-native-v2';
+import { RoomManager } from '../../stringee/RoomManager';
+import { useNavigation } from '@react-navigation/native';
+import { chunk } from '../../utils';
 
 const leaveIcon = require('../../../asset/leave.png');
 const muteIcon = require('../../../asset/ic-mute-new.png');
@@ -36,12 +29,13 @@ export const RoomConference = () => {
   }, []);
 
   const userOnRoom = (track, keyView) => {
+    console.log('track', track);
     return (
       <View style={sheet.videoRoom} key={keyView}>
         <StringeeVideoView
           style={sheet.videoRoom}
           videoTrack={track}
-          scalingType="fit"
+          scalingType= {StringeeVideoScalingType.fit}
         />
         <Text style={sheet.userInfo}>{track.publisher.userId}</Text>
       </View>
@@ -67,7 +61,7 @@ export const RoomConference = () => {
   return (
     <View style={sheet.main}>
       {mainRender()}
-      <View style={sheet.buttomContainer}>
+      <View style={sheet.buttonContainer}>
         <TouchableOpacity
           style={sheet.muteBtn}
           onPress={async () => {
@@ -78,7 +72,8 @@ export const RoomConference = () => {
             } catch (error) {
               console.log('mute', error);
             }
-          }}>
+          }}
+        >
           <Image
             style={sheet.muteBtn}
             source={!mute ? muteIcon : muteSelectedIcon}
@@ -86,14 +81,15 @@ export const RoomConference = () => {
         </TouchableOpacity>
         <View style={sheet.space} />
         <TouchableOpacity
-          style={sheet.swichCamera}
+          style={sheet.switchCamera}
           onPress={async () => {
             try {
               await RoomManager.instance.switchCamera();
             } catch (error) {
               console.log(error);
             }
-          }}>
+          }}
+        >
           <Image style={sheet.muteBtn} source={switchCameraIcon} />
         </TouchableOpacity>
         <View style={sheet.space} />
@@ -106,7 +102,8 @@ export const RoomConference = () => {
             } catch (error) {
               console.log(error.message);
             }
-          }}>
+          }}
+        >
           <Image
             source={enableVideo ? videoIcon : videoSelectedIcon}
             style={sheet.muteBtn}
@@ -142,16 +139,18 @@ export const RoomConference = () => {
               },
             ],
           );
-        }}>
+        }}
+      >
         <Image source={leaveIcon} style={sheet.leave} />
       </TouchableOpacity>
     </View>
   );
 };
+
 const sheet = StyleSheet.create({
   videoRoom: {
     flex: 1,
-    borderWidth: 2,
+    borderWidth: 1.5,
     borderColor: 'white',
   },
   userInfo: {
@@ -180,7 +179,7 @@ const sheet = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
   },
-  buttomContainer: {
+  buttonContainer: {
     position: 'absolute',
     right: 40,
     left: 40,
@@ -190,28 +189,30 @@ const sheet = StyleSheet.create({
   },
   leftRoomButton: {
     position: 'absolute',
-    top: 100,
-    right: 50,
-    width: 50,
-    height: 50,
-    borderWidth: 2,
-    borderColor: 'while',
-    borderRadius: 25,
+    top: 25,
+    right: 25,
+    width: 60,
+    height: 60,
+    borderRadius: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'white',
   },
-
   muteBtn: {
     width: 60,
     height: 60,
   },
-
-  swichCamera: {
+  switchCamera: {
+    width: 60,
+    height: 60,
+  },
+  enableVideoBtn: {
     width: 60,
     height: 60,
   },
   leave: {
-    width: 50,
-    height: 50,
-    backgroundColor: 'white'
+    width: 30,
+    height: 30,
   },
   space: {
     flex: 1,

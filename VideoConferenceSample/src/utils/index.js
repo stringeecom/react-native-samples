@@ -1,10 +1,10 @@
-import {generateStringeeToken, chunk} from './alg';
+import { generateStringeeToken, chunk } from './alg';
 import {
   SCREEN_WIDTH,
   SCREEN_HEIGHT,
   LOGIN_SCREEN,
   HOME_SCREEN,
-  CONFERCENE_SCREEN,
+  CONFERENCE_SCREEN,
 } from './constant';
 export {
   generateStringeeToken,
@@ -13,5 +13,5 @@ export {
   SCREEN_WIDTH,
   LOGIN_SCREEN,
   HOME_SCREEN,
-  CONFERCENE_SCREEN,
+  CONFERENCE_SCREEN,
 };

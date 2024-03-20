@@ -1,16 +1,15 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import {
-  TextInput,
-  View,
   StyleSheet,
-  TouchableOpacity,
   Text,
-  Alert,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import {generateStringeeToken} from '../../utils';
-import {useNavigation} from '@react-navigation/native';
-import {HOME_SCREEN} from '../../utils/constant';
-import {generateRestApiToken} from '../../utils/alg';
+import { generateStringeeToken } from '../../utils';
+import { useNavigation } from '@react-navigation/native';
+import { HOME_SCREEN } from '../../utils';
+import { generateRestApiToken } from '../../utils/alg';
 
 export const Login = () => {
   const [userName, setUserName] = useState('');
@@ -66,5 +65,5 @@ const sheet = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: 'green',
   },
-  text: {color: 'white'},
+  text: { color: 'white' },
 });

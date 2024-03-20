@@ -1,23 +1,26 @@
 import {
-  StringeeVideoView,
-  StringeeVideoTrack,
+  StringeeVideo,
   StringeeVideoRoom,
   StringeeVideoRoomListener,
-  StringeeVideo,
+  StringeeVideoTrack,
   StringeeVideoTrackOption,
 } from 'stringee-react-native-v2';
+import { VideoResolution } from 'stringee-react-native-v2/src/helpers/StringeeHelper';
 
 export class RoomManager {
   static instance = new RoomManager();
-  room;
-  localTrack;
+  room: StringeeVideoRoom;
+  localTrack: StringeeVideoTrack;
   displayTrack: Array<StringeeVideoTrack> = [];
-  needUpdateDisplay;
+  needUpdateDisplay: boolean;
   onLeave;
   didLeave = false;
 
-  constructor() {}
-  onJoinRoom = (_, user) => {};
+  constructor() {
+  }
+
+  onJoinRoom = (_, __) => {
+  };
 
   onLeaveRoom = (_, user) => {
     if (user.userId === this.room.client.userId) {
@@ -33,9 +36,11 @@ export class RoomManager {
     this.room
       .subscribe(
         trackInfo,
-        new StringeeVideoTrackOption(true, true, true, 'HD'),
+        new StringeeVideoTrackOption({
+          audio: true,
+          video: true,
+          videoResolution: VideoResolution.hd})
       )
-      .then(track => {})
       .catch(console.log);
   };
 
@@ -44,8 +49,8 @@ export class RoomManager {
   };
 
   onTrackReadyToPlay = (_, track) => {
+    console.log('onTrackReadyToPlay: ', track);
     this.displayTrack.push(track);
-    console.log(this.displayTrack.map(item => item.publisher.userId));
     if (this.needUpdateDisplay) {
       this.needUpdateDisplay(this.displayTrack);
     }
@@ -74,9 +79,8 @@ export class RoomManager {
         this.room
           .subscribe(
             trackInfo,
-            new StringeeVideoTrackOption(true, true, false, 'HD'),
+            new StringeeVideoTrackOption(true, true, false, VideoResolution.hd)
           )
-          .then(track => {})
           .catch(console.log);
       });
     }
@@ -90,22 +94,17 @@ export class RoomManager {
     this.room.setListener(roomEvent);
 
     this.createLocalTrack().then().catch(console.log);
-    this.room
-      .setSpeaker(true)
-      .then(() => {
-        console.log('setSpeaker ok');
-      })
-      .catch(console.log);
   }
 
   async createLocalTrack() {
     try {
       this.localTrack = await StringeeVideo.createLocalVideoTrack(
         this.room,
-        new StringeeVideoTrackOption(true, true, false, 'HD'),
+        new StringeeVideoTrackOption(true, true, false, VideoResolution.hd)
       );
       await this.room.publish(this.localTrack);
-    } catch (error) {}
+    } catch (error) {
+    }
   }
 
   async mute(isMute) {

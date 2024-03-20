@@ -4,10 +4,10 @@ const apiKeySid = 'SKE1RdUtUaYxNaQQ4Wr15qF1zUJuQdAaVT';
 const apiKeySecret = 'M3Fkcmswc1hvYllmOGR0VzY5TXhUcXZxWFJ2OHVudVc=';
 
 export const generateStringeeToken = async userId => {
-  var now = Math.floor(Date.now());
-  var exp = now + 3600000 * 24;
-  var header = {cty: 'stringee-api;v=1'};
-  var payload = {
+  const now = Math.floor(Date.now());
+  const exp = now + 3600000 * 24;
+  const header = {cty: 'stringee-api;v=1'};
+  const payload = {
     jti: apiKeySid + '-' + now,
     iss: apiKeySid,
     exp: exp,
@@ -20,10 +20,10 @@ export const generateStringeeToken = async userId => {
 };
 
 export const generateRestApiToken = async () => {
-  var now = Math.floor(Date.now());
-  var exp = now + 3600000 * 24;
-  var header = {cty: 'stringee-api;v=1'};
-  var payload = {
+  const now = Math.floor(Date.now());
+  const exp = now + 3600000 * 24;
+  const header = {cty: 'stringee-api;v=1'};
+  const payload = {
     jti: apiKeySid + '-' + now,
     iss: apiKeySid,
     exp: exp,
@@ -36,10 +36,10 @@ export const generateRestApiToken = async () => {
 };
 
 export const generateRoomToken = async roomId => {
-  var now = Math.floor(Date.now());
-  var exp = now + 3600000 * 24;
-  var header = {cty: 'stringee-api;v=1'};
-  var payload = {
+  const now = Math.floor(Date.now());
+  const exp = now + 3600000 * 24;
+  const header = {cty: 'stringee-api;v=1'};
+  const payload = {
     jti: apiKeySid + '-' + now,
     iss: apiKeySid,
     exp: exp,

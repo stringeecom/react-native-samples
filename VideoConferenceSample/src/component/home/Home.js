@@ -1,22 +1,23 @@
 import {useNavigation, useRoute} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {
+  PermissionsAndroid, Platform,
   StyleSheet,
   Text,
-  View,
   TextInput,
   TouchableOpacity,
-  Alert,
+  View,
 } from 'react-native';
 import {
   StringeeClient,
   StringeeClientListener,
   StringeeVideo,
 } from 'stringee-react-native-v2';
-import {CONFERCENE_SCREEN} from '../../utils';
+import {CONFERENCE_SCREEN} from '../../utils';
 import {createRoom} from '../../stringee/api';
 import {generateRoomToken} from '../../utils/alg';
 import {RoomManager} from '../../stringee/RoomManager';
+import { each } from 'lodash';
 
 const stringeeClient = new StringeeClient();
 
@@ -25,11 +26,15 @@ export const Home = () => {
   const rest = useRoute().params.rest;
   const [clientId, setClientId] = useState('');
   const [roomToken, setRoomToken] = useState(
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MDI2MjI4ODAsInJvb21JZCI6InJvb20tdm4tMS0xWktTSkk1RjFOLTE3MDE4ODA1NTk5MzgiLCJpc3MiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZUIiwicGVybWlzc2lvbnMiOnsiY29udHJvbF9yb29tIjp0cnVlLCJzdWJzY3JpYmUiOnRydWUsInB1Ymxpc2giOnRydWV9LCJqdGkiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZULTE3MDI1MzY0ODAxMTkifQ.OlxSAbWf7TGRHST2IJZVwaq4Ji8Vp9tXEOhNDp3ABNo',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZUIiwiZXhwIjoxNzEwOTk1MTE0LCJwZXJtaXNzaW9ucyI6eyJzdWJzY3JpYmUiOnRydWUsInB1Ymxpc2giOnRydWUsImNvbnRyb2xfcm9vbSI6dHJ1ZX0sInJvb21JZCI6InJvb20tdm4tMS0zUVpNSkVJUVNELTE3MTA3ODE1OTUyMjEiLCJqdGkiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZULTE3MTA5MDg3MTQ4OTQifQ.aRSErk5B2KZSKlCgh96nUYgodohxsgvASniXi8m0bic',
   );
   const navigation = useNavigation();
 
   useEffect(() => {
+    if (Platform.OS === 'android') {
+      requestPermission();
+    }
+
     let listener = new StringeeClientListener();
 
     listener.onConnect = (client, userId) => {
@@ -48,11 +53,39 @@ export const Home = () => {
     console.log(token);
   }, []);
 
+  const requestPermission = () => {
+    new Promise((resolve, reject) => {
+      PermissionsAndroid.requestMultiple([
+        PermissionsAndroid.PERMISSIONS.CAMERA,
+        PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+        PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT, // Need this permission for android 12 or higher
+      ])
+        .then(result => {
+          const permissionsError = {};
+          permissionsError.permissionsDenied = [];
+          each(result, (permissionValue, permissionType) => {
+            if (permissionValue === 'denied') {
+              permissionsError.permissionsDenied.push(permissionType);
+              permissionsError.type = 'Permissions error';
+            }
+          });
+          if (permissionsError.permissionsDenied.length > 0) {
+            reject(permissionsError);
+          } else {
+            resolve();
+          }
+        })
+        .catch(error => {
+          reject(error);
+        });
+    }).then();
+  };
+
   const didTapJoinRoom = () => {
     StringeeVideo.joinRoom(stringeeClient, roomToken)
-      .then(({room, tracks, users}) => {
+      .then(({room, tracks, _}) => {
         RoomManager.instance.setRoom(room, tracks);
-        navigation.navigate(CONFERCENE_SCREEN);
+        navigation.navigate(CONFERENCE_SCREEN);
       })
       .catch(error => {
         console.log('Error', error);
@@ -64,6 +97,7 @@ export const Home = () => {
       let response = await (await createRoom(rest, `${Math.random()}`)).json();
       let roomId = response.roomId;
       let room = await generateRoomToken(roomId);
+      console.log(room);
       setRoomToken(room);
     } catch (error) {
       console.error(error);
@@ -84,9 +118,9 @@ export const Home = () => {
       <TouchableOpacity style={sheet.botton} onPress={didTapJoinRoom}>
         <Text style={sheet.textBtn}>join room</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={sheet.botton} onPress={didTapCreateRoom}>
-        <Text style={sheet.textBtn}>create room</Text>
-      </TouchableOpacity>
+      {/*<TouchableOpacity style={sheet.botton} onPress={didTapCreateRoom}>*/}
+      {/*  <Text style={sheet.textBtn}>create room</Text>*/}
+      {/*</TouchableOpacity>*/}
     </View>
   );
 };
