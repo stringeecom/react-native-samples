@@ -1,22 +1,11 @@
-import {useNavigation, useRoute} from '@react-navigation/native';
-import React, {useEffect, useState} from 'react';
-import {
-  PermissionsAndroid, Platform,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import {
-  StringeeClient,
-  StringeeClientListener,
-  StringeeVideo,
-} from 'stringee-react-native-v2';
-import {CONFERENCE_SCREEN} from '../../utils';
-import {createRoom} from '../../stringee/api';
-import {generateRoomToken} from '../../utils/alg';
-import {RoomManager} from '../../stringee/RoomManager';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { BackHandler, PermissionsAndroid, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { StringeeClient, StringeeClientListener, StringeeVideo } from 'stringee-react-native-v2';
+import { CONFERENCE_SCREEN } from '../../utils';
+import { createRoom } from '../../stringee/api';
+import { generateRoomToken } from '../../utils/alg';
+import { RoomManager } from '../../stringee/RoomManager';
 import { each } from 'lodash';
 
 const stringeeClient = new StringeeClient();
@@ -26,7 +15,7 @@ export const Home = () => {
   const rest = useRoute().params.rest;
   const [clientId, setClientId] = useState('');
   const [roomToken, setRoomToken] = useState(
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZUIiwiZXhwIjoxNzEwOTk1MTE0LCJwZXJtaXNzaW9ucyI6eyJzdWJzY3JpYmUiOnRydWUsInB1Ymxpc2giOnRydWUsImNvbnRyb2xfcm9vbSI6dHJ1ZX0sInJvb21JZCI6InJvb20tdm4tMS0zUVpNSkVJUVNELTE3MTA3ODE1OTUyMjEiLCJqdGkiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZULTE3MTA5MDg3MTQ4OTQifQ.aRSErk5B2KZSKlCgh96nUYgodohxsgvASniXi8m0bic',
+    ''
   );
   const navigation = useNavigation();
 
@@ -39,7 +28,7 @@ export const Home = () => {
 
     listener.onConnect = (client, userId) => {
       setClientId(userId);
-      console.log(client.uuid);
+      console.log('onConnect', userId);
     };
     listener.onDisConnect = _ => {
       setClientId('');
@@ -51,6 +40,18 @@ export const Home = () => {
     stringeeClient.setListener(listener);
     stringeeClient.connect(token);
     console.log(token);
+  }, []);
+
+  useEffect(() => {
+    const backAction = () => {
+      stringeeClient.disconnect();
+      navigation.goBack();
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', backAction);
+
+    return () => backHandler.remove(); // Don't forget to remove the listener when the component unmounts.
   }, []);
 
   const requestPermission = () => {
@@ -83,7 +84,7 @@ export const Home = () => {
 
   const didTapJoinRoom = () => {
     StringeeVideo.joinRoom(stringeeClient, roomToken)
-      .then(({room, tracks, _}) => {
+      .then(({ room, tracks, _ }) => {
         RoomManager.instance.setRoom(room, tracks);
         navigation.navigate(CONFERENCE_SCREEN);
       })
@@ -115,12 +116,12 @@ export const Home = () => {
         onChangeText={setRoomToken}
         value={roomToken}
       />
-      <TouchableOpacity style={sheet.botton} onPress={didTapJoinRoom}>
-        <Text style={sheet.textBtn}>join room</Text>
+      <TouchableOpacity style={sheet.button} onPress={didTapJoinRoom}>
+        <Text style={sheet.textBtn}>Join room</Text>
       </TouchableOpacity>
-      {/*<TouchableOpacity style={sheet.botton} onPress={didTapCreateRoom}>*/}
-      {/*  <Text style={sheet.textBtn}>create room</Text>*/}
-      {/*</TouchableOpacity>*/}
+      <TouchableOpacity style={sheet.button} onPress={didTapCreateRoom}>
+        <Text style={sheet.textBtn}>Create room</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -137,21 +138,23 @@ const sheet = StyleSheet.create({
   },
   roomInput: {
     padding: 16,
-    margin: 20,
+    marginTop: 20,
     width: '80%',
     height: 50,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: 'black',
   },
-  botton: {
-    width: 100,
+  button: {
+    width: '80%',
     height: 50,
+    marginTop: 20,
     backgroundColor: 'green',
     alignItems: 'center',
     justifyContent: 'center',
   },
   textBtn: {
     color: 'white',
+    fontSize: 16,
   },
 });

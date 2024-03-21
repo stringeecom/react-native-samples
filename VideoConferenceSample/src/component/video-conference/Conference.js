@@ -43,7 +43,6 @@ export const RoomConference = () => {
   };
 
   useEffect(() => {
-    console.log('useEffect', tracks.length);
   }, [tracks]);
 
   const mainRender = () => {
@@ -68,7 +67,6 @@ export const RoomConference = () => {
             try {
               await RoomManager.instance.mute(!mute);
               setMute(!mute);
-              console.log('mute ok');
             } catch (error) {
               console.log('mute', error);
             }
@@ -114,11 +112,11 @@ export const RoomConference = () => {
         style={sheet.leftRoomButton}
         onPress={() => {
           Alert.alert(
-            'Rời khỏi phòng',
-            'Rời khỏi phòng ở thiết bị này hay tất cả các thiết bị',
+            'Leave the room',
+            'Leave the room at this device or all devices',
             [
               {
-                text: 'Rời khỏi phòng ở thiết bị này',
+                text: 'Leave the room on this device',
                 onPress: async () => {
                   try {
                     await RoomManager.instance.leave(false);
@@ -128,7 +126,7 @@ export const RoomConference = () => {
                 },
               },
               {
-                text: 'Rời khỏi phòng ở tất cả thiết bị',
+                text: 'Leave the room on all devices',
                 onPress: async () => {
                   try {
                     await RoomManager.instance.leave(true);
@@ -138,6 +136,7 @@ export const RoomConference = () => {
                 },
               },
             ],
+            { cancelable: true },
           );
         }}
       >

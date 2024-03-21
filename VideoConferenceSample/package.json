@@ -10,15 +10,16 @@
     "test": "jest"
   },
   "dependencies": {
-    "@react-navigation/native": "^6.1.15",
-    "@react-navigation/native-stack": "^6.9.24",
+    "@react-navigation/native": "^6.1.17",
+    "@react-navigation/native-stack": "^6.9.26",
+    "install": "^0.13.0",
     "lodash": "^4.17.21",
     "npm": "^10.5.0",
     "react": "^18.2.0",
-    "react-native": "^0.73.5",
+    "react-native": "^0.73.6",
     "react-native-gesture-handler": "^2.15.0",
     "react-native-pure-jwt": "^3.0.2",
-    "react-native-reanimated": "^3.8.0",
+    "react-native-reanimated": "^3.8.1",
     "react-native-safe-area-context": "^4.9.0",
     "react-native-screens": "^3.29.0",
     "stringee-react-native-v2": "https://github.com/stringeecom/stringee-react-native-v2.git#hieph/features/SG-10935-implement-video-conference"

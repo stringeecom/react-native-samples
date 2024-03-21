@@ -58,12 +58,12 @@ const sheet = StyleSheet.create({
     padding: 16,
   },
   button: {
-    width: 100,
-    height: 40,
-    marginTop: 30,
+    width: '80%',
+    height: 50,
+    marginTop: 20,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'green',
   },
-  text: { color: 'white' },
+  text: { color: 'white', fontSize: 16 },
 });
