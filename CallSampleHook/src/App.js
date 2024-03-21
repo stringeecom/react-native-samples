@@ -42,7 +42,6 @@ notifee.onBackgroundEvent(async event => {
         break;
       case REJECT_ACTION_ID:
         StringeeCallManager.instance.rejectCall();
-        StringeeCallManager.instance.endSectionCall();
         break;
       case OPEN_APP_IN_FULL_SCREEN_MODE_ACTION_ID:
         break;

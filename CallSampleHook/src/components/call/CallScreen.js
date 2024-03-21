@@ -16,6 +16,7 @@ import {
   SignalingState,
   StringeeVideoView,
   MediaState,
+  StringeeVideoScalingType,
 } from 'stringee-react-native-v2';
 import {HOME_SCREEN_NAME} from '../../const';
 import RNCallKeep from 'react-native-callkeep';
@@ -98,6 +99,7 @@ const CallScreen = () => {
       },
       onReceiveRemoteStream: () => {
         if (remoteTrack == null) {
+          console.log('onReceiveRemoteStream');
           setRemoteTrack({});
         }
       },
@@ -110,7 +112,10 @@ const CallScreen = () => {
         setLocalTrack(track);
       },
       onReceiveRemoteTrack: track => {
-        setRemoteTrack(track);
+        if (remoteTrack == null) {
+          console.log('onReceiveRemoteStream');
+          setRemoteTrack(track);
+        }
       },
 
       onChangeMediaState: (_, mediaState, __) => {
@@ -372,7 +377,7 @@ const CallScreen = () => {
         <StringeeVideoView
           uuid={StringeeCallManager.instance.call.uuid}
           local={true}
-          scalingType={'fit'}
+          scalingType={StringeeVideoScalingType.fit}
           overlay={true}
           videoTrack={localTrack}
           style={sheet.local_view_did_active_remote}

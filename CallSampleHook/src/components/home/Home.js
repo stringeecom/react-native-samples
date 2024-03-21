@@ -21,7 +21,8 @@ import {
 import {each} from 'underscore';
 import notifee from '@notifee/react-native';
 import {StringeeClientListener} from 'stringee-react-native-v2';
-const access_token = 'PUT_YOUR_TOKEN_HERE';
+const access_token =
+  'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZULTE3MTA5ODgyMzI3NjAiLCJpc3MiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZUIiwidXNlcklkIjoidXNlcjQiLCJleHAiOjE3NDI1MjQyMzJ9.YJ3-FrSIEajmt6cVayrUOCJQiN3tNXO7A38LE-0IiPY';
 const HomeScreen = () => {
   const [callWith, setCallWith] = useState('');
   const isOnline = useSelector(state => state.stringee.client.isOnline);
