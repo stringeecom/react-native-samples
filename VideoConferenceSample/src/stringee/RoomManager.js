@@ -23,6 +23,7 @@ export class RoomManager {
   };
 
   onLeaveRoom = (_, user) => {
+    console.log('onLeaveRoom', user);
     if (user.userId === this.room.client.userId) {
       if (this.onLeave && !this.didLeave) {
         this.onLeave();
@@ -39,7 +40,8 @@ export class RoomManager {
         new StringeeVideoTrackOption({
           audio: true,
           video: true,
-          videoResolution: VideoResolution.hd})
+          videoResolution: VideoResolution.hd,
+        })
       )
       .catch(console.log);
   };
@@ -122,5 +124,9 @@ export class RoomManager {
   async leave(isLeaveAll) {
     await this.room.leave(isLeaveAll);
     StringeeVideo.releaseRoom(this.room);
+    if (this.onLeave && !this.didLeave) {
+      this.onLeave();
+      this.didLeave = true;
+    }
   }
 }
