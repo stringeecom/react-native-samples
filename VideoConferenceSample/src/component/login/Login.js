@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+  Alert,
   StyleSheet,
   Text,
   TextInput,
@@ -15,6 +16,10 @@ export const Login = () => {
   const [userName, setUserName] = useState('');
   const navigation = useNavigation();
   const loginAction = async () => {
+    if (!userName) {
+      Alert.alert('Login error','Please enter userId');
+      return;
+    }
     try {
       const clientToken = await generateStringeeToken(userName);
       const restToken = await generateRestApiToken();
