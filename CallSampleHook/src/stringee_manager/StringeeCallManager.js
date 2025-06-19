@@ -75,6 +75,11 @@ class StringeeCallManager {
       if (!isIos) {
         InCallManager.stopRingtone();
       }
+    }
+    if (
+      signalingState === SignalingState.ended ||
+      signalingState === SignalingState.busy
+    ) {
       this.stopAudioManager();
     }
     if (this.events) {
@@ -112,51 +117,6 @@ class StringeeCallManager {
     if (this.events) {
       this.events.onHandleOnAnotherDevice(signalingState);
     }
-  };
-
-  // Invoked when the current audio device changes in android
-  onAudioDeviceChange = (selectedAudioDevice, availableAudioDevices) => {
-    console.log(
-      'onHandleOnAudioDeviceChange',
-      selectedAudioDevice,
-      availableAudioDevices,
-    );
-    this.availableAudioDevices = availableAudioDevices;
-    if (this.initializingAudio) {
-      this.initializingAudio = false;
-      let bluetoothIndex = -1;
-      let wiredHeadsetIndex = -1;
-      let speakerIndex = -1;
-      let earpieceIndex = -1;
-      availableAudioDevices.forEach(device => {
-        if (device.audioType === AudioType.bluetooth) {
-          bluetoothIndex = availableAudioDevices.indexOf(device);
-        }
-        if (device.audioType === AudioType.wiredHeadset) {
-          wiredHeadsetIndex = availableAudioDevices.indexOf(device);
-        }
-        if (device.audioType === AudioType.speakerPhone) {
-          speakerIndex = availableAudioDevices.indexOf(device);
-        }
-        if (device.audioType === AudioType.earpiece) {
-          earpieceIndex = availableAudioDevices.indexOf(device);
-        }
-      });
-      if (bluetoothIndex !== -1) {
-        selectedAudioDevice = availableAudioDevices.at(bluetoothIndex);
-      } else if (wiredHeadsetIndex !== -1) {
-        selectedAudioDevice = availableAudioDevices.at(wiredHeadsetIndex);
-      } else if (this.call.isVideoCall) {
-        if (speakerIndex !== -1) {
-          selectedAudioDevice = availableAudioDevices.at(speakerIndex);
-        }
-      } else {
-        if (earpieceIndex !== -1) {
-          selectedAudioDevice = availableAudioDevices.at(earpieceIndex);
-        }
-      }
-    }
-    this.selectDevice(selectedAudioDevice);
   };
 
   // Invoked when local track in video call is ready to play
@@ -403,9 +363,51 @@ class StringeeCallManager {
    * Start audio manager
    */
   startAudioManager() {
-    this.audioListener.onAudioDeviceChange = this.onAudioDeviceChange;
+    this.audioListener.onAudioDeviceChange =  (selectedAudioDevice, availableAudioDevices) => {
+      console.log(
+        'onHandleOnAudioDeviceChange',
+        selectedAudioDevice,
+        availableAudioDevices,
+      );
+      this.availableAudioDevices = availableAudioDevices;
+      if (this.initializingAudio) {
+        this.initializingAudio = false;
+        let bluetoothIndex = -1;
+        let wiredHeadsetIndex = -1;
+        let speakerIndex = -1;
+        let earpieceIndex = -1;
+        availableAudioDevices.forEach(device => {
+          if (device.audioType === AudioType.bluetooth) {
+            bluetoothIndex = availableAudioDevices.indexOf(device);
+          }
+          if (device.audioType === AudioType.wiredHeadset) {
+            wiredHeadsetIndex = availableAudioDevices.indexOf(device);
+          }
+          if (device.audioType === AudioType.speakerPhone) {
+            speakerIndex = availableAudioDevices.indexOf(device);
+          }
+          if (device.audioType === AudioType.earpiece) {
+            earpieceIndex = availableAudioDevices.indexOf(device);
+          }
+        });
+        if (bluetoothIndex !== -1) {
+          selectedAudioDevice = availableAudioDevices.at(bluetoothIndex);
+        } else if (wiredHeadsetIndex !== -1) {
+          selectedAudioDevice = availableAudioDevices.at(wiredHeadsetIndex);
+        } else if (this.call.isVideoCall) {
+          if (speakerIndex !== -1) {
+            selectedAudioDevice = availableAudioDevices.at(speakerIndex);
+          }
+        } else {
+          if (earpieceIndex !== -1) {
+            selectedAudioDevice = availableAudioDevices.at(earpieceIndex);
+          }
+        }
+      }
+      this.selectDevice(selectedAudioDevice);
+    };
     StringeeAudioManager.getInstance().addListener(this.audioListener);
-    StringeeAudioManager.getInstance().start().then().catch(console.log);
+    StringeeAudioManager.getInstance().start().then(console.log).catch(console.log);
   }
 
   /**

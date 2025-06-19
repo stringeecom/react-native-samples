@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,23 +7,23 @@ import {
   TouchableOpacity,
   Dimensions,
   Modal,
-} from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
-import icon from '../../../assets/icon';
-import StringeeCallManager from '../../stringee_manager/StringeeCallManager';
-import {useNavigation} from '@react-navigation/native';
-import {setSignalState} from '../../redux/actions';
+} from "react-native";
+import { useDispatch, useSelector } from "react-redux";
+import icon from "../../../assets/icon";
+import StringeeCallManager from "../../stringee_manager/StringeeCallManager";
+import { useNavigation } from "@react-navigation/native";
+import { setSignalState } from "../../redux/actions";
 import {
   SignalingState,
   StringeeVideoView,
   MediaState,
   AudioType,
-} from 'stringee-react-native-v2';
-import {HOME_SCREEN_NAME} from '../../const';
-import RNCallKeep from 'react-native-callkeep';
+} from "stringee-react-native-v2";
+import { HOME_SCREEN_NAME } from "../../const";
+import RNCallKeep from "react-native-callkeep";
 
-const height = Dimensions.get('window').height;
-const width = Dimensions.get('window').width;
+const height = Dimensions.get("window").height;
+const width = Dimensions.get("window").width;
 const CallScreen = () => {
   const callInfo = useSelector(state => state.stringee.call);
   const signalState: SignalingState = useSelector(
@@ -115,10 +115,6 @@ const CallScreen = () => {
       },
 
       onChangeMediaState: (_, mediaState, __) => {
-        if (mediaConnected === false && mediaState === MediaState.connected) {
-          StringeeCallManager.instance.enableSpeaker(callInfo.isVideo);
-        }
-
         if (mediaState === MediaState.connected) {
           setMediaConnected(true);
         }
@@ -139,10 +135,10 @@ const CallScreen = () => {
     let h = ((time - m) / 60).toFixed(0).toString();
 
     if (h.length === 1) {
-      h = '0' + h;
+      h = "0" + h;
     }
     if (m.length === 1) {
-      m = '0' + m;
+      m = "0" + m;
     }
     return `${h}:${m}`;
   };
@@ -155,7 +151,7 @@ const CallScreen = () => {
   const endCallButton = () => {
     return (
       <TouchableOpacity
-        style={{alignSelf: 'center', marginTop: '15%'}}
+        style={{ alignSelf: "center", marginTop: "15%" }}
         onPress={() => {
           StringeeCallManager.instance.hangup();
         }}>
@@ -170,6 +166,7 @@ const CallScreen = () => {
   };
 
   const didTapSpeaker = () => {
+    console.log("didTapSpeaker", StringeeCallManager.instance.availableAudioDevices);
     if (StringeeCallManager.instance.availableAudioDevices.length < 3) {
       if (StringeeCallManager.instance.availableAudioDevices.length <= 1) {
         return;
@@ -246,7 +243,7 @@ const CallScreen = () => {
                     );
                     setVisible(false);
                   }}>
-                  <Text style={sheet.option}>{item}</Text>
+                  <Text style={sheet.option}>{item.name}</Text>
                 </TouchableOpacity>
               ),
             )}
@@ -263,9 +260,9 @@ const CallScreen = () => {
           onPress={() => {
             StringeeCallManager.instance.answer().then().catch(console.log);
           }}>
-          <Image source={icon.answer} style={{width: 70, height: 70}} />
+          <Image source={icon.answer} style={{ width: 70, height: 70 }} />
         </TouchableOpacity>
-        <View style={{flex: 1}} />
+        <View style={{ flex: 1 }} />
         <TouchableOpacity
           onPress={() => {
             if (callInfo.isIncoming) {
@@ -274,7 +271,7 @@ const CallScreen = () => {
               StringeeCallManager.instance.hangup();
             }
           }}>
-          <Image source={icon.endCall} style={{width: 70, height: 70}} />
+          <Image source={icon.endCall} style={{ width: 70, height: 70 }} />
         </TouchableOpacity>
       </View>
     );
@@ -282,11 +279,11 @@ const CallScreen = () => {
 
   const incomingCallView = () => {
     return (
-      <View style={{flex: 1, alignItems: 'center'}}>
-        <View style={{flex: 1}} />
-        <Text style={{color: 'gray'}}>Cuộc gọi đến</Text>
-        <View style={{...sheet.border_view, marginLeft: null}} />
-        <Text style={{...sheet.call_info_name, marginBottom: 30}}>
+      <View style={{ flex: 1, alignItems: "center" }}>
+        <View style={{ flex: 1 }} />
+        <Text style={{ color: "gray" }}>Cuộc gọi đến</Text>
+        <View style={{ ...sheet.border_view, marginLeft: null }} />
+        <Text style={{ ...sheet.call_info_name, marginBottom: 30 }}>
           {callInfo.call_with}
         </Text>
       </View>
@@ -297,23 +294,24 @@ const CallScreen = () => {
     if (signalState === SignalingState.ringing && callInfo.isIncoming) {
       return <View />;
     }
-
+    let imageSource = icon.speakerOn;
+    if (audioDevice) {
+      imageSource = audioDevice.audioType === AudioType.speakerPhone
+        ? icon.speakerOff
+        : icon.speakerOn;
+    }
     return (
-      <View style={{marginBottom: 30, flexDirection: 'row'}}>
-        <TouchableOpacity style={{marginLeft: 80}} onPress={didTapMute}>
+      <View style={{ marginBottom: 30, flexDirection: "row" }}>
+        <TouchableOpacity style={{ marginLeft: 80 }} onPress={didTapMute}>
           <Image
             source={isMute ? icon.unMute : icon.mute}
             style={sheet.button_size}
           />
         </TouchableOpacity>
-        <View style={{flex: 1}} />
-        <TouchableOpacity style={{marginRight: 80}} onPress={didTapSpeaker}>
+        <View style={{ flex: 1 }} />
+        <TouchableOpacity style={{ marginRight: 80 }} onPress={didTapSpeaker}>
           <Image
-            source={
-              audioDevice.type === AudioType.speakerPhone
-                ? icon.speakerOff
-                : icon.speakerOn
-            }
+            source={imageSource}
             style={sheet.button_size}
           />
         </TouchableOpacity>
@@ -326,20 +324,20 @@ const CallScreen = () => {
       <View
         style={{
           marginBottom: 0,
-          width: '100%',
-          flexDirection: 'row',
+          width: "100%",
+          flexDirection: "row",
         }}>
         <View style>
-          <Text style={{color: 'gray', marginLeft: 5}}>{signalState}</Text>
+          <Text style={{ color: "gray", marginLeft: 5 }}>{signalState}</Text>
           <View style={sheet.border_view} />
           <Text style={sheet.call_info_name}>{callInfo.call_with}</Text>
         </View>
-        <View style={{flex: 1}} />
+        <View style={{ flex: 1 }} />
         <View>
-          <View style={{flex: 1}} />
+          <View style={{ flex: 1 }} />
           {mediaConnected && (
             <View style={sheet.time_duration}>
-              <Text style={{color: 'white', fontWeight: '600'}}>
+              <Text style={{ color: "white", fontWeight: "600" }}>
                 {duration2time(duration)}
               </Text>
             </View>
@@ -362,31 +360,31 @@ const CallScreen = () => {
 
   const normalCallScreen = () => {
     return (
-      <View style={{flex: 1}}>
+      <View style={{ flex: 1 }}>
         <View style={sheet.call_info_view}>
-          <View style={{flex: 1, flexDirection: 'column-reverse'}}>
+          <View style={{ flex: 1, flexDirection: "column-reverse" }}>
             {(!callInfo.isIncoming || signalState !== SignalingState.ringing) &&
               callInfoView()}
           </View>
-          <View style={{flex: 3}}>
-            <View style={{flex: 1}}>
+          <View style={{ flex: 3 }}>
+            <View style={{ flex: 1 }}>
               {callInfo.isIncoming &&
                 signalState === SignalingState.ringing &&
                 incomingCallView()}
             </View>
-            <View style={{flex: 2}}>
+            <View style={{ flex: 2 }}>
               <View style={sheet.circle_avatar_view}>
                 <Text
-                  style={{fontSize: 28, fontWeight: 'bold', color: 'white'}}>
+                  style={{ fontSize: 28, fontWeight: "bold", color: "white" }}>
                   {callInfo.call_with.charAt(0)}
                 </Text>
               </View>
-              <View style={{flex: 1}} />
+              <View style={{ flex: 1 }} />
               {callActionButton()}
             </View>
           </View>
         </View>
-        <View style={{flex: 2, backgroundColor: 'white'}}>
+        <View style={{ flex: 2, backgroundColor: "white" }}>
           {footerNormalCall()}
         </View>
         {selectAudioDevicePopup()}
@@ -396,18 +394,18 @@ const CallScreen = () => {
 
   const videoCallScreen = () => {
     return (
-      <View style={{flex: 1}}>
+      <View style={{ flex: 1 }}>
         {remoteTrack && (
           <StringeeVideoView
             uuid={StringeeCallManager.instance.call.uuid}
             local={false}
-            scalingType={'fit'}
+            scalingType={"fit"}
             videoTrack={remoteTrack}
             style={{
               flex: 1,
               width: width,
               height: height,
-              backgroundColor: 'black',
+              backgroundColor: "black",
             }}
             overlay={false}
           />
@@ -416,11 +414,11 @@ const CallScreen = () => {
           <View
             style={{
               ...sheet.time_duration,
-              position: 'absolute',
+              position: "absolute",
               top: 150,
               right: 0,
             }}>
-            <Text style={{color: 'white', fontWeight: '600'}}>
+            <Text style={{ color: "white", fontWeight: "600" }}>
               {duration2time(duration)}
             </Text>
           </View>
@@ -428,7 +426,7 @@ const CallScreen = () => {
         <StringeeVideoView
           uuid={StringeeCallManager.instance.call.uuid}
           local={true}
-          scalingType={'fit'}
+          scalingType={"fit"}
           overlay={true}
           videoTrack={localTrack}
           style={sheet.local_view_did_active_remote}
@@ -455,26 +453,26 @@ const sheet = StyleSheet.create({
     marginLeft: 5,
     width: 30,
     height: 2,
-    backgroundColor: '#66D54B',
+    backgroundColor: "#66D54B",
     marginTop: 8,
   },
   call_info_name: {
-    color: 'white',
+    color: "white",
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginTop: 16,
     marginLeft: 5,
   },
   time_duration: {
     padding: 8,
     paddingRight: 15,
-    backgroundColor: '#66D54B',
+    backgroundColor: "#66D54B",
     borderTopStartRadius: 5,
     borderBottomStartRadius: 5,
   },
   call_info_view: {
     flex: 5,
-    backgroundColor: '#082E53',
+    backgroundColor: "#082E53",
     borderBottomEndRadius: 16,
     borderBottomStartRadius: 16,
   },
@@ -482,12 +480,12 @@ const sheet = StyleSheet.create({
   circle_avatar_view: {
     width: 120,
     height: 120,
-    alignSelf: 'center',
-    backgroundColor: 'green',
+    alignSelf: "center",
+    backgroundColor: "green",
     borderWidth: 3,
-    borderColor: 'white',
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderColor: "white",
+    alignItems: "center",
+    justifyContent: "center",
     borderRadius: 60,
   },
 
@@ -498,33 +496,33 @@ const sheet = StyleSheet.create({
 
   incoming_btn: {
     height: 60,
-    flexDirection: 'row',
+    flexDirection: "row",
     marginHorizontal: 60,
-    marginTop: '15%',
+    marginTop: "15%",
   },
 
   video_call_button_section: {
-    justifyContent: 'center',
-    position: 'absolute',
-    width: '100%',
+    justifyContent: "center",
+    position: "absolute",
+    width: "100%",
     height: 200,
     bottom: 0,
-    flexDirection: 'row',
+    flexDirection: "row",
   },
 
   stack_item_button: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   local_view: {
     flex: 1,
-    backgroundColor: 'blue',
+    backgroundColor: "blue",
   },
 
   local_view_did_active_remote: {
-    position: 'absolute',
+    position: "absolute",
     width: 150,
     height: 200,
     top: 50,
@@ -534,11 +532,11 @@ const sheet = StyleSheet.create({
 
   overlay: {
     flex: 1,
-    backgroundColor: '#00000044',
-    justifyContent: 'flex-end',
+    backgroundColor: "#00000044",
+    justifyContent: "flex-end",
   },
   sheet: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     paddingVertical: 12,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
@@ -548,6 +546,7 @@ const sheet = StyleSheet.create({
     paddingVertical: 16,
     fontSize: 16,
     borderBottomWidth: 0.5,
-    borderBottomColor: '#ccc',
+    color: "black",
+    borderBottomColor: "#ccc",
   },
 });

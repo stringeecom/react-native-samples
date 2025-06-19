@@ -30,7 +30,8 @@
     "react-native-voip-push-notification": "^3.3.3",
     "react-redux": "^9.2.0",
     "redux": "^5.0.1",
-    "stringee-react-native-v2": "https://github.com/stringeecom/stringee-react-native-v2.git#feature/SG-23614-change-audio-device"
+    "stringee-react-native-v2": "https://github.com/stringeecom/stringee-react-native-v2.git#feature/SG-23614-change-audio-device",
+    "underscore": "^1.13.7"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

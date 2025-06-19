@@ -267,6 +267,7 @@ const style = StyleSheet.create({
     borderColor: 'gray',
     borderRadius: 16,
     borderWidth: 1,
+    color:'black',
     width: '90%',
     height: 50,
     marginVertical: 16,
