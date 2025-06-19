@@ -6,6 +6,7 @@ import {
   Image,
   TouchableOpacity,
   Dimensions,
+  Modal,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import icon from '../../../assets/icon';
@@ -16,6 +17,7 @@ import {
   SignalingState,
   StringeeVideoView,
   MediaState,
+  AudioType,
 } from 'stringee-react-native-v2';
 import {HOME_SCREEN_NAME} from '../../const';
 import RNCallKeep from 'react-native-callkeep';
@@ -29,11 +31,12 @@ const CallScreen = () => {
   );
   const [duration, setDuration] = useState(0);
   const [mediaConnected, setMediaConnected] = useState(false);
-  const [isSpeakerOn, setIsSpeakerOn] = useState(false);
+  const [audioDevice, setAudioDevice] = useState(null);
   const [isMute, setIsMute] = useState(false);
   const [isOnCamera, setIsOnCamera] = useState(true);
   const [remoteTrack, setRemoteTrack] = useState(null);
   const [localTrack, setLocalTrack] = useState(null);
+  const [visible, setVisible] = useState(false);
   const dispatch = useDispatch();
 
   const navigation = useNavigation();
@@ -80,8 +83,6 @@ const CallScreen = () => {
       dispatch(setSignalState(SignalingState.ringing));
     }
 
-    setIsSpeakerOn(callInfo.isVideo);
-
     StringeeCallManager.instance.didAnswer = () => {
       dispatch(setSignalState(SignalingState.answered));
     };
@@ -127,6 +128,9 @@ const CallScreen = () => {
           clearDataAndGoBack();
         }
       },
+      onAudioDeviceChange: device => {
+        setAudioDevice(device);
+      },
     };
   };
 
@@ -166,8 +170,27 @@ const CallScreen = () => {
   };
 
   const didTapSpeaker = () => {
-    StringeeCallManager.instance.enableSpeaker(!isSpeakerOn);
-    setIsSpeakerOn(!isSpeakerOn);
+    if (StringeeCallManager.instance.availableAudioDevices.length < 3) {
+      if (StringeeCallManager.instance.availableAudioDevices.length <= 1) {
+        return;
+      }
+      let position =
+        StringeeCallManager.instance.availableAudioDevices.indexOf(audioDevice);
+      if (
+        position ===
+        StringeeCallManager.instance.availableAudioDevices.length - 1
+      ) {
+        StringeeCallManager.instance.selectDevice(
+          StringeeCallManager.instance.availableAudioDevices[0],
+        );
+      } else {
+        StringeeCallManager.instance.selectDevice(
+          StringeeCallManager.instance.availableAudioDevices[position + 1],
+        );
+      }
+    } else {
+      setVisible(true);
+    }
   };
 
   const videoCallActionButton = () => {
@@ -205,12 +228,40 @@ const CallScreen = () => {
     );
   };
 
+  const selectAudioDevicePopup = () => {
+    return (
+      <Modal transparent visible={visible}>
+        <TouchableOpacity
+          style={sheet.overlay}
+          activeOpacity={1}
+          onPress={() => setVisible(false)}>
+          <View style={sheet.sheet}>
+            {StringeeCallManager.instance.availableAudioDevices.map(
+              (item, index) => (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => {
+                    StringeeCallManager.instance.selectDevice(
+                      StringeeCallManager.instance.availableAudioDevices[index],
+                    );
+                    setVisible(false);
+                  }}>
+                  <Text style={sheet.option}>{item}</Text>
+                </TouchableOpacity>
+              ),
+            )}
+          </View>
+        </TouchableOpacity>
+      </Modal>
+    );
+  };
+
   const incomingCallButtonAction = () => {
     return (
       <View style={sheet.incoming_btn}>
         <TouchableOpacity
           onPress={() => {
-            StringeeCallManager.instance.answer();
+            StringeeCallManager.instance.answer().then().catch(console.log);
           }}>
           <Image source={icon.answer} style={{width: 70, height: 70}} />
         </TouchableOpacity>
@@ -258,7 +309,11 @@ const CallScreen = () => {
         <View style={{flex: 1}} />
         <TouchableOpacity style={{marginRight: 80}} onPress={didTapSpeaker}>
           <Image
-            source={isSpeakerOn ? icon.speakerOff : icon.speakerOn}
+            source={
+              audioDevice.type === AudioType.speakerPhone
+                ? icon.speakerOff
+                : icon.speakerOn
+            }
             style={sheet.button_size}
           />
         </TouchableOpacity>
@@ -334,6 +389,7 @@ const CallScreen = () => {
         <View style={{flex: 2, backgroundColor: 'white'}}>
           {footerNormalCall()}
         </View>
+        {selectAudioDevicePopup()}
       </View>
     );
   };
@@ -378,6 +434,7 @@ const CallScreen = () => {
           style={sheet.local_view_did_active_remote}
         />
         {videoCallActionButton()}
+        {selectAudioDevicePopup()}
       </View>
     );
   };
@@ -473,5 +530,24 @@ const sheet = StyleSheet.create({
     top: 50,
     left: 16,
     zIndex: 2,
+  },
+
+  overlay: {
+    flex: 1,
+    backgroundColor: '#00000044',
+    justifyContent: 'flex-end',
+  },
+  sheet: {
+    backgroundColor: 'white',
+    paddingVertical: 12,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    paddingHorizontal: 24,
+  },
+  option: {
+    paddingVertical: 16,
+    fontSize: 16,
+    borderBottomWidth: 0.5,
+    borderBottomColor: '#ccc',
   },
 });

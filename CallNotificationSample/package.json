@@ -18,7 +18,7 @@
     "react-native-callkeep": "^4.2.0",
     "react-native-uuid": "^2.0.1",
     "react-native-voip-push-notification": "^3.3.0",
-    "stringee-react-native": "^1.4.3"
+    "stringee-react-native-v2": "^1.0.4"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
@@ -34,4 +34,3 @@
     "preset": "react-native"
   }
 }
-

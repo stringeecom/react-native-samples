@@ -1,5 +1,9 @@
 import {
+  AudioDevice,
+  AudioType,
   SignalingState,
+  StringeeAudioListener,
+  StringeeAudioManager,
   StringeeCall,
   StringeeCall2,
 } from 'stringee-react-native-v2';
@@ -55,6 +59,10 @@ class StringeeCallManager {
   signalingState;
   events;
   didActiveAudioSection = false;
+  audioListener = new StringeeAudioListener();
+  initializingAudio = true;
+  audioDevice: AudioDevice;
+  availableAudioDevices: Array<AudioDevice> = [];
 
   // Invoked when the call's signaling state changes
   onChangeSignalingState = (_, signalingState, __, ___, ____) => {
@@ -67,6 +75,7 @@ class StringeeCallManager {
       if (!isIos) {
         InCallManager.stopRingtone();
       }
+      this.stopAudioManager();
     }
     if (this.events) {
       this.events.onChangeSignalingState(signalingState);
@@ -106,12 +115,48 @@ class StringeeCallManager {
   };
 
   // Invoked when the current audio device changes in android
-  onAudioDeviceChange = (_, selectedAudioDevice, availableAudioDevices) => {
+  onAudioDeviceChange = (selectedAudioDevice, availableAudioDevices) => {
     console.log(
       'onHandleOnAudioDeviceChange',
       selectedAudioDevice,
       availableAudioDevices,
     );
+    this.availableAudioDevices = availableAudioDevices;
+    if (this.initializingAudio) {
+      this.initializingAudio = false;
+      let bluetoothIndex = -1;
+      let wiredHeadsetIndex = -1;
+      let speakerIndex = -1;
+      let earpieceIndex = -1;
+      availableAudioDevices.forEach(device => {
+        if (device.audioType === AudioType.bluetooth) {
+          bluetoothIndex = availableAudioDevices.indexOf(device);
+        }
+        if (device.audioType === AudioType.wiredHeadset) {
+          wiredHeadsetIndex = availableAudioDevices.indexOf(device);
+        }
+        if (device.audioType === AudioType.speakerPhone) {
+          speakerIndex = availableAudioDevices.indexOf(device);
+        }
+        if (device.audioType === AudioType.earpiece) {
+          earpieceIndex = availableAudioDevices.indexOf(device);
+        }
+      });
+      if (bluetoothIndex !== -1) {
+        selectedAudioDevice = availableAudioDevices.at(bluetoothIndex);
+      } else if (wiredHeadsetIndex !== -1) {
+        selectedAudioDevice = availableAudioDevices.at(wiredHeadsetIndex);
+      } else if (this.call.isVideoCall) {
+        if (speakerIndex !== -1) {
+          selectedAudioDevice = availableAudioDevices.at(speakerIndex);
+        }
+      } else {
+        if (earpieceIndex !== -1) {
+          selectedAudioDevice = availableAudioDevices.at(earpieceIndex);
+        }
+      }
+    }
+    this.selectDevice(selectedAudioDevice);
   };
 
   // Invoked when local track in video call is ready to play
@@ -136,7 +181,6 @@ class StringeeCallManager {
     onReceiveLocalStream: this.onReceiveLocalStream,
     onChangeMediaState: this.onChangeMediaState,
     onHandleOnAnotherDevice: this.onHandleOnAnotherDevice,
-    onAudioDeviceChange: this.onAudioDeviceChange,
   };
 
   constructor() {}
@@ -154,13 +198,13 @@ class StringeeCallManager {
     });
     this.call.isVideoCall = isVideoCall;
     this.callType = CallType.out;
+    this.setListenerForCall1();
     this.call
       .makeCall()
       .then(() => {
-        this.call.setSpeakerphoneOn(isVideoCall).then().catch(console.log);
+        this.startAudioManager();
       })
       .catch(console.log);
-    this.setListenerForCall1();
   }
 
   /**
@@ -177,13 +221,13 @@ class StringeeCallManager {
     });
     this.call.isVideoCall = isVideoCall;
     this.callType = CallType.out;
+    this.setListenerForCall2();
     this.call
       .makeCall()
       .then(() => {
-        this.call.setSpeakerphoneOn(isVideoCall).then().catch(console.log);
+        this.startAudioManager();
       })
       .catch(console.log);
-    this.setListenerForCall2();
   }
 
   /**
@@ -220,17 +264,7 @@ class StringeeCallManager {
       }
     }
     this.signalingState = SignalingState.calling;
-    call
-      .initAnswer()
-      .then(() => {
-        if (this.events) {
-          this.events.onChangeSignalingState(SignalingState.ringing);
-          if (isIos) {
-            this.answerStringeeCallIfConditionMatch();
-          }
-        }
-      })
-      .catch(console.log);
+    this.initAnswer();
     this.call = call;
     this.callType = CallType.out;
     // generate uuid and display callkeep
@@ -301,7 +335,17 @@ class StringeeCallManager {
    */
   initAnswer() {
     if (this.call) {
-      this.call.initAnswer().then().catch(console.log);
+      this.call
+        .initAnswer()
+        .then(() => {
+          if (this.events) {
+            this.events.onChangeSignalingState(SignalingState.ringing);
+            if (isIos) {
+              this.answerStringeeCallIfConditionMatch();
+            }
+          }
+        })
+        .catch(console.log);
     }
   }
 
@@ -356,6 +400,23 @@ class StringeeCallManager {
   }
 
   /**
+   * Start audio manager
+   */
+  startAudioManager() {
+    this.audioListener.onAudioDeviceChange = this.onAudioDeviceChange;
+    StringeeAudioManager.getInstance().addListener(this.audioListener);
+    StringeeAudioManager.getInstance().start().then().catch(console.log);
+  }
+
+  /**
+   * Stop audio manager
+   */
+  stopAudioManager() {
+    StringeeAudioManager.getInstance().removeListener(this.audioListener);
+    StringeeAudioManager.getInstance().stop().then().catch(console.log);
+  }
+
+  /**
    * Enable/Disable camera
    * @param {boolean} isEnable Camera is on or off
    */
@@ -369,34 +430,43 @@ class StringeeCallManager {
   }
 
   /**
-   * Change speaker to earpiece/speaker
-   * @param {boolean} isOn Speaker is on or off
+   * Select audio device
+   * @param {AudioDevice} audioDevice
    */
-  enableSpeaker(isOn) {
+  selectDevice(audioDevice: AudioDevice) {
     if (this.call) {
-      this.call
-        .setSpeakerphoneOn(isOn)
-        .then(() => {})
+      StringeeAudioManager.getInstance()
+        .selectDevice(audioDevice)
+        .then(() => {
+          this.audioDevice = audioDevice;
+          if (this.events) {
+            this.events.onAudioDeviceChange(audioDevice);
+          }
+        })
         .catch(console.log);
       if (this.callKeeps) {
-        RNCallKeep.toggleAudioRouteSpeaker(this.callKeeps.uuid, isOn);
+        RNCallKeep.toggleAudioRouteSpeaker(
+          this.callKeeps.uuid,
+          audioDevice.audioType === AudioType.speakerPhone,
+        );
       }
     }
   }
+
   /**
    * Answer the call
    */
   answer(): Promise<void> {
     return new Promise((resolve, reject) => {
       if (this.call && !isIos) {
-        this.call.answer().then(() => {
-          InCallManager.stopRingtone();
-          this.call
-            .setSpeakerphoneOn(this.call.isVideoCall)
-            .then(() => {})
-            .catch(console.log);
-          resolve();
-        });
+        this.call
+          .answer()
+          .then(() => {
+            InCallManager.stopRingtone();
+            this.startAudioManager();
+            resolve();
+          })
+          .catch(() => reject());
       } else if (this.callKeeps) {
         // Synchronize call answering with CallKeep
         RNCallKeep.answerIncomingCall(this.callKeeps.uuid);
@@ -488,7 +558,13 @@ class StringeeCallManager {
     }
 
     if (this.callKeeps && this.callkeepAnswered.includes(this.callKeeps.uuid)) {
-      this.call.answer().then(this.didAnswer).catch(console.log);
+      this.call
+        .answer()
+        .then(() => {
+          this.didAnswer();
+          this.startAudioManager();
+        })
+        .catch(console.log);
     } else {
       console.log('The user has not answered the call');
     }

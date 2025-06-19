@@ -14,7 +14,6 @@ import {
   REJECT_ACTION_ID,
 } from './const';
 import {CallScreen} from './components/call';
-import 'react-native-reanimated';
 import notifee, {EventType} from '@notifee/react-native';
 import StringeeCallManager from './stringee_manager/StringeeCallManager';
 

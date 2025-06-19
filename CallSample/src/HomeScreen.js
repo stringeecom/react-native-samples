@@ -8,10 +8,9 @@ import {
   View,
   Platform,
 } from 'react-native';
-import {StringeeClient, StringeeServerAddress} from 'stringee-react-native';
+import {StringeeClient, StringeeServerAddress} from 'stringee-react-native-v2';
 
 export default class HomeScreen extends Component {
-
   token: string = 'PUT_YOUR_TOKEN_HERE';
 
   constructor(props) {

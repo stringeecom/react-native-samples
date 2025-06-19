@@ -10,13 +10,12 @@ import {
 } from 'react-native';
 
 import {Icon} from 'react-native-elements';
-import {StringeeCall, StringeeVideoView} from 'stringee-react-native';
+import {StringeeCall, StringeeVideoView} from 'stringee-react-native-v2';
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
 
 export default class CallScreen extends Component {
-
   constructor(props) {
     super(props);
     this.state = {
