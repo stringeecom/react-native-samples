@@ -8,6 +8,17 @@
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
 # Add any project specific keep options here:
--dontwarn org.webrtc.**
+# WebRTC
 -keep class org.webrtc.** { *; }
+-dontwarn org.webrtc.**
+-keepclassmembers class org.webrtc.** { *; }
+
+# JNI
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
+-keep class org.jni_zero.** { *; }
+
+# Stringee
+-dontwarn com.stringee.**
 -keep class com.stringee.** { *; }

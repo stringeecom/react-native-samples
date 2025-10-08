@@ -118,6 +118,8 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
     implementation 'com.android.volley:volley:1.2.1'
+    implementation 'com.stringee.sdk.android:stringee-android-sdk:2.1.5'
+    implementation 'io.github.webrtc-sdk:android:137.7151.03'
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {

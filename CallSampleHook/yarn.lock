@@ -6476,10 +6476,10 @@ string_decoder@~1.1.1:
   dependencies:
     safe-buffer "~5.1.0"
 
-stringee-react-native-v2@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/stringee-react-native-v2/-/stringee-react-native-v2-1.0.0.tgz#58505f39c455e48427792d445d596ebef32e58b8"
-  integrity sha512-3EqkU5YOIJRnB+9x7VmptbmCHcNpZgRDRRV68Ovmy+7l4Y7t3idFQcvF7WlvCP242m5c1d5yaZ+4dPhWyg9vWQ==
+stringee-react-native-v2@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/stringee-react-native-v2/-/stringee-react-native-v2-1.0.5.tgz#55702b342079a055ff9e96f2330845de8895cc1d"
+  integrity sha512-5+hygGknpPh10GtZ5dA+chYQwZrOyhXhcX/+sOx2rREzNSAWdEhzIKk9pal7qUVkgIWqaWNX7ll2K+TYlBo5Sw==
   dependencies:
     underscore "^1.13.6"
 
