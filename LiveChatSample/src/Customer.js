@@ -7,7 +7,8 @@ import {
   StyleSheet,
   FlatList,
 } from 'react-native';
-import {StringeeClient, Conversation} from 'stringee-react-native';
+import {Conversation} from 'stringee-react-native-v2';
+import StringeeClient from './StringeeClient';
 
 const widgetKey = 'YOUR_WIDGET_KEY';
 var _conversation: Conversation;

@@ -5,7 +5,7 @@ require Pod::Executable.execute_command('node', ['-p',
     {paths: [process.argv[1]]},
   )', __dir__]).strip
 
-platform :ios, min_ios_version_supported
+platform :ios, '13.0'
 prepare_react_native_project!
 
 # If you are using a `react-native-flipper` your iOS build will fail when `NO_FLIPPER=1` is set.
@@ -17,7 +17,9 @@ prepare_react_native_project!
 #   dependencies: {
 #     ...(process.env.NO_FLIPPER ? { 'react-native-flipper': { platforms: { ios: null } } } : {}),
 # ```
-flipper_config = ENV['NO_FLIPPER'] == "1" ? FlipperConfiguration.disabled : FlipperConfiguration.enabled
+# RN 0.72's Flipper headers do not compile with Xcode 26. Flipper is not
+# required by this call sample, so keep it disabled for reproducible builds.
+flipper_config = FlipperConfiguration.disabled
 
 linkage = ENV['USE_FRAMEWORKS']
 if linkage != nil
@@ -63,6 +65,16 @@ target 'CallSampleHook' do
       config[:reactNativePath],
       :mac_catalyst_enabled => false
     )
+    # RN 0.72 Yoga uses the pre-C++23 literal-operator spelling. Xcode 26
+    # reports it as an error because Yoga enables -Werror.
+    installer.pods_project.targets.each do |target|
+      next unless target.name == 'Yoga'
+      target.build_configurations.each do |build_config|
+        flags = build_config.build_settings['OTHER_CPLUSPLUSFLAGS'] || '$(inherited)'
+        build_config.build_settings['OTHER_CPLUSPLUSFLAGS'] =
+          "#{flags} -Wno-deprecated-literal-operator"
+      end
+    end
     __apply_Xcode_12_5_M1_post_install_workaround(installer)
   end
 end

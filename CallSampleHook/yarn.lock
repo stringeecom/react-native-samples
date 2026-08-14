@@ -1823,6 +1823,11 @@
   dependencies:
     "@sinonjs/commons" "^3.0.0"
 
+"@tsconfig/react-native@^2.0.3":
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/@tsconfig/react-native/-/react-native-2.0.3.tgz#79ad8efc6d3729152da6cb23725b6c364a7349b2"
+  integrity sha512-jE58snEKBd9DXfyR4+ssZmYJ/W2mOSnNrvljR0aLyQJL9JKX6vlWELHkRjb3HBbcM9Uy0hZGijXbqEAjOERW2A==
+
 "@types/babel__core@^7.1.14":
   version "7.20.5"
   resolved "https://registry.yarnpkg.com/@types/babel__core/-/babel__core-7.20.5.tgz#3df15f27ba85319caa07ba08d0721889bb39c017"
@@ -6476,12 +6481,10 @@ string_decoder@~1.1.1:
   dependencies:
     safe-buffer "~5.1.0"
 
-stringee-react-native-v2@^1.0.5:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/stringee-react-native-v2/-/stringee-react-native-v2-1.0.5.tgz#55702b342079a055ff9e96f2330845de8895cc1d"
-  integrity sha512-5+hygGknpPh10GtZ5dA+chYQwZrOyhXhcX/+sOx2rREzNSAWdEhzIKk9pal7qUVkgIWqaWNX7ll2K+TYlBo5Sw==
-  dependencies:
-    underscore "^1.13.6"
+stringee-react-native-v2@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/stringee-react-native-v2/-/stringee-react-native-v2-1.1.0.tgz#8453a07d9cf7e04270527640e05d42eb603afd5f"
+  integrity sha512-w+GCWEmVtH/o5aLPOWO0AxUORuUphqWonnadpmg6ANE5N9/iMy6/LtJXxCQeXYXo2U6DViw1h4yUtAsTT4rnPQ==
 
 strip-ansi@^5.0.0, strip-ansi@^5.1.0, strip-ansi@^5.2.0:
   version "5.2.0"
@@ -6719,6 +6722,11 @@ typed-array-length@^1.0.4:
     call-bind "^1.0.2"
     for-each "^0.3.3"
     is-typed-array "^1.1.9"
+
+typescript@^5.2.2:
+  version "5.9.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.9.3.tgz#5b4f59e15310ab17a216f5d6cf53ee476ede670f"
+  integrity sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==
 
 uglify-es@^3.1.9:
   version "3.3.9"

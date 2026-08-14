@@ -7,6 +7,15 @@
 #import "RNCallKeep.h"
 #import "CustomPushPayload.h"
 #import <RNStringee/RNStringeeInstanceManager.h>
+
+static NSDictionary *StringeeDictionary(id value) {
+  return [value isKindOfClass:[NSDictionary class]] ? value : @{};
+}
+
+static NSString *StringeeString(id value) {
+  return [value isKindOfClass:[NSString class]] ? value : @"";
+}
+
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -15,6 +24,7 @@
   // You can add your custom initial props in the dictionary below.
   // They will be passed down to the ViewController used by React Native.
   self.initialProps = @{};
+  self.backgroundUpdateTask = UIBackgroundTaskInvalid;
   [RNCallKeep setup:@{
     @"appName": @"CallSampleHook",
     @"supportsVideo": @YES
@@ -41,27 +51,41 @@
 }
 
 - (void)pushRegistry:(PKPushRegistry *)registry didReceiveIncomingPushWithPayload:(PKPushPayload *)payload forType:(PKPushType)type withCompletionHandler:(void (^)(void))completion {
-  NSDictionary *payloadDataDic = payload.dictionaryPayload[@"data"][@"map"][@"data"][@"map"];
+  NSDictionary *data = StringeeDictionary(payload.dictionaryPayload[@"data"]);
+  NSDictionary *dataMap = StringeeDictionary(data[@"map"]);
+  NSDictionary *nestedData = StringeeDictionary(dataMap[@"data"]);
+  NSDictionary *payloadDataDic = StringeeDictionary(nestedData[@"map"]);
   NSLog(@"didReceiveIncomingPushWithPayload: %@", payload.dictionaryPayload);
-  NSString *callId = payloadDataDic[@"callId"];
-  NSNumber *serial = payloadDataDic[@"serial"];
-  NSString *callStatus = payloadDataDic[@"callStatus"];
+  NSString *callId = StringeeString(payloadDataDic[@"callId"]);
+  id serialValue = payloadDataDic[@"serial"];
+  NSNumber *serial = [serialValue respondsToSelector:@selector(integerValue)]
+    ? @([serialValue integerValue])
+    : @(1);
+  NSString *callStatus = StringeeString(payloadDataDic[@"callStatus"]);
+  id isVideoCall = payloadDataDic[@"isVideoCall"];
 
-  NSString *fromAlias = payloadDataDic[@"from"][@"map"][@"alias"];
-  NSString *fromNumber = payloadDataDic[@"from"][@"map"][@"number"];
-  NSString *callName = fromAlias != NULL ? fromAlias : fromNumber != NULL ? fromNumber : @"Connecting...";
+  NSDictionary *from = StringeeDictionary(payloadDataDic[@"from"]);
+  NSDictionary *fromMap = StringeeDictionary(from[@"map"]);
+  NSString *fromAlias = StringeeString(fromMap[@"alias"]);
+  NSString *fromNumber = StringeeString(fromMap[@"number"]);
+  NSString *callName = fromAlias.length > 0 ? fromAlias : fromNumber.length > 0 ? fromNumber : @"Connecting...";
+  BOOL hasVideo = [isVideoCall respondsToSelector:@selector(boolValue)]
+    ? [isVideoCall boolValue]
+    : NO;
 
       
   NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
-  if (serial == NULL) {
-    serial = @(1);
+  if (callId.length == 0) {
+    NSDictionary *content = StringeeDictionary(payloadDataDic[@"content"]);
+    NSDictionary *contentMap = StringeeDictionary(content[@"map"]);
+    NSDictionary *message = StringeeDictionary(contentMap[@"message"]);
+    NSDictionary *messageMap = StringeeDictionary(message[@"map"]);
+    callId = StringeeString(messageMap[@"call_id"]);
   }
   
-  if (callId == NULL) {
-    callId = payloadDataDic[@"content"][@"map"][@"message"][@"map"][@"call_id"];
-  }
-  
-  NSString *uuid = [RNStringeeInstanceManager.instance generateUUID:callId serial:serial];
+  NSString *uuid = callId.length > 0
+    ? [RNStringeeInstanceManager.instance generateUUID:callId serial:serial]
+    : nil;
 
   if (uuid.length == 0) {
     uuid = [[[NSUUID UUID] UUIDString] lowercaseString];
@@ -71,12 +95,14 @@
   
   [dict setObject:uuid forKey:@"uuid"];
   [dict setObject:serial forKey:@"serial"];
-  [dict setObject:callId forKey:@"callId"];
+  if (callId.length > 0) {
+    [dict setObject:callId forKey:@"callId"];
+  }
   [dict setObject:callName forKey:@"callName"];
   
   NSLog(@"voip push from stringee ---------------------");
 
-  if (callId != NULL && [callStatus isEqual: @"started"]) {
+  if (callId.length > 0 && [callStatus isEqual: @"started"]) {
     // --- Process the received push
     CustomPushPayload* customPayload = [[CustomPushPayload alloc] init];
     customPayload.customDictionaryPayload = dict;
@@ -91,14 +117,20 @@
       }
     }
     if (!didShow) {
-      [RNCallKeep reportNewIncomingCall:uuid handle:@"Stringee" handleType:@"generic" hasVideo:true localizedCallerName:callName supportsHolding:false supportsDTMF:true supportsGrouping:false supportsUngrouping:false fromPushKit:true payload:nil withCompletionHandler:completion];
+      [RNCallKeep reportNewIncomingCall:uuid handle:@"Stringee" handleType:@"generic" hasVideo:hasVideo localizedCallerName:callName supportsHolding:false supportsDTMF:true supportsGrouping:false supportsUngrouping:false fromPushKit:true payload:nil withCompletionHandler:completion];
+    } else {
+      completion();
     }
   } else {
     // Show fake call
     NSLog(@"show fake call");
-    [RNCallKeep reportNewIncomingCall:uuid handle:@"Stringee" handleType:@"generic" hasVideo:true localizedCallerName:callName supportsHolding:false supportsDTMF:true supportsGrouping:false supportsUngrouping:false fromPushKit:true payload:nil withCompletionHandler:completion];
+    [RNCallKeep reportNewIncomingCall:uuid handle:@"Stringee" handleType:@"generic" hasVideo:hasVideo localizedCallerName:callName supportsHolding:false supportsDTMF:true supportsGrouping:false supportsUngrouping:false fromPushKit:true payload:nil withCompletionHandler:completion];
     [RNCallKeep endCallWithUUID:uuid reason:1];
   }
+}
+
+- (void)pushRegistry:(PKPushRegistry *)registry didInvalidatePushTokenForType:(PKPushType)type {
+  NSLog(@"VoIP push token was invalidated for type: %@", type);
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
@@ -127,8 +159,9 @@
 
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     [NSThread sleepForTimeInterval:10];
-    [[UIApplication sharedApplication] endBackgroundTask:self.backgroundUpdateTask];
-    self.backgroundUpdateTask = UIBackgroundTaskInvalid;
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [self endBackgroundTask];
+    });
   });
 }
 

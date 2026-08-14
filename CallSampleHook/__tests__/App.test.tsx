@@ -1,17 +1,31 @@
-/**
- * @format
- */
+import {SignalingState} from 'stringee-react-native-v2';
+import stringeeReducer from '../src/reducers/StringeeReducers';
+import {setClientInfo} from '../src/redux/actions';
 
-import 'react-native';
-import React from 'react';
-import App from '../src/App';
+jest.mock('stringee-react-native-v2', () => ({
+  SignalingState: {
+    calling: 'calling',
+    ringing: 'ringing',
+    answered: 'answered',
+    busy: 'busy',
+    ended: 'ended',
+  },
+}));
 
-// Note: import explicitly to use the types shiped with jest.
-import {it} from '@jest/globals';
+describe('stringeeReducer', () => {
+  it('creates the initial call state', () => {
+    const state = stringeeReducer(undefined, {type: '@@INIT'});
 
-// Note: test renderer must be required after react-native.
-import renderer from 'react-test-renderer';
+    expect(state.client.isOnline).toBe(false);
+    expect(state.signalState).toBe(SignalingState.calling);
+  });
 
-it('renders correctly', () => {
-  renderer.create(<App />);
+  it('stores connected client information', () => {
+    const state = stringeeReducer(
+      undefined,
+      setClientInfo({isOnline: true, client_id: 'alice'}),
+    );
+
+    expect(state.client).toEqual({isOnline: true, client_id: 'alice'});
+  });
 });

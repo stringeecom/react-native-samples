@@ -7,7 +7,8 @@ import {
   StyleSheet,
   FlatList,
 } from 'react-native';
-import {StringeeClient, Conversation, ChatRequest} from 'stringee-react-native';
+import {Conversation, ChatRequest} from 'stringee-react-native-v2';
+import StringeeClient from './StringeeClient';
 
 const token = 'YOUR_ACCESS_TOKEN';
 var _conversation: Conversation;

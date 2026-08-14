@@ -16,22 +16,23 @@ import {
   SignalingState,
   StringeeVideoView,
   MediaState,
+  StringeeVideoScalingType,
 } from 'stringee-react-native-v2';
 import {HOME_SCREEN_NAME} from '../../const';
-import RNCallKeep from 'react-native-callkeep';
+import {StringeeWrapper} from '../../stringee_wrapper';
 
 const height = Dimensions.get('window').height;
 const width = Dimensions.get('window').width;
 const CallScreen = () => {
   const callInfo = useSelector(state => state.stringee.call);
-  const signalState: SignalingState = useSelector(
-    state => state.stringee.signalState,
-  );
+  const signalState = useSelector(state => state.stringee.signalState);
   const [duration, setDuration] = useState(0);
   const [mediaConnected, setMediaConnected] = useState(false);
   const [isSpeakerOn, setIsSpeakerOn] = useState(false);
   const [isMute, setIsMute] = useState(false);
   const [isOnCamera, setIsOnCamera] = useState(true);
+  const [remoteStreamReady, setRemoteStreamReady] = useState(false);
+  const [localStreamReady, setLocalStreamReady] = useState(false);
   const [remoteTrack, setRemoteTrack] = useState(null);
   const [localTrack, setLocalTrack] = useState(null);
   const dispatch = useDispatch();
@@ -41,17 +42,21 @@ const CallScreen = () => {
   useEffect(() => {
     setupCall();
     return () => {
-      RNCallKeep.endAllCalls();
+      StringeeCallManager.instance.finishSystemCallUI();
     };
+    // A call session is initialized once for this screen instance.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    setTimeout(() => {
-      if (mediaConnected) {
-        setDuration(duration + 1);
-      }
+    if (!mediaConnected) {
+      return undefined;
+    }
+    const timer = setInterval(() => {
+      setDuration(currentDuration => currentDuration + 1);
     }, 1000);
-  }, [duration, mediaConnected]);
+    return () => clearInterval(timer);
+  }, [mediaConnected]);
 
   const clearDataAndGoBack = () => {
     StringeeCallManager.instance.endCallSection();
@@ -63,25 +68,6 @@ const CallScreen = () => {
   };
 
   const setupCall = () => {
-    if (!callInfo.isIncoming) {
-      if (callInfo.useCall2) {
-        StringeeCallManager.instance.makeCall2(
-          callInfo.call_with,
-          callInfo.isVideo,
-        );
-      } else {
-        StringeeCallManager.instance.makeCall(
-          callInfo.call_with,
-          callInfo.isVideo,
-        );
-      }
-      dispatch(setSignalState(SignalingState.calling));
-    } else {
-      dispatch(setSignalState(SignalingState.ringing));
-    }
-
-    setIsSpeakerOn(callInfo.isVideo);
-
     StringeeCallManager.instance.didAnswer = () => {
       dispatch(setSignalState(SignalingState.answered));
     };
@@ -97,14 +83,10 @@ const CallScreen = () => {
         dispatch(setSignalState(signalingState));
       },
       onReceiveRemoteStream: () => {
-        if (remoteTrack == null) {
-          setRemoteTrack({});
-        }
+        setRemoteStreamReady(true);
       },
       onReceiveLocalStream: () => {
-        if (localTrack == null) {
-          setLocalTrack({});
-        }
+        setLocalStreamReady(true);
       },
       onReceiveLocalTrack: track => {
         setLocalTrack(track);
@@ -113,13 +95,12 @@ const CallScreen = () => {
         setRemoteTrack(track);
       },
 
-      onChangeMediaState: (_, mediaState, __) => {
-        if (mediaConnected === false && mediaState === MediaState.connected) {
-          StringeeCallManager.instance.enableSpeaker(callInfo.isVideo);
-        }
-
+      onChangeMediaState: (_, mediaState) => {
         if (mediaState === MediaState.connected) {
           setMediaConnected(true);
+          StringeeCallManager.instance
+            .enableSpeaker(callInfo.isVideo)
+            .catch(console.log);
         }
       },
       onHandleOnAnotherDevice: signalingState => {
@@ -128,6 +109,24 @@ const CallScreen = () => {
         }
       },
     };
+
+    if (!callInfo.isIncoming) {
+      dispatch(setSignalState(SignalingState.calling));
+      StringeeWrapper.instance
+        .makeCall({
+          to: callInfo.call_with,
+          isVideoCall: callInfo.isVideo,
+          useCall2: callInfo.useCall2,
+        })
+        .catch(error => {
+          console.log('Unable to make call', error);
+          clearDataAndGoBack();
+        });
+    } else {
+      dispatch(setSignalState(SignalingState.ringing));
+    }
+
+    setIsSpeakerOn(callInfo.isVideo);
   };
 
   const duration2time = time => {
@@ -148,18 +147,6 @@ const CallScreen = () => {
     setIsOnCamera(!isOnCamera);
   };
 
-  const endCallButton = () => {
-    return (
-      <TouchableOpacity
-        style={{alignSelf: 'center', marginTop: '15%'}}
-        onPress={() => {
-          StringeeCallManager.instance.hangup();
-        }}>
-        <Image source={icon.endCall} style={sheet.button_size} />
-      </TouchableOpacity>
-    );
-  };
-
   const didTapMute = () => {
     StringeeCallManager.instance.mute(!isMute);
     setIsMute(!isMute);
@@ -170,308 +157,293 @@ const CallScreen = () => {
     setIsSpeakerOn(!isSpeakerOn);
   };
 
-  const videoCallActionButton = () => {
+  const renderActionButton = (source, label, onPress, active = false) => {
     return (
-      <View style={sheet.video_call_button_section}>
-        <TouchableOpacity
-          style={sheet.stack_item_button}
-          onPress={didTapCamera}>
-          <Image
-            source={isOnCamera ? icon.cameraOn : icon.cameraOff}
-            style={sheet.button_size}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity style={sheet.stack_item_button} onPress={didTapMute}>
-          <Image
-            source={isMute ? icon.unMute : icon.mute}
-            style={sheet.button_size}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={sheet.stack_item_button}
-          onPress={() => {
-            StringeeCallManager.instance.switchCamera();
-          }}>
-          <Image source={icon.cameraSwitch} style={sheet.button_size} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={sheet.stack_item_button}
-          onPress={() => {
-            StringeeCallManager.instance.hangup();
-          }}>
-          <Image source={icon.endCall} style={sheet.button_size} />
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity
+        accessibilityRole="button"
+        accessibilityLabel={label}
+        style={[sheet.actionButton, active && sheet.actionButtonActive]}
+        onPress={onPress}>
+        <Image source={source} style={sheet.actionIcon} resizeMode="contain" />
+      </TouchableOpacity>
     );
   };
 
-  const incomingCallButtonAction = () => {
+  const renderAvatar = () => {
+    const initial = callInfo.call_with?.trim().charAt(0).toUpperCase() || '';
     return (
-      <View style={sheet.incoming_btn}>
-        <TouchableOpacity
-          onPress={() => {
-            StringeeCallManager.instance.answer();
-          }}>
-          <Image source={icon.answer} style={{width: 70, height: 70}} />
-        </TouchableOpacity>
-        <View style={{flex: 1}} />
-        <TouchableOpacity
-          onPress={() => {
-            if (callInfo.isIncoming) {
-              StringeeCallManager.instance.rejectCall();
-            } else {
-              StringeeCallManager.instance.hangup();
-            }
-          }}>
-          <Image source={icon.endCall} style={{width: 70, height: 70}} />
-        </TouchableOpacity>
-      </View>
-    );
-  };
-
-  const incomingCallView = () => {
-    return (
-      <View style={{flex: 1, alignItems: 'center'}}>
-        <View style={{flex: 1}} />
-        <Text style={{color: 'gray'}}>Cuộc gọi đến</Text>
-        <View style={{...sheet.border_view, marginLeft: null}} />
-        <Text style={{...sheet.call_info_name, marginBottom: 30}}>
-          {callInfo.call_with}
-        </Text>
-      </View>
-    );
-  };
-
-  const callActionButton = () => {
-    if (signalState === SignalingState.ringing && callInfo.isIncoming) {
-      return <View />;
-    }
-
-    return (
-      <View style={{marginBottom: 30, flexDirection: 'row'}}>
-        <TouchableOpacity style={{marginLeft: 80}} onPress={didTapMute}>
-          <Image
-            source={isMute ? icon.unMute : icon.mute}
-            style={sheet.button_size}
-          />
-        </TouchableOpacity>
-        <View style={{flex: 1}} />
-        <TouchableOpacity style={{marginRight: 80}} onPress={didTapSpeaker}>
-          <Image
-            source={isSpeakerOn ? icon.speakerOff : icon.speakerOn}
-            style={sheet.button_size}
-          />
-        </TouchableOpacity>
-      </View>
-    );
-  };
-
-  const callInfoView = () => {
-    return (
-      <View
-        style={{
-          marginBottom: 0,
-          width: '100%',
-          flexDirection: 'row',
-        }}>
-        <View style>
-          <Text style={{color: 'gray', marginLeft: 5}}>{signalState}</Text>
-          <View style={sheet.border_view} />
-          <Text style={sheet.call_info_name}>{callInfo.call_with}</Text>
+      <View style={sheet.avatarBorder}>
+        <View style={sheet.avatar}>
+          <Text style={sheet.avatarText}>{initial}</Text>
         </View>
-        <View style={{flex: 1}} />
-        <View>
-          <View style={{flex: 1}} />
-          {mediaConnected && (
-            <View style={sheet.time_duration}>
-              <Text style={{color: 'white', fontWeight: '600'}}>
-                {duration2time(duration)}
-              </Text>
-            </View>
+      </View>
+    );
+  };
+
+  const renderCallHeader = (showDuration = false) => {
+    return (
+      <View style={sheet.headerRow}>
+        <View style={sheet.headerCopy}>
+          <Text style={sheet.statusText}>{signalState}</Text>
+          <View style={sheet.statusDivider} />
+          <Text style={sheet.calleeText}>{callInfo.call_with}</Text>
+        </View>
+        {showDuration && (
+          <View style={sheet.voiceDuration}>
+            <Text style={sheet.durationText}>{duration2time(duration)}</Text>
+          </View>
+        )}
+      </View>
+    );
+  };
+
+  const renderRingingActions = () => {
+    return (
+      <View style={sheet.bottomActions}>
+        {callInfo.isIncoming ? (
+          <View style={sheet.actionRow}>
+            {renderActionButton(icon.endCall, 'Reject call', () =>
+              StringeeCallManager.instance.rejectCall(),
+            )}
+            {renderActionButton(icon.answer, 'Answer call', () =>
+              StringeeCallManager.instance.answer(),
+            )}
+          </View>
+        ) : (
+          renderActionButton(icon.endCall, 'End call', () =>
+            StringeeCallManager.instance.hangup(),
+          )
+        )}
+      </View>
+    );
+  };
+
+  const renderRingingScreen = () => {
+    return (
+      <View style={sheet.screen}>
+        <View style={sheet.callBody}>
+          {renderCallHeader()}
+          <View style={sheet.avatarCenter}>{renderAvatar()}</View>
+        </View>
+        {renderRingingActions()}
+      </View>
+    );
+  };
+
+  const renderVoiceCall = () => {
+    return (
+      <View style={sheet.screen}>
+        <View style={[sheet.callBody, sheet.voiceCallBody]}>
+          <View style={sheet.voiceHeaderArea}>{renderCallHeader(true)}</View>
+          {renderAvatar()}
+          <View style={sheet.voiceSpacer} />
+          <View style={sheet.voiceControls}>
+            {renderActionButton(
+              isSpeakerOn ? icon.speakerOff : icon.speakerOn,
+              'Toggle audio route',
+              didTapSpeaker,
+              isSpeakerOn,
+            )}
+            {renderActionButton(
+              isMute ? icon.unMute : icon.mute,
+              isMute ? 'Unmute microphone' : 'Mute microphone',
+              didTapMute,
+              isMute,
+            )}
+          </View>
+        </View>
+        <View style={sheet.bottomActions}>
+          {renderActionButton(icon.endCall, 'End call', () =>
+            StringeeCallManager.instance.hangup(),
           )}
         </View>
       </View>
     );
   };
 
-  const footerNormalCall = () => {
-    if (
-      callInfo.isIncoming &&
-      (signalState === SignalingState.ringing ||
-        signalState === SignalingState.calling)
-    ) {
-      return incomingCallButtonAction();
-    }
-    return endCallButton();
-  };
-
-  const normalCallScreen = () => {
+  const renderVideoCall = () => {
     return (
-      <View style={{flex: 1}}>
-        <View style={sheet.call_info_view}>
-          <View style={{flex: 1, flexDirection: 'column-reverse'}}>
-            {(!callInfo.isIncoming || signalState !== SignalingState.ringing) &&
-              callInfoView()}
-          </View>
-          <View style={{flex: 3}}>
-            <View style={{flex: 1}}>
-              {callInfo.isIncoming &&
-                signalState === SignalingState.ringing &&
-                incomingCallView()}
-            </View>
-            <View style={{flex: 2}}>
-              <View style={sheet.circle_avatar_view}>
-                <Text
-                  style={{fontSize: 28, fontWeight: 'bold', color: 'white'}}>
-                  {callInfo.call_with.charAt(0)}
-                </Text>
-              </View>
-              <View style={{flex: 1}} />
-              {callActionButton()}
-            </View>
-          </View>
-        </View>
-        <View style={{flex: 2, backgroundColor: 'white'}}>
-          {footerNormalCall()}
-        </View>
-      </View>
-    );
-  };
-
-  const videoCallScreen = () => {
-    return (
-      <View style={{flex: 1}}>
-        {remoteTrack && (
+      <View style={sheet.videoScreen}>
+        {(remoteStreamReady || remoteTrack) && (
           <StringeeVideoView
-            uuid={StringeeCallManager.instance.call.uuid}
+            uuid={StringeeCallManager.instance.call?.uuid}
             local={false}
-            scalingType={'fit'}
+            scalingType={StringeeVideoScalingType.fit}
             videoTrack={remoteTrack}
-            style={{
-              flex: 1,
-              width: width,
-              height: height,
-              backgroundColor: 'black',
-            }}
-            overlay={false}
+            style={sheet.remoteVideo}
           />
         )}
-        {mediaConnected && (
-          <View
-            style={{
-              ...sheet.time_duration,
-              position: 'absolute',
-              top: 150,
-              right: 0,
-            }}>
-            <Text style={{color: 'white', fontWeight: '600'}}>
-              {duration2time(duration)}
-            </Text>
-          </View>
+        {!remoteStreamReady && !remoteTrack && (
+          <View style={sheet.remotePlaceholder} />
         )}
-        <StringeeVideoView
-          uuid={StringeeCallManager.instance.call.uuid}
-          local={true}
-          scalingType={'fit'}
-          overlay={true}
-          videoTrack={localTrack}
-          style={sheet.local_view_did_active_remote}
-        />
-        {videoCallActionButton()}
+        <View style={sheet.videoDuration}>
+          <Text style={sheet.durationText}>{duration2time(duration)}</Text>
+        </View>
+        <View style={sheet.localPreview}>
+          {(localStreamReady || localTrack) && (
+            <StringeeVideoView
+              uuid={StringeeCallManager.instance.call?.uuid}
+              local={true}
+              scalingType={StringeeVideoScalingType.fit}
+              videoTrack={localTrack}
+              style={sheet.localVideo}
+            />
+          )}
+          {!localStreamReady && !localTrack && (
+            <View style={sheet.localPlaceholder} />
+          )}
+        </View>
+        <View style={sheet.videoActions}>
+          {renderActionButton(
+            isOnCamera ? icon.cameraOn : icon.cameraOff,
+            isOnCamera ? 'Turn camera off' : 'Turn camera on',
+            didTapCamera,
+            !isOnCamera,
+          )}
+          {renderActionButton(
+            isMute ? icon.unMute : icon.mute,
+            isMute ? 'Unmute microphone' : 'Mute microphone',
+            didTapMute,
+            isMute,
+          )}
+          {renderActionButton(icon.cameraSwitch, 'Switch camera', () =>
+            StringeeCallManager.instance.switchCamera(),
+          )}
+          {renderActionButton(icon.endCall, 'End call', () =>
+            StringeeCallManager.instance.hangup(),
+          )}
+        </View>
       </View>
     );
   };
 
-  const mainRender = () => {
-    if (callInfo.isVideo && mediaConnected) {
-      return videoCallScreen();
-    }
-    return normalCallScreen();
-  };
-  return mainRender();
+  if (!mediaConnected) {
+    return renderRingingScreen();
+  }
+  if (callInfo.isVideo) {
+    return renderVideoCall();
+  }
+  return renderVoiceCall();
 };
 
 export default CallScreen;
 
 const sheet = StyleSheet.create({
-  border_view: {
-    marginLeft: 5,
-    width: 30,
+  screen: {flex: 1, backgroundColor: 'white'},
+  callBody: {
+    flex: 3,
+    paddingTop: 64,
+    backgroundColor: '#1A578D',
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  headerCopy: {paddingHorizontal: 16, flexShrink: 1},
+  statusText: {color: 'rgba(255,255,255,0.7)', fontSize: 15},
+  statusDivider: {
+    marginTop: 5,
+    width: 20,
     height: 2,
-    backgroundColor: '#66D54B',
-    marginTop: 8,
+    backgroundColor: '#40B649',
   },
-  call_info_name: {
-    color: 'white',
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginTop: 16,
-    marginLeft: 5,
-  },
-  time_duration: {
-    padding: 8,
-    paddingRight: 15,
-    backgroundColor: '#66D54B',
-    borderTopStartRadius: 5,
-    borderBottomStartRadius: 5,
-  },
-  call_info_view: {
-    flex: 5,
-    backgroundColor: '#082E53',
-    borderBottomEndRadius: 16,
-    borderBottomStartRadius: 16,
-  },
-
-  circle_avatar_view: {
+  calleeText: {marginTop: 15, color: 'white', fontSize: 22},
+  avatarCenter: {flex: 1, alignItems: 'center', justifyContent: 'center'},
+  avatarBorder: {
     width: 120,
     height: 120,
-    alignSelf: 'center',
-    backgroundColor: 'green',
-    borderWidth: 3,
-    borderColor: 'white',
-    alignItems: 'center',
-    justifyContent: 'center',
     borderRadius: 60,
-  },
-
-  button_size: {
-    width: 60,
-    height: 60,
-  },
-
-  incoming_btn: {
-    height: 60,
-    flexDirection: 'row',
-    marginHorizontal: 60,
-    marginTop: '15%',
-  },
-
-  video_call_button_section: {
+    backgroundColor: 'white',
+    alignItems: 'center',
     justifyContent: 'center',
-    position: 'absolute',
-    width: '100%',
-    height: 200,
-    bottom: 0,
-    flexDirection: 'row',
   },
-
-  stack_item_button: {
+  avatar: {
+    width: 114,
+    height: 114,
+    borderRadius: 57,
+    backgroundColor: '#40B649',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarText: {color: 'white', fontSize: 50},
+  bottomActions: {
     flex: 1,
+    alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: 'white',
+  },
+  actionRow: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
     alignItems: 'center',
   },
-
-  local_view: {
-    flex: 1,
-    backgroundColor: 'blue',
+  actionButton: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-
-  local_view_did_active_remote: {
+  actionButtonActive: {backgroundColor: 'rgba(255,255,255,0.35)'},
+  actionIcon: {width: 60, height: 60},
+  voiceDuration: {
+    width: 55,
+    height: 30,
+    borderTopLeftRadius: 5,
+    borderBottomLeftRadius: 5,
+    backgroundColor: '#40B649',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  durationText: {color: 'white', fontSize: 12, fontWeight: '600'},
+  voiceCallBody: {paddingBottom: 40, alignItems: 'center'},
+  voiceHeaderArea: {flex: 1, width: '100%'},
+  voiceSpacer: {flex: 1},
+  voiceControls: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+  },
+  videoScreen: {flex: 1, backgroundColor: 'black'},
+  remoteVideo: {width, height, backgroundColor: 'black'},
+  remotePlaceholder: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'black',
+  },
+  videoDuration: {
     position: 'absolute',
-    width: 150,
-    height: 200,
-    top: 50,
+    top: 64,
     left: 16,
-    zIndex: 2,
+    width: 55,
+    height: 30,
+    borderRadius: 5,
+    backgroundColor: '#40B649',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  localPreview: {
+    position: 'absolute',
+    top: 64,
+    right: 16,
+    width: 110,
+    height: 150,
+    borderRadius: 8,
+    overflow: 'hidden',
+    backgroundColor: 'black',
+  },
+  localVideo: {width: 110, height: 150},
+  localPlaceholder: {flex: 1, backgroundColor: 'black'},
+  videoActions: {
+    position: 'absolute',
+    left: 24,
+    right: 24,
+    bottom: 64,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-evenly',
   },
 });

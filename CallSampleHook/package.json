@@ -6,6 +6,7 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "lint": "eslint .",
+    "postinstall": "node scripts/fix-react-native-boost.js",
     "start": "react-native start",
     "test": "jest"
   },
@@ -30,12 +31,13 @@
     "react-native-voip-push-notification": "^3.3.0",
     "react-redux": "^8.1.2",
     "redux": "^4.2.1",
-    "stringee-react-native-v2": "^1.0.5"
+    "stringee-react-native-v2": "^1.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
     "@babel/preset-env": "^7.20.0",
     "@babel/runtime": "^7.20.0",
+    "@tsconfig/react-native": "^2.0.3",
     "@react-native-community/eslint-config": "^2.0.0",
     "@react-native/metro-config": "^0.72.9",
     "babel-jest": "^29.2.1",
@@ -44,6 +46,7 @@
     "metro-react-native-babel-preset": "0.76.7",
     "prettier": "^2.4.1",
     "react-test-renderer": "18.2.0",
+    "typescript": "^5.2.2",
     "underscore": "^1.13.6"
   },
   "engines": {

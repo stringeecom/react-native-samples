@@ -10,6 +10,12 @@ import com.facebook.react.defaults.DefaultReactNativeHost;
 import com.facebook.soloader.SoLoader;
 import java.util.List;
 
+/**
+ * Initializes the React Native host and application-level native packages.
+ *
+ * <p>The full-screen-intent package is linked manually because it belongs to this sample rather
+ * than to an installable React Native dependency.
+ */
 public class MainApplication extends Application implements ReactApplication {
 
   private final ReactNativeHost mReactNativeHost =
@@ -25,6 +31,7 @@ public class MainApplication extends Application implements ReactApplication {
           List<ReactPackage> packages = new PackageList(this).getPackages();
           // Packages that cannot be autolinked yet can be added manually here, for example:
           // packages.add(new MyReactNativePackage());
+          packages.add(new FullScreenIntentPackage());
           return packages;
         }
 

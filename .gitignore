@@ -54,6 +54,16 @@ yarn-error.log
 
 # Bundle artifact
 *.jsbundle
+*.apk
+*.aab
+
+# Generated release and test artifacts
+/release/
+*/android/app/release/
+*/coverage/
+
+# Source icons are already extracted and versioned
+*/assets/icon.zip
 
 # CocoaPods
 */ios/Pods/

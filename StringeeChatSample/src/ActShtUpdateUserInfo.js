@@ -7,9 +7,10 @@ import {
   TouchableOpacity,
   View,
   SafeAreaView,
-  ScrollView, Alert,
+  ScrollView,
+  Alert,
 } from 'react-native';
-import {UserInfoParam} from 'stringee-react-native';
+import {UserInfo as UserInfoParam} from 'stringee-react-native-v2';
 
 export default class ActShtUpdateUserInfo extends Component {
   constructor(props) {

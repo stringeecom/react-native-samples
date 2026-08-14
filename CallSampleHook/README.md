@@ -1,48 +1,216 @@
-This is a call sample project using [`stringee-react-native-v2`](https://www.npmjs.com/package/stringee-react-native-v2).
+# Stringee React Native call sample (JavaScript)
 
-# Getting Started
+This sample demonstrates a production-oriented one-to-one call flow using
+`stringee-react-native-v2` on Android and iOS. It includes complete
+incoming-call handling for foreground, background, and cold-start application
+states.
 
-## Step 1: Start the Metro Server
+## Included flows
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+- Connect, reconnect, and disconnect a `StringeeClient` with a persisted access
+  token.
+- Make and receive `StringeeCall` and `StringeeCall2` voice/video calls.
+- Answer, reject, hang up, mute, switch speaker, enable video, and switch camera.
+- Show the Stringee-style home and call views with local raster icons.
+- Handle Android FCM and Notifee incoming-call notifications, including Answer,
+  Reject, full-screen intent, and an active-call microphone foreground service.
+- Handle iOS PushKit VoIP pushes and CallKeep actions, including events delivered
+  before the React Native bridge is ready.
+- Make repeated Answer and cleanup events safe so native, notification, and UI
+  actions cannot finish the same call twice.
 
-To start Metro, run the following command from the _root_ of your React Native project:
+## Requirements
+
+- Node.js 16 or newer and Yarn 1.x.
+- Android Studio, Android SDK, and JDK 17 for Android builds.
+- Xcode and CocoaPods for iOS builds.
+- A Stringee access token for each test user.
+- A Firebase project for Android incoming-call notifications.
+- An Apple developer account, Push Notifications capability, and VoIP push
+  configuration for iOS incoming calls.
+
+Incoming FCM requires an Android device/emulator with Google Play services.
+PushKit VoIP notifications must be tested on a physical iOS device; the iOS
+Simulator can only validate compilation and outgoing/UI flows.
+
+Never generate Stringee access tokens from an API secret inside the React
+Native application. API secrets must remain on a trusted server.
+
+## Setup
+
+### Install dependencies
+
+```shell
+yarn install
+cd ios
+pod install
+cd ..
+```
+
+The install hook replaces React Native 0.72's retired JFrog Boost URL with
+`archives.boost.io` while preserving the original checksum so CocoaPods can
+install reliably.
+
+### Configure Stringee
+
+Create access tokens on a trusted application server. Paste a valid token into
+the connection screen at runtime.
+
+After a successful connection, the sample persists the token and reconnects on
+the next launch. Use **Logout** to unregister push, disconnect Stringee, and
+clear the saved session.
+
+### Configure Android notifications
+
+1. Register application ID `com.callsamplehook` in Firebase.
+2. Download `google-services.json` and place it at:
+
+```text
+android/app/google-services.json
+```
+
+3. Enable Firebase Cloud Messaging and upload the required FCM credentials to
+   the Stringee dashboard.
+4. Allow Camera, Microphone, Notifications, and Bluetooth permissions when the
+   application requests them.
+5. On Android 14 or newer, allow full-screen notifications when the sample
+   opens the app-specific system setting.
+
+`index.android.js` installs FCM and Notifee handlers before registering the
+React component. Do not move this setup into a screen: background and cold-start
+events can arrive before React views mount.
+
+### Configure iOS notifications
+
+1. Open `ios/CallSampleHook.xcworkspace` and select your development team.
+2. Use a bundle identifier registered in the Apple Developer portal.
+3. Enable **Push Notifications** and the **Voice over IP**, **Remote
+   notifications**, and **Audio, AirPlay, and Picture in Picture** background
+   modes.
+4. Configure the corresponding APNs/VoIP credential in the Stringee dashboard.
+5. Keep `aps-environment` as `development` for debug provisioning and use the
+   production entitlement/profile for release builds.
+
+PushKit is received in `AppDelegate.mm`, where the call is reported to CallKeep
+immediately. `VoipPushManager` then restores the Stringee connection and
+reconciles early CallKeep actions after JavaScript becomes available.
+
+### Run the sample
+
+Start Metro in one terminal:
 
 ```bash
-# using npm
-npm start
-
-# OR using Yarn
 yarn start
 ```
 
-## Step 2: Start your Application
-
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
-
-### For Android
+Run the selected platform in another terminal:
 
 ```bash
-# using npm
-npm run android
-
-# OR using Yarn
 yarn android
-```
-
-### For iOS
-
-```bash
-# using npm
-npm run ios
-
-# OR using Yarn
+# or
 yarn ios
 ```
 
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
+In the application:
 
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
+1. Enter a valid Stringee access token and select **Connect**.
+2. Enter the other Stringee user ID.
+3. Choose Voice or Video under either **Stringee Call** or **Stringee Call2**.
+4. Use a second signed-in device/user to validate incoming calls and push
+   notifications.
+
+The token is persisted so a headless notification handler can reconnect after
+the app is backgrounded or terminated. Logging out clears the saved token and
+push registration.
+
+## Connection and session flow
+
+1. `StringeeClientManager` creates one `StringeeClient` and installs permanent
+   SDK listeners.
+2. `connect(token)` validates and persists the token before connecting.
+3. On the next launch, the saved token is restored for automatic reconnection.
+4. After `onConnect`, the current FCM or PushKit token is registered with
+   Stringee.
+5. When Stringee requests a new access token, the saved token is cleared and
+   the UI asks the user for a replacement.
+6. Logout unregisters push, clears saved call/push state and the access token,
+   then disconnects.
+
+## Four outgoing-call cases
+
+| API | Voice | Video |
+| --- | --- | --- |
+| `StringeeCall` | Supported | Supported |
+| `StringeeCall2` | Supported | Supported |
+
+An outgoing call is accepted only when the client is connected, the callee ID
+is not empty, and there is no other active call.
+
+## Call lifecycle safeguards
+
+- Only one active SDK call is retained at a time.
+- SDK listeners are installed before `makeCall()` or `initAnswer()` starts.
+- Answer waits for the required native audio state and cannot run after the
+  active call has already been cleared.
+- Repeated UI, SDK, notification, or CallKeep end events clean up the same call
+  only once.
+- Terminal SDK states clear local state without issuing an unnecessary second
+  `hangup()` or `reject()` request.
+- Audio state, notifications, foreground services, timers, and video views are
+  released during cleanup.
+
+## Call and notification architecture
+
+- `StringeeWrapper` is the application-facing connect/disconnect/outgoing-call
+  API.
+- `StringeeClientManager` owns the SDK client, token persistence, reconnection,
+  and push registration.
+- `StringeeCallManager` owns the single active call and synchronizes Stringee,
+  CallKeep, audio state, and Android notifications.
+- `AndroidPushManager` handles FCM/Notifee foreground, background, and cold-start
+  events.
+- `CallNotificationService` owns Android incoming and active-call notifications.
+- `VoipPushManager` reconciles PushKit and CallKeep events on iOS.
+- `PushPayload` normalizes platform payloads and detects terminal call states.
+- React screens render state and invoke managers; notification lifecycle logic
+  remains outside the view layer.
+
+## Verification
+
+```bash
+yarn lint
+yarn test --runInBand --watchman=false
+
+cd android
+./gradlew app:assembleDebug
+```
+
+For iOS, build the `CallSampleHook` scheme from the workspace. A missing
+`*.pcm` module error normally indicates stale Xcode DerivedData; use a clean or
+new DerivedData location and rebuild.
+
+## Troubleshooting
+
+- If Metro serves stale JavaScript, restart it with
+  `yarn start --reset-cache`.
+- If incoming Android calls do not appear, verify FCM delivery, notification
+  permission, full-screen-intent permission, and Google Play services.
+- If an iOS incoming call does not appear, verify the physical device's VoIP
+  token, provisioning profile, bundle identifier, and Stringee APNs setup.
+- `firebase.json` is optional; React Native Firebase may print a warning when it
+  is absent.
+
+## Repository safety
+
+Do not commit:
+
+- Stringee access tokens, API secrets, or server private keys.
+- Signing keystores, passwords, provisioning profiles, or private APNs keys.
+- Machine-specific credentials or development overrides.
+
+Firebase configuration files contain project identifiers and client API keys,
+not Stringee server secrets. Whether they are committed should still follow the
+owning Firebase project's repository policy.
 
 # Learn more about stringee-react-native-v2 objects
 

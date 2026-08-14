@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import {StringeeClient} from 'stringee-react-native';
+import StringeeClient from './src/StringeeClient';
 import {Icon} from 'react-native-elements';
 import ActShtCreateConversation from './src/ActShtCreateConversation';
 import ActShtGetConversation from './src/ActShtGetConversation';
@@ -21,8 +21,7 @@ import ActShtMsgAction from './src/ActShtMsgAction';
 import ActShtGetUserInfo from './src/ActShtGetUserInfo';
 import ActShtUpdateUserInfo from './src/ActShtUpdateUserInfo';
 
-const token =
-  'eyJjdHkiOiJzdHJpbmdlZS1hcGk7dj0xIiwidHlwIjoiSldUIiwiYWxnIjoiSFMyNTYifQ.eyJqdGkiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZULTE2NjMwNDMyMjQiLCJpc3MiOiJTS0UxUmRVdFVhWXhOYVFRNFdyMTVxRjF6VUp1UWRBYVZUIiwiZXhwIjoxNjY1NjM1MjI0LCJ1c2VySWQiOiJ1c2VyMSJ9.O6E7_IHRejlgPv8A9ag722FuDp0bKMeDK8y_9lMs_iY';
+const token = 'YOUR_ACCESS_TOKEN';
 
 export default class App extends Component {
   constructor(props) {
@@ -816,7 +815,7 @@ export default class App extends Component {
             onPress={() => {
               this.clearLog();
             }}>
-            <Icon name="cleaning-services" s color="#000000" />
+            <Icon name="delete" type="material" size={24} color="#000000" />
           </TouchableOpacity>
         </View>
 
@@ -1003,7 +1002,7 @@ export default class App extends Component {
                 onPress={() => {
                   this.clearMsgLog();
                 }}>
-                <Icon name="cleaning-services" s color="#000000" />
+                <Icon name="delete" type="material" size={24} color="#000000" />
               </TouchableOpacity>
             </View>
 

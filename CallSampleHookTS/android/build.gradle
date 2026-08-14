@@ -1,0 +1,31 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    ext {
+        buildToolsVersion = "33.0.0"
+        minSdkVersion = 21
+        compileSdkVersion = 33
+        targetSdkVersion = 33
+
+        // We use NDK 23 which has both M1 support and is the side-by-side NDK version from AGP.
+        ndkVersion = "23.1.7779620"
+    }
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle")
+        classpath("com.facebook.react:react-native-gradle-plugin")
+        classpath 'com.google.gms:google-services:4.3.15'
+    }
+}
+
+allprojects {
+    configurations.configureEach {
+        // Stringee Android SDK 2.1.13 requests 1.4.1, which requires AGP 8 /
+        // compileSdk 34. RN 0.72 uses AGP 7.4; Stringee only uses APIs already
+        // available in 1.3.7, so keep the sample compatible with its RN toolchain.
+        resolutionStrategy.force 'androidx.exifinterface:exifinterface:1.3.7'
+    }
+}
