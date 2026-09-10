@@ -6509,10 +6509,10 @@ string_decoder@~1.1.1:
   dependencies:
     safe-buffer "~5.1.0"
 
-stringee-react-native-v2@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/stringee-react-native-v2/-/stringee-react-native-v2-1.1.0.tgz#8453a07d9cf7e04270527640e05d42eb603afd5f"
-  integrity sha512-w+GCWEmVtH/o5aLPOWO0AxUORuUphqWonnadpmg6ANE5N9/iMy6/LtJXxCQeXYXo2U6DViw1h4yUtAsTT4rnPQ==
+stringee-react-native-v2@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/stringee-react-native-v2/-/stringee-react-native-v2-1.1.1.tgz#2f3181f7ac1dcc83565c281f4a23238a6d8d07fc"
+  integrity sha512-nAxjVzxNK7lqqGjy5SA4i74LLwxqQDTEGR6QlpkMV14QWhAmz8Yo9TCT7XbbuxGCWTHhVKITEGck5Arxn3WKzg==
 
 strip-ansi@^5.0.0, strip-ansi@^5.1.0, strip-ansi@^5.2.0:
   version "5.2.0"

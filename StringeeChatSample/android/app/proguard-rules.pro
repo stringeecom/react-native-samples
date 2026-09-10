@@ -7,13 +7,10 @@
 # For more details, see
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
-# Add any project specific keep options here:
--dontwarn org.webrtc.**
+# Stringee React Native 1.1.1 supplies targeted Stringee, WebRTC, and JNI
+# consumer rules. Keep only application-specific rules below.
 -dontwarn com.google.android.gms.internal.zzbeb
 -dontwarn com.google.android.gms.internal.zzbec
--keep class org.webrtc.** { *; }
--dontwarn org.apache.http.**
--keep class org.apache.http.** { *; }
 -assumenosideeffects class android.util.Log {
     public static *** d(...);
     public static *** w(...);

@@ -5,7 +5,7 @@ apply plugin: "com.facebook.react"
 react {
 }
 
-def enableProguardInReleaseBuilds = false
+def enableProguardInReleaseBuilds = true
 def jscFlavor = 'org.webkit:android-jsc:+'
 def releaseStoreFile = project.findProperty('STRINGEE_RELEASE_STORE_FILE')
 def releaseStorePassword = project.findProperty('STRINGEE_RELEASE_STORE_PASSWORD')
@@ -47,7 +47,8 @@ android {
         release {
             signingConfig releaseStoreFile ? signingConfigs.release : signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            shrinkResources enableProguardInReleaseBuilds
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }
     }
     lintOptions {

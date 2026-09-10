@@ -12,7 +12,9 @@ chat, and programmable chat features on Android and iOS.
 | [`LiveChatSample`](LiveChatSample/) | JavaScript | Live Chat integration with separate Customer and Agent flows. |
 | [`StringeeChatSample`](StringeeChatSample/) | JavaScript | Programmable Chat operations for conversations, participants, messages, user information, typing state, and object-change events. |
 
-All four samples use `stringee-react-native-v2` and React Native `0.72.3`.
+All four samples use `stringee-react-native-v2` `1.1.1` and React Native
+`0.72.3`. Android release builds enable R8 and resource shrinking; the SDK
+supplies targeted Stringee, WebRTC, and JNI consumer rules.
 
 ## Requirements
 
