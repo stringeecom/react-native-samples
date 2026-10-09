@@ -161,6 +161,20 @@ class StringeeClientManager {
     this.listener?.onRequestAccessToken?.(client);
   };
 
+  /**
+   * Called about 60 seconds before the access token expires. This sample has no
+   * token server, so it only logs the event. A real app gets a new token for the
+   * same user from its server and renews the open connection, for example:
+   *   const newToken = await fetchTokenFromYourServer();
+   *   await client.updateToken(newToken);
+   *   await saveAccessToken(newToken);
+   * Without renewal the server disconnects when the token expires and
+   * onRequestAccessToken is called.
+   */
+  onTokenWillExpire = (client, exp, expireInSeconds) => {
+    console.log('onTokenWillExpire', exp, expireInSeconds);
+  };
+
   /** Installs the permanent SDK listener that forwards events to this manager. */
   setListener() {
     const clientListener = new StringeeClientListener();
@@ -170,6 +184,7 @@ class StringeeClientManager {
     clientListener.onIncomingCall2 = this.onIncomingCall2;
     clientListener.onFailWithError = this.onFailWithError;
     clientListener.onRequestAccessToken = this.onRequestAccessToken;
+    clientListener.onTokenWillExpire = this.onTokenWillExpire;
     this.client.setListener(clientListener);
   }
 
