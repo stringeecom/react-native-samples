@@ -430,7 +430,7 @@ PODS:
   - RNScreens (3.23.0):
     - React-Core
     - React-RCTImage
-  - RNStringee (1.1.0):
+  - RNStringee (1.1.3):
     - React-Core (>= 0.60.0)
     - Stringee (= 2.0.2)
   - SocketRocket (0.6.1)
@@ -623,7 +623,7 @@ SPEC CHECKSUMS:
   React-utils: 7fd3d931a5487f66d185e9bf78d71b55b5a5e47d
   ReactCommon: f1e92b2cd9fbcf42969c002948bd88747fd751ad
   RNScreens: f1a2bc1890623ba12ff757d72e54d04af1cb7842
-  RNStringee: 6e5b57065eff9f9f1d29a2c189b12d6f28f2ec52
+  RNStringee: 82be0895ccf4687fdfbb7cb23e1d98b0e4ea90cd
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   Stringee: d796154243e0c190fb48526526bbce4f13fb6bc0
   WebRTC-SDK: 63428499c4f102f47daec9c7b88b5440788f2072

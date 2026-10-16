@@ -8,8 +8,7 @@ messages, user information, typing state, and object-change events.
 
 - Node.js 16 or newer and Yarn 1.x
 - JDK 17 and Android SDK 33 or newer
-- Xcode and CocoaPods for iOS; iOS 15 or later (Stringee iOS SDK `2.2.0`, referenced
-  by podspec in `ios/Podfile`)
+- Xcode and CocoaPods for iOS
 - A Stringee project with Chat enabled
 
 ## Configure

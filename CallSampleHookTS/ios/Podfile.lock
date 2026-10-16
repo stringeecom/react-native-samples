@@ -569,15 +569,15 @@ PODS:
   - RNScreens (3.27.0):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
-  - RNStringee (1.1.2):
+  - RNStringee (1.1.3):
     - React-Core (>= 0.60.0)
-    - Stringee (= 2.2.0)
+    - Stringee (= 2.0.2)
   - RNVoipPushNotification (3.3.2):
     - React-Core
   - SocketRocket (0.6.1)
-  - Stringee (2.2.0):
-    - WebRTC-lib (= 137.0.0)
-  - WebRTC-lib (137.0.0)
+  - Stringee (2.0.2):
+    - WebRTC-SDK (= 137.7151.09)
+  - WebRTC-SDK (137.7151.09)
   - Yoga (1.14.0)
 
 DEPENDENCIES:
@@ -637,7 +637,6 @@ DEPENDENCIES:
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNStringee (from `../node_modules/stringee-react-native-v2`)
   - RNVoipPushNotification (from `../node_modules/react-native-voip-push-notification`)
-  - Stringee (from `https://raw.githubusercontent.com/stringeecom/Stringee-iOS-SDK/2.2.0/Stringee.podspec`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -657,7 +656,8 @@ SPEC REPOS:
     - nanopb
     - PromisesObjC
     - SocketRocket
-    - WebRTC-lib
+    - Stringee
+    - WebRTC-SDK
 
 EXTERNAL SOURCES:
   boost:
@@ -761,8 +761,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/stringee-react-native-v2"
   RNVoipPushNotification:
     :path: "../node_modules/react-native-voip-push-notification"
-  Stringee:
-    :podspec: https://raw.githubusercontent.com/stringeecom/Stringee-iOS-SDK/2.2.0/Stringee.podspec
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -829,13 +827,13 @@ SPEC CHECKSUMS:
   RNNotifee: c29575665bc5af1a664c1459560d082a04b8cf79
   RNReanimated: 1af9a7dcf56d61c3d6cdb23d3196b341269b5a19
   RNScreens: c04e015e917ce64d0983974d8efb8fa1dc1ddc56
-  RNStringee: 585c7c94a387fd3917541ca3b6cc1b28592079d3
+  RNStringee: 82be0895ccf4687fdfbb7cb23e1d98b0e4ea90cd
   RNVoipPushNotification: e5edde96849c0133ebc7e900dc30c8c221cfb690
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
-  Stringee: e63b65230c544096f171903f2b3d17ea6a17ed61
-  WebRTC-lib: 8409875f2703d7fd08d7daa63e2f854ed49d8447
+  Stringee: d796154243e0c190fb48526526bbce4f13fb6bc0
+  WebRTC-SDK: 63428499c4f102f47daec9c7b88b5440788f2072
   Yoga: 8796b55dba14d7004f980b54bcc9833ee45b28ce
 
-PODFILE CHECKSUM: 49f73a2974a1c1d6c41527096013aadd568726b1
+PODFILE CHECKSUM: 2627bf149408306c1ea7aa0325526149fb94ecb6
 
 COCOAPODS: 1.16.2

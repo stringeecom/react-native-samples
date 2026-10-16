@@ -5,7 +5,7 @@ require Pod::Executable.execute_command('node', ['-p',
     {paths: [process.argv[1]]},
   )', __dir__]).strip
 
-platform :ios, '15.0'
+platform :ios, '13.0'
 prepare_react_native_project!
 
 # Flipper is not required by the sample and does not compile with current Xcode releases.
@@ -13,9 +13,6 @@ flipper_config = FlipperConfiguration.disabled
 
 target 'LiveChatSample' do
   config = use_native_modules!
-
-  # Stringee iOS SDK 2.2.0 (iOS 15+) is not published to the CocoaPods trunk.
-  pod 'Stringee', :podspec => 'https://raw.githubusercontent.com/stringeecom/Stringee-iOS-SDK/2.2.0/Stringee.podspec'
   flags = get_default_flags()
 
   use_react_native!(

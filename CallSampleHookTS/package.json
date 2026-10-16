@@ -32,7 +32,7 @@
     "react-native-voip-push-notification": "^3.3.0",
     "react-redux": "^8.1.2",
     "redux": "^4.2.1",
-    "stringee-react-native-v2": "^1.1.2"
+    "stringee-react-native-v2": "^1.1.3"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

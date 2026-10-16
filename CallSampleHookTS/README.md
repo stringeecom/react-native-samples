@@ -27,8 +27,7 @@ application states.
 
 - Node.js 16 or newer and Yarn 1.x.
 - Android Studio, Android SDK, and JDK 17 for Android builds.
-- Xcode and CocoaPods for iOS builds; iOS 15 or later. The `Podfile` references
-  the Stringee iOS SDK `2.2.0` podspec because it is not on the CocoaPods trunk.
+- Xcode and CocoaPods for iOS builds.
 - A Stringee access token for each test user.
 - A Firebase project for Android incoming-call notifications.
 - An Apple developer account, Push Notifications capability, and VoIP push
@@ -48,7 +47,7 @@ Native application. API secrets must remain on a trusted server.
 ```shell
 yarn install
 cd ios
-pod install --repo-update
+pod install
 cd ..
 ```
 
@@ -144,12 +143,9 @@ push registration.
 3. On the next launch, the saved token is restored for automatic reconnection.
 4. After `onConnect`, the current FCM or PushKit token is registered with
    Stringee.
-5. About 60 seconds before the token expires, `onTokenWillExpire` is logged.
-   This sample has no token server; a real app fetches a new token there and
-   calls `client.updateToken(newToken)` to keep the connection.
-6. When Stringee requests a new access token, the saved token is cleared and
+5. When Stringee requests a new access token, the saved token is cleared and
    the UI asks the user for a replacement.
-7. Logout unregisters push, clears saved call/push state and the access token,
+6. Logout unregisters push, clears saved call/push state and the access token,
    then disconnects.
 
 ## Four outgoing-call cases
@@ -257,9 +253,6 @@ Connect to Stringee server using the provided access token.
 
 ##### disconnect(): void
 Disconnect from Stringee server.
-
-##### updateToken(token: string): Promise&lt;void&gt;
-Renew the access token of the current connection without reconnecting. Call it from `onTokenWillExpire` with a new token for the same user. Rejects with a `StringeeError` whose code is the same on Android and iOS; see the error codes in [StringeeClient](https://developer.stringee.com/docs/react-native-module/react-native-stringeeclient).
 
 ##### registerPush(deviceToken: string, isProduction: boolean, isVoip: boolean): Promise&lt;void&gt;
 Register the registration deviceToken for push notifications to Stringee server.
@@ -408,11 +401,6 @@ Invoked when StringeeClient connect false.
 
 ##### onRequestAccessToken: (stringeeClient: [StringeeClient](https://developer.stringee.com/docs/react-native-module/stringeeclient)) => void
 Invoked when your token is expired. You must get a new token and reconnect.
-
-##### onTokenWillExpire: (stringeeClient: [StringeeClient](https://developer.stringee.com/docs/react-native-module/stringeeclient), exp: number, expireInSeconds: number) => void
-Invoked about 60 seconds before your token expires. Get a new token and call `updateToken(token)`; otherwise the server disconnects when the token expires and `onRequestAccessToken` is invoked.
-- exp: Expiration time of the current token, in epoch seconds.
-- expireInSeconds: Seconds left before the token expires.
 
 ##### onIncomingCall: (stringeeClient: [StringeeClient](https://developer.stringee.com/docs/react-native-module/stringeeclient), stringeeCall: [StringeeCall](https://developer.stringee.com/docs/react-native-module/react-native-stringeecall)) => void
 Invoked when receive an incoming of StringeeCall.
